@@ -1,33 +1,19 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿namespace MigracaoTabelas.Target;
 
-namespace MigracaoTabelas.Target
+public class Perfil
 {
-    /// <summary>
-    /// Tabela de perfis que agrupam permissões de acesso
-    /// </summary>
-    [Table("perfil")]
-    public class Perfil
+    public ulong Id { get; private set; }
+    public string Nome { get; private set; }
+
+    public Perfil(string nome)
     {
-        /// <summary>
-        /// Identificador único do perfil
-        /// </summary>
-        [Key]
-        [Column("id")]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public ulong Id { get; set; }
+        Nome = nome;
+    }
 
-        /// <summary>
-        /// Nome do perfil (único)
-        /// </summary>
-        [Column("nome")]
-        [Required]
-        [StringLength(255)]
-        public string Nome { get; set; } = string.Empty;
+    protected Perfil() { }
 
-        // Navegações
-        public virtual ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();
-        public virtual ICollection<TelaAcaoPerfil> TelasAcoesPerfis { get; set; } = new List<TelaAcaoPerfil>();
+    public void Atualizar(string nome, string email, bool ativo)
+    {
+        Nome = nome;
     }
 }
-

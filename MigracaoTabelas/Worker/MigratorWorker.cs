@@ -143,7 +143,7 @@ namespace MigracaoTabelas.Worker
 
         private static DateTime ETA(int totalPrestamistas, int processados, System.Diagnostics.Stopwatch stopwatch, DateTime lastUpdate, TimeSpan updateInterval)
         {
-            if (totalPrestamistas==0)
+            if (totalPrestamistas == 0)
                 return lastUpdate;
             var now = DateTime.Now;
             if (now - lastUpdate > updateInterval || processados == totalPrestamistas)
@@ -197,10 +197,10 @@ namespace MigracaoTabelas.Worker
             return _DataCache.GetAgenciaSeguradora(agenciaId, seguradoraId);
         }
 
-    private (CooperadoAgenciaConta, Cooperado, SxContas) GetCooperadoId(SxEpSegPrestamista prestamista)
-    {
-        return _DataCache.GetCooperado(_SContext, prestamista.SegCpf, prestamista.CcoConta, _SAgencia.Codigo);
-    }
+        private (CooperadoAgenciaConta, Cooperado, SxContas) GetCooperadoId(SxEpSegPrestamista prestamista)
+        {
+            return _DataCache.GetCooperado(_SContext, prestamista.SegCpf, prestamista.CcoConta, _SAgencia.Codigo);
+        }
 
         private ulong GetPontoAtendimentoId(string pPonto)
         {

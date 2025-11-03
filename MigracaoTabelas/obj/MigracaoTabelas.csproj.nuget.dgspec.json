@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\CrediSIS\\Source\\backendx\\Tools\\MigracaoTabelas\\MigracaoTabelas.csproj": {}
+    "D:\\CrediSIS\\Source\\Migracao\\MigracaoTabelas\\MigracaoTabelas.csproj": {}
   },
   "projects": {
-    "D:\\CrediSIS\\Source\\backendx\\Tools\\MigracaoTabelas\\MigracaoTabelas.csproj": {
+    "D:\\CrediSIS\\Source\\Migracao\\MigracaoTabelas\\MigracaoTabelas.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\CrediSIS\\Source\\backendx\\Tools\\MigracaoTabelas\\MigracaoTabelas.csproj",
+        "projectUniqueName": "D:\\CrediSIS\\Source\\Migracao\\MigracaoTabelas\\MigracaoTabelas.csproj",
         "projectName": "MigracaoTabelas",
-        "projectPath": "D:\\CrediSIS\\Source\\backendx\\Tools\\MigracaoTabelas\\MigracaoTabelas.csproj",
+        "projectPath": "D:\\CrediSIS\\Source\\Migracao\\MigracaoTabelas\\MigracaoTabelas.csproj",
         "packagesPath": "C:\\Users\\Hermes\\.nuget\\packages\\",
-        "outputPath": "D:\\CrediSIS\\Source\\backendx\\Tools\\MigracaoTabelas\\obj\\",
+        "outputPath": "D:\\CrediSIS\\Source\\Migracao\\MigracaoTabelas\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -22,7 +22,7 @@
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "net8.0"
+          "net9.0"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
@@ -30,8 +30,8 @@
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net8.0": {
-            "targetAlias": "net8.0",
+          "net9.0": {
+            "targetAlias": "net9.0",
             "projectReferences": {}
           }
         },
@@ -48,8 +48,8 @@
         "SdkAnalysisLevel": "9.0.300"
       },
       "frameworks": {
-        "net8.0": {
-          "targetAlias": "net8.0",
+        "net9.0": {
+          "targetAlias": "net9.0",
           "dependencies": {
             "Microsoft.Data.SqlClient": {
               "target": "Package",
@@ -57,19 +57,19 @@
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[8.0.21, )"
+              "version": "[9.0.10, )"
             },
             "Microsoft.EntityFrameworkCore.Design": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[8.0.21, )"
+              "version": "[9.0.10, )"
             },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[8.0.10, )"
+              "version": "[9.0.10, )"
             },
             "Microsoft.Extensions.Hosting": {
               "target": "Package",
@@ -93,7 +93,7 @@
             },
             "Pomelo.EntityFrameworkCore.MySql": {
               "target": "Package",
-              "version": "[8.0.3, )"
+              "version": "[9.0.0, )"
             },
             "Serilog.AspNetCore": {
               "target": "Package",

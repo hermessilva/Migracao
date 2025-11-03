@@ -1,52 +1,25 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿namespace MigracaoTabelas.Target;
 
-namespace MigracaoTabelas.Target
+public class TelaAcaoPerfil
 {
-    /// <summary>
-    /// Permissões: quais perfis podem executar determinadas ações em determinadas telas
-    /// </summary>
-    [Table("tela_acao_perfil")]
-    public class TelaAcaoPerfil
+    public ulong Id { get; private set; }
+    public ulong TelaId { get; private set; }
+    public ulong AcaoId { get; private set; }
+    public ulong PerfilId { get; private set; }
+
+    public TelaAcaoPerfil(ulong telaId, ulong acaoId, ulong perfilId)
     {
-        /// <summary>
-        /// Identificador único
-        /// </summary>
-        [Key]
-        [Column("id")]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public ulong Id { get; set; }
+        TelaId = telaId;
+        AcaoId = acaoId;
+        PerfilId = perfilId;
+    }
 
-        /// <summary>
-        /// FK da tela
-        /// </summary>
-        [Column("tela_id")]
-        [Required]
-        public ulong TelaId { get; set; }
+    protected TelaAcaoPerfil() { }
 
-        /// <summary>
-        /// FK da ação
-        /// </summary>
-        [Column("acao_id")]
-        [Required]
-        public ulong AcaoId { get; set; }
-
-        /// <summary>
-        /// FK do perfil
-        /// </summary>
-        [Column("perfil_id")]
-        [Required]
-        public ulong PerfilId { get; set; }
-
-        // Navegações
-        [ForeignKey("TelaId")]
-        public virtual Tela Tela { get; set; } = null!;
-
-        [ForeignKey("AcaoId")]
-        public virtual Acao Acao { get; set; } = null!;
-
-        [ForeignKey("PerfilId")]
-        public virtual Perfil Perfil { get; set; } = null!;
+    public void Atualizar(ulong telaId, ulong acaoId, ulong perfilId)
+    {
+        TelaId = telaId;
+        AcaoId = acaoId;
+        PerfilId = perfilId;
     }
 }
-

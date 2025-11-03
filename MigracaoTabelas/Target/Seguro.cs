@@ -1,205 +1,77 @@
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
 using MigracaoTabelas.Source;
 
-namespace MigracaoTabelas.Target
+namespace MigracaoTabelas.Target;
+
+public class Seguro
 {
-    /// <summary>
-    /// Contratos de seguros e seus metadados financeiros e relacionamentos
-    /// </summary>
-    [Table("seguro")]
-    public class Seguro
+    public void Assign(SxEpSegPrestamista source)
     {
-        public void Assign(SxEpSegPrestamista source)
-        {
-            // Campos de PK 'id' s√£o Identity, n√£o s√£o mapeados diretamente da source.
+        // Campos de PK 'id' s„o Identity, n„o s„o mapeados diretamente da source.
 
-            // (SEG_CANCTIPO: Tipo de Cancelamento -> status: Identificador do status)
-            // Regra aplicada: > 0 consideramos cancelado (3), sen√£o aberto (1)
-            this.Status = (byte)((source.SegCancTipo.HasValue && source.SegCancTipo.Value > 0) ? 3 : 1);
+        // (SEG_CANCTIPO: Tipo de Cancelamento -> status: Identificador do status)
+        // Regra aplicada: > 0 consideramos cancelado (3), sen„o aberto (1)
+        this.Status = (byte)((source.SegCancTipo.HasValue && source.SegCancTipo.Value > 0) ? 3 : 1);
 
-            // Mapeamentos com correspond√™ncia direta
-            this.Contrato = source.SegContrato ?? string.Empty;                         // (SEG_CONTRATO: Contrato -> contrato: N√∫mero do contrato do seguro)
-            this.InicioVigencia = source.SegInicio;                                     // (SEG_INICIO: In√≠cio do Contrato -> inicio_vigencia: In√≠cio de vig√™ncia do seguro)
-            this.FimVigencia = source.SegFim;                                           // (SEG_FIM: Final do Contrato -> fim_vigencia: Fim de vig√™ncia do seguro)
+        // Mapeamentos com correspondÍncia direta
+        this.Contrato = source.SegContrato ?? string.Empty;                         // (SEG_CONTRATO: Contrato -> contrato: N˙mero do contrato do seguro)
+        this.InicioVigencia = source.SegInicio;                                     // (SEG_INICIO: InÌcio do Contrato -> inicio_vigencia: InÌcio de vigÍncia do seguro)
+        this.FimVigencia = source.SegFim;                                           // (SEG_FIM: Final do Contrato -> fim_vigencia: Fim de vigÍncia do seguro)
 
-            // Quantidade de parcelas: preferir valor informado (SegMeses); fallback para quantidade de parcelas de navega√ß√£o
-            this.QuantidadeParcelas = (short)(source.SegMeses ?? 0);                             // (SEG_MESES: N¬∫ de Meses do Seguro -> quantidade_parcelas: Quantidade total de parcelas)
+        // Quantidade de parcelas: preferir valor informado (SegMeses); fallback para quantidade de parcelas de navegaÁ„o
+        this.QuantidadeParcelas = (ushort)(source.SegMeses ?? 0);                             // (SEG_MESES: N∫ de Meses do Seguro -> quantidade_parcelas: Quantidade total de parcelas)
 
 
-            // Vencimento: manter como fim de vig√™ncia, at√© haver regra espec√≠fica
-            this.Vencimento = source.SegFim;                                            // (SEG_FIM: Final do Contrato -> vencimento: Data de vencimento) [assumido]
+        // Vencimento: manter como fim de vigÍncia, atÈ haver regra especÌfica
+        this.Vencimento = source.SegFim;                                            // (SEG_FIM: Final do Contrato -> vencimento: Data de vencimento) [assumido]
 
-            // Capital segurado: usar base segurada como principal, com fallback para valor do contrato
-            this.CapitalSegurado = (source.SegBase ?? source.SegVrContrato) ?? 0.00m;   // (SEG_BASE: Valor Base Segurado / SEG_VRCONTRATO: Valor do Contrato -> capital_segurado: Valor do capital segurado)
+        // Capital segurado: usar base segurada como principal, com fallback para valor do contrato
+        this.CapitalSegurado = (source.SegBase ?? source.SegVrContrato) ?? 0.00m;   // (SEG_BASE: Valor Base Segurado / SEG_VRCONTRATO: Valor do Contrato -> capital_segurado: Valor do capital segurado)
 
-            // Pr√™mio total e tipo de pagamento
-            this.PremioTotal = source.SegPremio ?? 0.00m;                               // (SEG_PREMIO: Valor do Seguro -> premio_total: Valor do pr√™mio total do seguro)
-            this.TipoPagamento = (byte)(source.SegModalidade ?? 0);                             // (SEG_MODALIDADE: Modalidade -> tipo_pagamento: Identificador do tipo de pagamento)
+        // PrÍmio total e tipo de pagamento
+        this.PremioTotal = source.SegPremio ?? 0.00m;                               // (SEG_PREMIO: Valor do Seguro -> premio_total: Valor do prÍmio total do seguro)
+        this.TipoPagamento = (byte)(source.SegModalidade ?? 0);                             // (SEG_MODALIDADE: Modalidade -> tipo_pagamento: Identificador do tipo de pagamento)
 
-            // Campos que precisam de l√≥gica de neg√≥cio para buscar FKs
+        // Campos que precisam de lÛgica de negÛcio para buscar FKs
 
-            // Sem correspond√™ncia direta no momento (deixar expl√≠cito para avalia√ß√£o de neg√≥cio):
-            // this.CodigoGrupo = 0;
-            // this.EstornoProporcional = 0.00m;
+        // Sem correspondÍncia direta no momento (deixar explÌcito para avaliaÁ„o de negÛcio):
+        // this.CodigoGrupo = 0;
+        // this.EstornoProporcional = 0.00m;
 
-            // Campos da Source sem correspond√™ncia direta no Target (mantidos apenas para contexto de migra√ß√£o):
-            // source.SegNome;
-            // source.SegNasc;
-            // source.SegTipoConta;
-            // source.SegCancelamento;
-            // source.SegCancMotivo;
-            // source.SegIof;
-            // source.SegDps;
-            // source.SegEfetivacao;
-            // source.ConSeq;
-            // source.ControleUnimed;
-            // source.SqlDeleted;
-        }
-
-        /// <summary>
-        /// Identificador √∫nico do seguro
-        /// </summary>
-        [Key]
-        [Column("id")]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public ulong Id { get; set; }
-
-        /// <summary>
-        /// Identificador do status (ex.: 1=aberto, 2=quitado, 3=cancelado)
-        /// </summary>
-        [Column("status")]
-        [Required]
-        public byte Status { get; set; } = 0;
-
-        /// <summary>
-        /// FK do ponto de atendimento
-        /// </summary>
-        [Column("ponto_atendimento_id")]
-        [Required]
-        public ulong PontoAtendimentoId { get; set; }
-
-        /// <summary>
-        /// Conta corrente relacionada ao seguro
-        /// </summary>
-        [Column("cooperado_agencia_conta_id")]
-        [Required]
-        public ulong CooperadoAgenciaContaId { get; set; }
-
-        /// <summary>
-        /// N√∫mero do contrato do seguro
-        /// </summary>
-        [Column("contrato")]
-        [Required]
-        [StringLength(10)]
-        public string Contrato { get; set; } = string.Empty;
-
-        /// <summary>
-        /// In√≠cio de vig√™ncia do seguro
-        /// </summary>
-        [Column("inicio_vigencia")]
-        public DateTime? InicioVigencia { get; set; }
-
-        /// <summary>
-        /// Fim de vig√™ncia do seguro
-        /// </summary>
-        [Column("fim_vigencia")]
-        public DateTime? FimVigencia { get; set; }
-
-        /// <summary>
-        /// Fim de vig√™ncia do seguro
-        /// </summary>
-        [Column("valor_iof", TypeName = "decimal(10,2)")]
-        public decimal? ValorIof { get; set; } = 0.00m;
-
-        /// <summary>
-        /// FK do v√≠nculo entre agencia e seguradora
-        /// </summary>
-        [Column("agencia_seguradora_id")]
-        [Required]
-        public ulong AgenciaSeguradoraId { get; set; }
-
-        /// <summary>
-        /// Identificador do grupo (c√≥digo)
-        /// </summary>
-        [Column("codigo_grupo")]
-        [Required]
-        public int CodigoGrupo { get; set; } = 0;
-
-        /// <summary>
-        /// Quantidade total de parcelas do seguro
-        /// </summary>
-        [Column("quantidade_parcelas")]
-        [Required]
-        public short QuantidadeParcelas { get; set; } = 0;
-
-        /// <summary>
-        /// Data de vencimento (padr√£o do contrato ou pr√≥xima parcela)
-        /// </summary>
-        [Column("vencimento")]
-        public DateTime? Vencimento { get; set; }
-
-
-        /// Valor do capital segurado
-        /// </summary>
-        [Column("capital_segurado", TypeName = "decimal(10,2)")]
-        [Required]
-        public decimal CapitalSegurado { get; set; } = 0.00m;
-
-        /// <summary>
-        /// Valor do pr√™mio total do seguro
-        /// </summary>
-        [Column("premio_total", TypeName = "decimal(10,2)")]
-        [Required]
-        public decimal PremioTotal { get; set; } = 0.00m;
-
-        /// <summary>
-        /// Identificador do tipo de pagamento (ex.: 1=√† vista, 2=parcelado)
-        /// </summary>
-        [Column("tipo_pagamento")]
-        [Required]
-        public byte TipoPagamento { get; set; } = 0;
-
-        /// <summary>
-        /// Valor de estorno proporcional quando aplic√°vel
-        /// </summary>
-        [Column("estorno_proporcional", TypeName = "decimal(10,2)")]
-        [Required]
-        public decimal EstornoProporcional { get; set; } = 0.00m;
-
-        /// <summary>
-        /// Valor Base Segurado
-        /// </summary>
-        [Column("valor_base", TypeName = "decimal(10,2)")]
-        public decimal? ValorBase { get; set; }
-
-        /// <summary>
-        /// Informa√ß√£o de Exig√™ncia de DPS
-        /// </summary>
-        [Column("dps")]
-        public bool? Dps { get; set; }
-
-        /// <summary>
-        /// FK do usu√°rio respons√°vel/criador
-        /// </summary>
-        [Column("usuario_id")]
-        public ulong? UsuarioId { get; set; }
-
-        // Navega√ß√µes
-        [ForeignKey("PontoAtendimentoId")]
-        public virtual PontoAtendimento PontoAtendimento { get; set; } = null!;
-
-        [ForeignKey("CooperadoAgenciaContaId")]
-        public virtual CooperadoAgenciaConta ContaCorrente { get; set; } = null!;
-
-        [ForeignKey("AgenciaSeguradoraId")]
-        public virtual AgenciaSeguradora AgenciaSeguradora { get; set; } = null!;
-
-        [ForeignKey("UsuarioId")]
-        public virtual Usuario? Usuario { get; set; }
-
-        public virtual ICollection<Parcela> Parcelas { get; set; } = new List<Parcela>();
+        // Campos da Source sem correspondÍncia direta no Target (mantidos apenas para contexto de migraÁ„o):
+        // source.SegNome;
+        // source.SegNasc;
+        // source.SegTipoConta;
+        // source.SegCancelamento;
+        // source.SegCancMotivo;
+        // source.SegIof;
+        // source.SegDps;
+        // source.SegEfetivacao;
+        // source.ConSeq;
+        // source.ControleUnimed;
+        // source.SqlDeleted;
     }
-}
+    public ulong Id { get; set; }
+    public ulong AgenciaSeguradoraId { get; set; }
+    public ulong CooperadoAgenciaContaId { get; set; }
+    public ulong PontoAtendimentoId { get; set; }
+    public ulong? UsuarioId { get; set; }
+    public byte Status { get; set; }
+    public string Contrato { get; set; } = null!;
+    public DateTime? InicioVigencia { get; set; }
+    public DateTime? FimVigencia { get; set; }
+    public uint CodigoGrupo { get; set; }
+    public ushort QuantidadeParcelas { get; set; }
+    public DateTime? Vencimento { get; set; }
+    public decimal CapitalSegurado { get; set; }
+    public decimal PremioTotal { get; set; }
+    public byte TipoPagamento { get; set; }
+    public decimal EstornoProporcional { get; set; }
+    public decimal? ValorBase { get; set; }
+    public bool? Dps { get; set; }
+    public decimal? ValorIof { get; set; }
 
+    public virtual CooperadoAgenciaConta CooperadoAgenciaConta { get; set; } = null!;
+    public virtual PontoAtendimento PontoAtendimento { get; set; } = null!;
+    public virtual Usuario Usuario { get; set; }
+    public virtual ICollection<Parcela> Parcelas { get; set; } = new List<Parcela>();
+}
