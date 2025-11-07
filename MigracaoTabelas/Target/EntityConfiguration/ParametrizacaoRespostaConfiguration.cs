@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using MigracaoTabelas.Target;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
@@ -7,7 +9,7 @@ public class ParametrizacaoRespostaConfiguration : IEntityTypeConfiguration<Para
 {
     public void Configure(EntityTypeBuilder<ParametrizacaoResposta> builder)
     {
-        builder.ToTable("parametrizacao_resposta");
+        builder.ToTable("parametrizacao_resposta", t => t.HasComment("Resposta dos campos de parametrização"));
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
@@ -28,8 +30,8 @@ public class ParametrizacaoRespostaConfiguration : IEntityTypeConfiguration<Para
             .IsRequired();
 
         // Relacionamentos
-        builder.HasOne(x => x.Parametrizacao)
-            .WithMany(x => x.ParametrizacaoRespostas)
+        builder.HasOne(x => x.Parametrizacoes)
+            .WithMany(x => x.ParametrizacoesRespostas)
             .HasForeignKey(x => x.ParametrizacaoId)
             .OnDelete(DeleteBehavior.NoAction);
     }

@@ -1,4 +1,4 @@
-﻿
+
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -117,7 +117,7 @@ namespace MigracaoTabelas.Worker
                     processados++;
 
                     parcnt += Migrate(parcelas, seguros, prestamista);
-                    if (seguros.Count > 100)
+                    if (seguros.Count > 10)
                     {
                         _TContext.AddRange(seguros);
                         _TContext.SaveChanges();
@@ -174,10 +174,12 @@ namespace MigracaoTabelas.Worker
             tgt.Assign(pPrestamista);
             var (cooagct, cooperado, conta) = GetCooperadoId(pPrestamista);
             var agenciaId = GetAgenciaId();
-            tgt.CooperadoAgenciaContaId = cooagct.Id;
-            tgt.PontoAtendimentoId = GetPontoAtendimentoId(conta.PaCodigo);
+
             tgt.AgenciaSeguradoraId = GetAgenciaSeguradoraId(pPrestamista, agenciaId);
             tgt.CooperadoAgenciaContaId = cooagct.Id;
+            tgt.PontoAtendimentoId = GetPontoAtendimentoId(conta.PaCodigo);
+            tgt.UsuarioId = 21;
+
 
             foreach (var item in parcelasSrc)
             {

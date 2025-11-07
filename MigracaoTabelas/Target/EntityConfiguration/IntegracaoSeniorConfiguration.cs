@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using MigracaoTabelas.Target;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
@@ -22,27 +24,15 @@ public class IntegracaoSeniorConfiguration : IEntityTypeConfiguration<Integracao
             .IsRequired();
 
         builder.Property(x => x.ContaCredito)
-            .HasColumnName("conta_credito")
-            .HasColumnType("tinyint(1)")
-            .HasComment("Indica se é uma conta de crédito")
+            .HasColumnName("conta_contabil_credito")
+            .HasColumnType("varchar(255)")
+            .HasComment("Conta contábil de crédito")
             .IsRequired();
 
         builder.Property(x => x.ContaDebito)
-            .HasColumnName("conta_debito")
-            .HasColumnType("tinyint(1)")
-            .HasComment("Indica se é uma conta de débito")
-            .IsRequired();
-
-        builder.Property(x => x.ContaCreditoComissao)
-            .HasColumnName("conta_credito_comissao")
-            .HasColumnType("tinyint(1)")
-            .HasComment("Indica se é uma conta de crédito de comissão")
-            .IsRequired();
-
-        builder.Property(x => x.ContaDebitoComissao)
-            .HasColumnName("conta_debito_comissao")
-            .HasColumnType("tinyint(1)")
-            .HasComment("Indica se é uma conta de débito de comissão")
+            .HasColumnName("conta_contabil_debito")
+            .HasColumnType("varchar(255)")
+            .HasComment("Conta contábil de débito")
             .IsRequired();
 
         builder.Property(x => x.Status)
@@ -65,7 +55,7 @@ public class IntegracaoSeniorConfiguration : IEntityTypeConfiguration<Integracao
             .IsRequired();
 
         builder.Property(x => x.Lancamento)
-            .HasColumnName("lancamento")
+            .HasColumnName("numero_lancamento")
             .HasColumnType("int")
             .HasComment("Número do lançamento no sistema Senior")
             .IsRequired();
@@ -76,9 +66,22 @@ public class IntegracaoSeniorConfiguration : IEntityTypeConfiguration<Integracao
             .HasComment("Descrição da integração")
             .IsRequired();
 
+        builder.Property(x => x.TipoLancamentoContabil)
+            .HasColumnName("tipo_lancamento_contabil")
+            .HasColumnType("enum('Seguro Prestamista Contratado', 'Comissão Seguro Prestamista Contratado', 'Cancelamento Seguro Prestamista Parcelado', 'Cancelamento Seguro Prestamista Parcelado Comissão', 'Cancelamento Seguro Prestamista À Vista Proporcional Comissão', 'Pagamento Seguro Prestamista', 'Recebimento Comissão Seguro Prestamista')")
+            .HasConversion<string>()
+            .HasComment("Tipo de lançamento contábil")
+            .IsRequired();
+
+        builder.Property(x => x.CodigoPontoAtendimento)
+            .HasColumnName("codigo")
+            .HasColumnType("char(3)")
+            .HasComment("Código único do ponto de atendimento")
+            .IsRequired();
+
         // Relacionamentos
-        builder.HasOne(x => x.Agencia)
-            .WithMany(x => x.IntegracoesSenior)
+        builder.HasOne(x => x.Agencias)
+            .WithMany(x => x.IntegracoesSeniores)
             .HasForeignKey(x => x.AgenciaId)
             .OnDelete(DeleteBehavior.NoAction);
     }

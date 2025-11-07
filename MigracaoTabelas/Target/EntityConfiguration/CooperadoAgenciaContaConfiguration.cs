@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using MigracaoTabelas.Target;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
@@ -7,7 +9,7 @@ public class CooperadoAgenciaContaConfiguration : IEntityTypeConfiguration<Coope
 {
     public void Configure(EntityTypeBuilder<CooperadoAgenciaConta> builder)
     {
-        builder.ToTable("cooperado_agencia_conta");
+        builder.ToTable("cooperado_agencia_conta", t => t.HasComment("Junção entre cooperados, agencias e contas"));
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
@@ -33,22 +35,28 @@ public class CooperadoAgenciaContaConfiguration : IEntityTypeConfiguration<Coope
             .IsRequired();
 
         // Relacionamentos
-        builder.HasOne(x => x.Cooperado)
-            .WithMany(x => x.CooperadoAgenciaContas)
+        builder.HasOne(x => x.Cooperados)
+            .WithMany(x => x.CooperadosAgenciasContas)
             .HasForeignKey(x => x.CooperadoId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        builder.HasOne(x => x.Agencia)
-            .WithMany(x => x.CooperadoAgenciaContas)
+        builder.HasOne(x => x.Agencias)
+            .WithMany(x => x.CooperadosAgenciasContas)
             .HasForeignKey(x => x.AgenciaId)
             .OnDelete(DeleteBehavior.NoAction);
 
         // Índices
         builder.HasIndex(x => new { x.CooperadoId, x.AgenciaId, x.ContaCorrente })
-            .IsUnique();
+            .IsUnique()
+            .HasDatabaseName("cooperado_agencia_conta_index_7");
 
-        builder.HasIndex(x => x.CooperadoId);
-        builder.HasIndex(x => x.AgenciaId);
-        builder.HasIndex(x => x.ContaCorrente);
+        builder.HasIndex(x => x.CooperadoId)
+            .HasDatabaseName("cooperado_agencia_conta_index_8");
+
+        builder.HasIndex(x => x.AgenciaId)
+            .HasDatabaseName("cooperado_agencia_conta_index_9");
+
+        builder.HasIndex(x => x.ContaCorrente)
+            .HasDatabaseName("cooperado_agencia_conta_index_10");
     }
 }

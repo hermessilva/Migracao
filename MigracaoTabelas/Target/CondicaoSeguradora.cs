@@ -9,8 +9,5 @@ public class CondicaoSeguradora
     public decimal PorcentagemCoberturaMorte { get; set; }
     public decimal PorcentagemCoberturaInvalidez { get; set; }
     public decimal PorcentagemCoberturaPerdaRenda { get; set; }
-    public decimal PorcentagemComissaoCorretora { get; set; }
-    public decimal PorcentagemComissaoCooperativa { get; set; }
-
-    public virtual Seguradora Seguradora { get; set; } = null!;
+    public virtual Seguradora Seguradoras { get; set; } = null!;
 }

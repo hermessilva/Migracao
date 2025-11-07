@@ -6,5 +6,5 @@ public class ParametrizacaoResposta
     public ulong ParametrizacaoId { get; set; }
     public string Resposta { get; set; } = null!;
 
-    public virtual Parametrizacao Parametrizacao { get; set; } = null!;
+    public virtual Parametrizacao Parametrizacoes { get; set; } = null!;
 }

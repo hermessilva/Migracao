@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using MigracaoTabelas.Target;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
@@ -7,7 +9,7 @@ public class GestaoDocumentoConfiguration : IEntityTypeConfiguration<GestaoDocum
 {
     public void Configure(EntityTypeBuilder<GestaoDocumento> builder)
     {
-        builder.ToTable("gestao_documento");
+        builder.ToTable("gestao_documento", t => t.HasComment("Gestão de documentos"));
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
@@ -64,8 +66,8 @@ public class GestaoDocumentoConfiguration : IEntityTypeConfiguration<GestaoDocum
             .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
         // Relacionamentos
-        builder.HasOne(x => x.Seguradora)
-            .WithMany(x => x.GestaoDocumentos)
+        builder.HasOne(x => x.Seguradoras)
+            .WithMany(x => x.GestoesDocumentos)
             .HasForeignKey(x => x.SeguradoraId)
             .OnDelete(DeleteBehavior.NoAction);
     }

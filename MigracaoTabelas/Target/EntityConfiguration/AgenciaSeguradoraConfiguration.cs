@@ -1,15 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using MigracaoTabelas.Target;
-
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class PropostaSeguradoraConfiguration : IEntityTypeConfiguration<PropostaSeguradora>
+public class AgenciaSeguradoraConfiguration : IEntityTypeConfiguration<AgenciaSeguradora>
 {
-    public void Configure(EntityTypeBuilder<PropostaSeguradora> builder)
+    public void Configure(EntityTypeBuilder<AgenciaSeguradora> builder)
     {
-        builder.ToTable("proposta_seguradora");
+        builder.ToTable("agencia_seguradora");
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
@@ -18,24 +16,24 @@ public class PropostaSeguradoraConfiguration : IEntityTypeConfiguration<Proposta
             .HasComment("Identificador do registro na tabela")
             .IsRequired();
 
+        builder.Property(x => x.AgenciaId)
+            .HasColumnName("agencia_id")
+            .HasComment("Chave estrangeira da tabela agencia")
+            .IsRequired();
+
         builder.Property(x => x.SeguradoraId)
             .HasColumnName("seguradora_id")
             .HasComment("Chave estrangeira da tabela seguradora")
             .IsRequired();
 
-        builder.Property(x => x.DescricaoSequencial)
-            .HasColumnName("descricao_sequencial")
-            .HasComment("Descrição sequencial da proposta")
-            .IsRequired();
-
-        builder.Property(x => x.NumeroSequencial)
-            .HasColumnName("numero_sequencial")
-            .HasComment("Número sequencial da proposta")
-            .IsRequired();
-
         // Relacionamentos
+        builder.HasOne(x => x.Agencias)
+            .WithMany(x => x.AgenciasSeguradoras)
+            .HasForeignKey(x => x.AgenciaId)
+            .OnDelete(DeleteBehavior.NoAction);
+
         builder.HasOne(x => x.Seguradoras)
-            .WithMany(s => s.PropostasSeguradoras)
+            .WithMany(x => x.AgenciasSeguradoras)
             .HasForeignKey(x => x.SeguradoraId)
             .OnDelete(DeleteBehavior.NoAction);
     }

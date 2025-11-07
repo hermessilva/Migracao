@@ -1,4 +1,4 @@
-﻿namespace MigracaoTabelas.Target;
+namespace MigracaoTabelas.Target;
 
 public class TelaAcao
 {
@@ -8,6 +8,7 @@ public class TelaAcao
 
     public virtual Tela Tela { get; private set; }
     public virtual Acao Acao { get; private set; }
+    public virtual ICollection<TelaAcaoPerfil> TelasAcoesPerfis { get; set; } = new List<TelaAcaoPerfil>();
 
     public TelaAcao(ulong telaId, ulong acaoId)
     {

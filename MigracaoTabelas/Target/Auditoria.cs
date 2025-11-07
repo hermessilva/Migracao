@@ -9,8 +9,8 @@ public class Auditoria
     public string Operacao { get; set; } = null!;
     public string Antes { get; set; } = null!;
     public string Depois { get; set; } = null!;
-    public DateTime CriadoEm { get; set; }
+    public DateTime? CriadoEm { get; set; }
 
-    public virtual Usuario Usuario { get; set; } = null!;
-    public virtual Agencia Agencia { get; set; } = null!;
+    public virtual Usuario Usuarios { get; set; } = null!;
+    public virtual Agencia Agencias { get; set; } = null!;
 }

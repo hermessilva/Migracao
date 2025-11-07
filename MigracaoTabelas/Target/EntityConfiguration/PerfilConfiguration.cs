@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using MigracaoTabelas.Target;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 public class PerfilConfiguration : IEntityTypeConfiguration<Perfil>
@@ -19,7 +21,7 @@ public class PerfilConfiguration : IEntityTypeConfiguration<Perfil>
             .HasColumnName("nome")
             .HasMaxLength(255)
             .IsRequired()
-            .HasComment("Nome do perfil (único)");
+            .HasComment("Nome do perfil");
 
         builder.HasIndex(x => x.Nome)
             .IsUnique();

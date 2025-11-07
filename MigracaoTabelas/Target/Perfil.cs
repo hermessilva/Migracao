@@ -1,4 +1,4 @@
-﻿namespace MigracaoTabelas.Target;
+namespace MigracaoTabelas.Target;
 
 public class Perfil
 {
@@ -16,4 +16,7 @@ public class Perfil
     {
         Nome = nome;
     }
+
+    public virtual ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();
+    public virtual ICollection<TelaAcaoPerfil> TelasAcoesPerfis { get; set; } = new List<TelaAcaoPerfil>();
 }

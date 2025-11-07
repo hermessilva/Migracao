@@ -1,13 +1,12 @@
 namespace MigracaoTabelas.Target;
 
-public class CooperadoAgenciaConta
+public class AgenciaSeguradora
 {
     public ulong Id { get; set; }
-    public ulong CooperadoId { get; set; }
     public ulong AgenciaId { get; set; }
-    public string ContaCorrente { get; set; } = null!;
+    public ulong SeguradoraId { get; set; }
 
-    public virtual Cooperado Cooperados { get; set; } = null!;
     public virtual Agencia Agencias { get; set; } = null!;
+    public virtual Seguradora Seguradoras { get; set; } = null!;
     public virtual ICollection<Seguro> Seguros { get; set; } = new List<Seguro>();
 }

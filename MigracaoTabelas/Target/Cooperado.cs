@@ -9,6 +9,6 @@ public class Cooperado
     public string NomeFantasia { get; set; }
     public string Email { get; set; }
 
-    public virtual ICollection<CooperadoAgenciaConta> CooperadoAgenciaContas { get; set; } = new List<CooperadoAgenciaConta>();
+    public virtual ICollection<CooperadoAgenciaConta> CooperadosAgenciasContas { get; set; } = new List<CooperadoAgenciaConta>();
     public virtual ICollection<LancamentoEfetivar> LancamentosEfetivar { get; set; } = new List<LancamentoEfetivar>();
 }

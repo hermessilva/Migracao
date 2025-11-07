@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using MigracaoTabelas.Target;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
@@ -7,7 +9,7 @@ public class SeguroConfiguration : IEntityTypeConfiguration<Seguro>
 {
     public void Configure(EntityTypeBuilder<Seguro> builder)
     {
-        builder.ToTable("seguro");
+        builder.ToTable("seguro", t => t.HasComment("Contratos de seguros e seus metadados financeiros e relacionamentos"));
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
@@ -55,8 +57,7 @@ public class SeguroConfiguration : IEntityTypeConfiguration<Seguro>
         builder.Property(x => x.FimVigencia)
             .HasColumnName("fim_vigencia")
             .HasColumnType("date")
-            .HasComment("Fim de vigência do seguro")
-            .HasColumnType("date");
+            .HasComment("Fim de vigência do seguro");
 
         builder.Property(x => x.CodigoGrupo)
             .HasColumnName("codigo_grupo")
@@ -115,19 +116,21 @@ public class SeguroConfiguration : IEntityTypeConfiguration<Seguro>
             .HasComment("Valor de IOF");
 
         // Relacionamentos
-        builder.HasOne(x => x.CooperadoAgenciaConta)
+
+        builder.HasOne(x => x.CooperadosAgenciasContas)
             .WithMany(x => x.Seguros)
             .HasForeignKey(x => x.CooperadoAgenciaContaId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        builder.HasOne(x => x.PontoAtendimento)
+        builder.HasOne(x => x.PontosAtendimentos)
             .WithMany(x => x.Seguros)
             .HasForeignKey(x => x.PontoAtendimentoId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        builder.HasOne(x => x.Usuario)
+        builder.HasOne(x => x.Usuarios)
             .WithMany()
             .HasForeignKey(x => x.UsuarioId)
             .OnDelete(DeleteBehavior.NoAction);
+
     }
 }

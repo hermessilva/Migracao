@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using MigracaoTabelas.Target;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
@@ -7,7 +9,7 @@ public class CooperadoConfiguration : IEntityTypeConfiguration<Cooperado>
 {
     public void Configure(EntityTypeBuilder<Cooperado> builder)
     {
-        builder.ToTable("cooperado");
+        builder.ToTable("cooperado", t => t.HasComment("Cadastro de cooperados vinculados a uma agência"));
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)

@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using MigracaoTabelas.Target;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
@@ -40,7 +42,7 @@ public class PontoAtendimentoConfiguration : IEntityTypeConfiguration<PontoAtend
 
         // Relacionamentos
         builder.HasOne(x => x.Agencia)
-            .WithMany(x => x.PontosAtendimento)
+            .WithMany(x => x.PontosAtendimentos)
             .HasForeignKey(x => x.AgenciaId)
             .OnDelete(DeleteBehavior.NoAction);
 
@@ -49,8 +51,10 @@ public class PontoAtendimentoConfiguration : IEntityTypeConfiguration<PontoAtend
             .IsUnique();
 
         builder.HasIndex(x => new { x.AgenciaId, x.Codigo })
-            .IsUnique();
+            .IsUnique()
+            .HasDatabaseName("ponto_atendimento_index_0");
 
-        builder.HasIndex(x => x.AgenciaId);
+        builder.HasIndex(x => x.AgenciaId)
+            .HasDatabaseName("ponto_atendimento_index_1");
     }
 }

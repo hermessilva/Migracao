@@ -11,6 +11,6 @@ public class LancamentoEfetivar
     public decimal Valor { get; set; }
     public DateTime? DataLancamento { get; set; }
 
-    public virtual Agencia Agencia { get; set; } = null!;
-    public virtual Cooperado Cooperado { get; set; } = null!;
+    public virtual Agencia Agencias { get; set; } = null!;
+    public virtual Cooperado Cooperados { get; set; } = null!;
 }

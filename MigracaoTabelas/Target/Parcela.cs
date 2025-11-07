@@ -6,9 +6,9 @@ public class Parcela
 {
     public void Assign(SxEpSegParcela source)
     {
-        // Campos de PK 'id' são Identity, não são mapeados diretamente da source.
+        // Campos de PK 'id' sÃ£o Identity, nÃ£o sÃ£o mapeados diretamente da source.
 
-        // Mapeamentos com correspondência direta:
+        // Mapeamentos com correspondÃªncia direta:
         this.Status = (byte)(source.SegLiberado ? 1 : 0); // SegLiberado -> Status (0=aberta, 1=quitada)
         this.NumeroParcela = (ushort)source.SegParcela; // SegParcela -> NumeroParcela
         this.ValorParcela = source.SegValor; // SegValor -> ValorParcela
@@ -21,13 +21,13 @@ public class Parcela
         else
             this.ValorPago = 0.00m; // Sem pagamento registrado
 
-        // Campos da Source sem correspondência direta no Target:
+        // Campos da Source sem correspondÃªncia direta no Target:
         // source.CcoConta; // Usado para buscar SeguroId
         // source.SegContrato; // Usado para buscar SeguroId
         // source.ConSeq; // Usado para buscar SeguroId
-        // source.SegCancelado; // Sem correspondência no Target
+        // source.SegCancelado; // Sem correspondÃªncia no Target
     }
-    
+
     public ulong Id { get; set; }
     public ulong SeguroId { get; set; }
     public byte Status { get; set; }
@@ -38,5 +38,5 @@ public class Parcela
     public DateTime? Liquidacao { get; set; }
     public DateTime? DataUltimoPagamento { get; set; }
 
-    public virtual Seguro Seguro { get; set; } = null!;
+    public virtual Seguro Seguros { get; set; } = null!;
 }

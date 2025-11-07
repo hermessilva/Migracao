@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using MigracaoTabelas.Target;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
@@ -7,7 +9,7 @@ public class AcaoConfiguration : IEntityTypeConfiguration<Acao>
 {
     public void Configure(EntityTypeBuilder<Acao> builder)
     {
-        builder.ToTable("acao");
+        builder.ToTable("acao", t => t.HasComment("Catálogo de ações que podem ser executadas nas telas"));
 
         builder.HasKey(x => x.Id);
 

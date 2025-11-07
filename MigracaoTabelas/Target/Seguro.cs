@@ -6,38 +6,38 @@ public class Seguro
 {
     public void Assign(SxEpSegPrestamista source)
     {
-        // Campos de PK 'id' são Identity, não são mapeados diretamente da source.
+        // Campos de PK 'id' sÃ£o Identity, nÃ£o sÃ£o mapeados diretamente da source.
 
         // (SEG_CANCTIPO: Tipo de Cancelamento -> status: Identificador do status)
-        // Regra aplicada: > 0 consideramos cancelado (3), senão aberto (1)
+        // Regra aplicada: > 0 consideramos cancelado (3), senÃ£o aberto (1)
         this.Status = (byte)((source.SegCancTipo.HasValue && source.SegCancTipo.Value > 0) ? 3 : 1);
 
-        // Mapeamentos com correspondência direta
-        this.Contrato = source.SegContrato ?? string.Empty;                         // (SEG_CONTRATO: Contrato -> contrato: Número do contrato do seguro)
-        this.InicioVigencia = source.SegInicio;                                     // (SEG_INICIO: Início do Contrato -> inicio_vigencia: Início de vigência do seguro)
-        this.FimVigencia = source.SegFim;                                           // (SEG_FIM: Final do Contrato -> fim_vigencia: Fim de vigência do seguro)
+        // Mapeamentos com correspondÃªncia direta
+        this.Contrato = source.SegContrato ?? string.Empty;                         // (SEG_CONTRATO: Contrato -> contrato: NÃºmero do contrato do seguro)
+        this.InicioVigencia = source.SegInicio;                                     // (SEG_INICIO: InÃ­cio do Contrato -> inicio_vigencia: InÃ­cio de vigÃªncia do seguro)
+        this.FimVigencia = source.SegFim;                                           // (SEG_FIM: Final do Contrato -> fim_vigencia: Fim de vigÃªncia do seguro)
 
-        // Quantidade de parcelas: preferir valor informado (SegMeses); fallback para quantidade de parcelas de navegação
-        this.QuantidadeParcelas = (ushort)(source.SegMeses ?? 0);                             // (SEG_MESES: Nº de Meses do Seguro -> quantidade_parcelas: Quantidade total de parcelas)
+        // Quantidade de parcelas: preferir valor informado (SegMeses); fallback para quantidade de parcelas de navegaÃ§Ã£o
+        this.QuantidadeParcelas = (ushort)(source.SegMeses ?? 0);                             // (SEG_MESES: NÂº de Meses do Seguro -> quantidade_parcelas: Quantidade total de parcelas)
 
 
-        // Vencimento: manter como fim de vigência, até haver regra específica
+        // Vencimento: manter como fim de vigÃªncia, atÃ© haver regra especÃ­fica
         this.Vencimento = source.SegFim;                                            // (SEG_FIM: Final do Contrato -> vencimento: Data de vencimento) [assumido]
 
         // Capital segurado: usar base segurada como principal, com fallback para valor do contrato
         this.CapitalSegurado = (source.SegBase ?? source.SegVrContrato) ?? 0.00m;   // (SEG_BASE: Valor Base Segurado / SEG_VRCONTRATO: Valor do Contrato -> capital_segurado: Valor do capital segurado)
 
-        // Prêmio total e tipo de pagamento
-        this.PremioTotal = source.SegPremio ?? 0.00m;                               // (SEG_PREMIO: Valor do Seguro -> premio_total: Valor do prêmio total do seguro)
+        // PrÃªmio total e tipo de pagamento
+        this.PremioTotal = source.SegPremio ?? 0.00m;                               // (SEG_PREMIO: Valor do Seguro -> premio_total: Valor do prÃªmio total do seguro)
         this.TipoPagamento = (byte)(source.SegModalidade ?? 0);                             // (SEG_MODALIDADE: Modalidade -> tipo_pagamento: Identificador do tipo de pagamento)
 
-        // Campos que precisam de lógica de negócio para buscar FKs
+        // Campos que precisam de lÃ³gica de negÃ³cio para buscar FKs
 
-        // Sem correspondência direta no momento (deixar explícito para avaliação de negócio):
+        // Sem correspondÃªncia direta no momento (deixar explÃ­cito para avaliaÃ§Ã£o de negÃ³cio):
         // this.CodigoGrupo = 0;
         // this.EstornoProporcional = 0.00m;
 
-        // Campos da Source sem correspondência direta no Target (mantidos apenas para contexto de migração):
+        // Campos da Source sem correspondÃªncia direta no Target (mantidos apenas para contexto de migraÃ§Ã£o):
         // source.SegNome;
         // source.SegNasc;
         // source.SegTipoConta;
@@ -70,8 +70,8 @@ public class Seguro
     public bool? Dps { get; set; }
     public decimal? ValorIof { get; set; }
 
-    public virtual CooperadoAgenciaConta CooperadoAgenciaConta { get; set; } = null!;
-    public virtual PontoAtendimento PontoAtendimento { get; set; } = null!;
-    public virtual Usuario Usuario { get; set; }
+    public virtual CooperadoAgenciaConta CooperadosAgenciasContas { get; set; } = null!;
+    public virtual PontoAtendimento PontosAtendimentos { get; set; } = null!;
+    public virtual Usuario Usuarios { get; set; }
     public virtual ICollection<Parcela> Parcelas { get; set; } = new List<Parcela>();
 }

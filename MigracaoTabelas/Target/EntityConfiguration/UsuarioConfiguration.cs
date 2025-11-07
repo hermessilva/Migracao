@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using MigracaoTabelas.Target;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
@@ -7,7 +9,7 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
 {
     public void Configure(EntityTypeBuilder<Usuario> builder)
     {
-        builder.ToTable("usuarios");
+        builder.ToTable("usuario");
 
         builder.HasKey(e => e.Id);
 
@@ -16,7 +18,7 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
             .HasComment("Identificador do registro na tabela")
             .IsRequired();
 
-        builder.Property(e => e.UsuarioLogin)
+        builder.Property(e => e.Login)
             .HasColumnName("usuario")
             .HasComment("Login de acesso do usuário")
             .IsRequired()
@@ -34,15 +36,52 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
             .IsRequired()
             .HasMaxLength(255);
 
-        builder.Property(e => e.Ativo)
-            .HasColumnName("ativo")
-            .HasColumnType("tinyint(1)")
-            .HasComment("ENUM('Ativo', 'Inativo') — Indica o status do perfil")
+        builder.Property(x => x.Status)
+            .HasColumnName("status")
+            .HasColumnType("enum('Ativo','Inativo')")
+            .HasConversion<string>()
+            .HasComment("Indica o status do usuário")
             .IsRequired();
+
 
         builder.Property(e => e.CriadoEm)
             .HasColumnName("criado_em")
             .HasComment("Data/hora de criação do registro")
             .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+
+        // Propriedades de chave estrangeira
+        builder.Property(e => e.PerfilId)
+           .HasColumnName("perfil_id")
+           .HasComment("Chave estrangeira para a Perfil ")
+           .IsRequired();
+
+        builder.Property(e => e.AgenciaId)
+            .HasColumnName("agencia_id")
+            .HasComment("Chave estrangeira para a Agência")
+            .IsRequired();
+
+        builder.Property(e => e.PontoAtendimentoId)
+            .HasColumnName("ponto_atendimento_id")
+            .HasComment("Chave estrangeira para Ponto de Atendimento")
+            .IsRequired();
+
+        // Relacionamentos
+        builder.HasOne(e => e.Perfils)
+            .WithMany()
+            .IsRequired()
+            .HasForeignKey(e => e.PerfilId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(e => e.Agencias)
+            .WithMany(a => a.Usuarios)
+            .IsRequired()
+            .HasForeignKey(e => e.AgenciaId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(e => e.PontosAtendimentos)
+            .WithMany(p => p.Usuarios)
+            .IsRequired()
+            .HasForeignKey(e => e.PontoAtendimentoId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

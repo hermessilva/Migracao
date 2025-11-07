@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using MigracaoTabelas.Target;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
@@ -10,6 +12,7 @@ public class TelaAcaoConfiguration : IEntityTypeConfiguration<TelaAcao>
         builder.ToTable("tela_acao");
 
         builder.HasKey(x => x.Id);
+        builder.HasAlternateKey(x => new { x.TelaId, x.AcaoId });
 
         builder.Property(x => x.Id)
             .HasColumnName("id")
@@ -19,24 +22,29 @@ public class TelaAcaoConfiguration : IEntityTypeConfiguration<TelaAcao>
 
         builder.Property(x => x.TelaId)
             .HasColumnName("tela_id")
-            .HasComment("Chave estrangeira da tabela tela");
+            .HasComment("Chave estrangeira da tabela tela")
+            .IsRequired();
 
         builder.Property(x => x.AcaoId)
             .HasColumnName("acao_id")
-            .HasComment("Chave estrangeira da tabela ação");
+            .HasComment("Chave estrangeira da tabela acao")
+            .IsRequired();
 
         builder.HasIndex(x => x.TelaId)
-            .HasDatabaseName("idx_tela_acao_tela_id");
+            .HasDatabaseName("tela_acao_index_2");
 
         builder.HasIndex(x => x.AcaoId)
-            .HasDatabaseName("idx_tela_acao_acao_id");
+            .HasDatabaseName("tela_acao_index_3");
 
-        builder.HasOne<Tela>()
-            .WithMany()
-            .HasForeignKey(x => x.TelaId);
+        builder.HasOne(x => x.Tela)
+            .WithMany(t => t.TelasAcoes)
+            .HasForeignKey(x => x.TelaId)
+            .OnDelete(DeleteBehavior.NoAction);
 
-        builder.HasOne<Acao>()
-            .WithMany()
-            .HasForeignKey(x => x.AcaoId);
+        builder.HasOne(x => x.Acao)
+            .WithMany(a => a.TelasAcoes)
+            .HasForeignKey(x => x.AcaoId)
+            .OnDelete(DeleteBehavior.NoAction);
+
     }
 }

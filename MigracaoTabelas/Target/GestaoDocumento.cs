@@ -10,7 +10,7 @@ public class GestaoDocumento
     public string Campo { get; set; } = null!;
     public string Valor { get; set; } = null!;
     public uint Ordem { get; set; }
-    public DateTime CriadoEm { get; set; }
+    public DateTime? CriadoEm { get; set; }
 
-    public virtual Seguradora Seguradora { get; set; } = null!;
+    public virtual Seguradora Seguradoras { get; set; } = null!;
 }

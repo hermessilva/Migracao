@@ -1,4 +1,4 @@
-﻿using System.Text.RegularExpressions;
+using System.Text.RegularExpressions;
 
 using Microsoft.EntityFrameworkCore;
 
@@ -13,7 +13,7 @@ namespace MigracaoTabelas.Worker
         private Dictionary<(string, string), PontoAtendimento> PontosAtendimento = new Dictionary<(string, string), PontoAtendimento>();
         private Dictionary<string, Cooperado> Cooperados = new Dictionary<string, Cooperado>();
         private Dictionary<string, Seguradora> Seguradoras = new Dictionary<string, Seguradora>();
-        private Dictionary<(ulong, ulong), ApoliceGrupoSeguradora> ApoliceGrupoSeguradoras = new Dictionary<(ulong, ulong), ApoliceGrupoSeguradora>();
+        private Dictionary<(ulong, ulong), AgenciaSeguradora> AgenciasSeguradoras = new Dictionary<(ulong, ulong), AgenciaSeguradora>();
 
         private Object _ToLock = new Object();
 
@@ -37,6 +37,10 @@ namespace MigracaoTabelas.Worker
 
         private void PrepareCache()
         {
+            _TContext.Seguradora.AsNoTracking().ToList().ForEach(a =>
+            {
+                Seguradoras.Add(a.Id.ToString("0000"), a);
+            });
             _TContext.Agencia.AsNoTracking().ToList().ForEach(a =>
             {
                 Agencias.Add(a.Codigo, a);
@@ -45,13 +49,13 @@ namespace MigracaoTabelas.Worker
             {
                 PontosAtendimento.Add((p.Agencia.Codigo, p.Codigo), p);
             });
-            _TContext.Cooperado.Include(c => c.CooperadoAgenciaContas).AsNoTracking().ToList().ForEach(c =>
+            _TContext.Cooperado.Include(c => c.CooperadosAgenciasContas).AsNoTracking().ToList().ForEach(c =>
             {
                 Cooperados.Add(c.NumeroDocumento, c);
             });
-            _TContext.ApoliceGrupoSeguradora.AsNoTracking().ToList().ForEach(a =>
+            _TContext.AgenciaSeguradora.AsNoTracking().ToList().ForEach(a =>
             {
-                ApoliceGrupoSeguradoras.Add((a.AgenciaId, a.SeguradoraId), a);
+                AgenciasSeguradoras.Add((a.AgenciaId, a.SeguradoraId), a);
             });
         }
 
@@ -126,7 +130,7 @@ namespace MigracaoTabelas.Worker
                 if (Cooperados.ContainsKey(pNumeroDocumento))
                 {
                     coop = Cooperados[pNumeroDocumento];
-                    var tcac = coop.CooperadoAgenciaContas.FirstOrDefault(c => c.CooperadoId == coop.Id && c.AgenciaId == agencia.Id && c.ContaCorrente == conta.Codigo);
+                    var tcac = coop.CooperadosAgenciasContas.FirstOrDefault(c => c.CooperadoId == coop.Id && c.AgenciaId == agencia.Id && c.ContaCorrente == conta.Codigo);
                     if (tcac != null)
                         return (tcac, coop, conta);
                 }
@@ -159,38 +163,38 @@ namespace MigracaoTabelas.Worker
                 _TContext.CooperadoAgenciaConta.Add(cac);
                 _TContext.SaveChanges();
                 Cooperados.Clear();
-                _TContext.Cooperado.Include(c => c.CooperadoAgenciaContas).ToList().ForEach(c => Cooperados.Add(c.NumeroDocumento, c));
+                _TContext.Cooperado.Include(c => c.CooperadosAgenciasContas).ToList().ForEach(c => Cooperados.Add(c.NumeroDocumento, c));
 
                 coop = Cooperados[pNumeroDocumento];
-                cac = coop.CooperadoAgenciaContas.FirstOrDefault(c => c.CooperadoId == coop.Id && c.AgenciaId == agencia.Id && c.ContaCorrente == conta.Codigo);
+                cac = coop.CooperadosAgenciasContas.FirstOrDefault(c => c.CooperadoId == coop.Id && c.AgenciaId == agencia.Id && c.ContaCorrente == conta.Codigo);
 
                 return (cac, coop, conta);
             }
         }
 
-        public ulong GetContaCorrente(ulong pCooperadoId, ulong pAgenciaId, string pConta)
-        {
-            ArgumentNullException.ThrowIfNull(pConta, nameof(pConta));
-            ArgumentOutOfRangeException.ThrowIfZero(pAgenciaId, nameof(pAgenciaId));
-            ArgumentOutOfRangeException.ThrowIfZero(pCooperadoId, nameof(pCooperadoId));
+        //public ulong GetContaCorrente(ulong pCooperadoId, ulong pAgenciaId, string pConta)
+        //{
+        //    ArgumentNullException.ThrowIfNull(pConta, nameof(pConta));
+        //    ArgumentOutOfRangeException.ThrowIfZero(pAgenciaId, nameof(pAgenciaId));
+        //    ArgumentOutOfRangeException.ThrowIfZero(pCooperadoId, nameof(pCooperadoId));
 
-            var coop = Cooperados.Values.FirstOrDefault(c => c.Id == pCooperadoId);
-            if (coop == null)
-                throw new Exception($"Cooperado Id [{pCooperadoId}] não encontrado no cache.");
-            var cac = coop.CooperadoAgenciaContas.FirstOrDefault(c => c.AgenciaId == pAgenciaId && c.ContaCorrente == pConta);
-            if (cac == null)
-            {
-                cac = new CooperadoAgenciaConta
-                {
-                    AgenciaId = pAgenciaId,
-                    ContaCorrente = pConta
-                };
-                coop.CooperadoAgenciaContas.Add(cac);
-                _TContext.CooperadoAgenciaConta.Add(cac);
-                _TContext.SaveChanges();
-            }
-            return cac.Id;
-        }
+        //    var coop = Cooperados.Values.FirstOrDefault(c => c.Id == pCooperadoId);
+        //    if (coop == null)
+        //        throw new Exception($"Cooperado Id [{pCooperadoId}] não encontrado no cache.");
+        //    var cac = coop.CooperadoAgenciaContas.FirstOrDefault(c => c.AgenciaId == pAgenciaId && c.ContaCorrente == pConta);
+        //    if (cac == null)
+        //    {
+        //        cac = new CooperadoAgenciaConta
+        //        {
+        //            AgenciaId = pAgenciaId,
+        //            ContaCorrente = pConta
+        //        };
+        //        coop.CooperadoAgenciaContas.Add(cac);
+        //        _TContext.CooperadoAgenciaConta.Add(cac);
+        //        _TContext.SaveChanges();
+        //    }
+        //    return cac.Id;
+        //}
 
         public Seguradora GetSeguradora(SxDbContext pSContext, string pCodigo)
         {
@@ -221,27 +225,19 @@ namespace MigracaoTabelas.Worker
             ArgumentOutOfRangeException.ThrowIfZero(pAgenciaId, nameof(pAgenciaId));
             lock (_ToLock)
             {
-                if (ApoliceGrupoSeguradoras.ContainsKey((pAgenciaId, pSeguradoraId)))
-                    return ApoliceGrupoSeguradoras[(pAgenciaId, pSeguradoraId)].Id;
+                if (AgenciasSeguradoras.ContainsKey((pAgenciaId, pSeguradoraId)))
+                    return AgenciasSeguradoras[(pAgenciaId, pSeguradoraId)].Id;
 
-                var ag = new ApoliceGrupoSeguradora
+                var ag = new AgenciaSeguradora
                 {
                     AgenciaId = pAgenciaId,
                     SeguradoraId = pSeguradoraId,
-                    Apolice = "Apolice",
-                    Grupo = "Grupo",
-                    SubGrupo = "SubGrupo",
-                    TipoCapital = "Variável",
-                    ModalidadeUnico = "ModalidadeUnico",
-                    ModalidadeAvista = 0,
-                    ModalidadeParcelado = 0,
-                    Ordem = 0
                 };
-                _TContext.ApoliceGrupoSeguradora.Add(ag);
+                _TContext.AgenciaSeguradora.Add(ag);
                 _TContext.SaveChanges();
 
-                ApoliceGrupoSeguradoras.Add((pAgenciaId, pSeguradoraId), ag);
-                return 0;
+                AgenciasSeguradoras.Add((pAgenciaId, pSeguradoraId), ag);
+                return ag.Id;
             }
         }
     }

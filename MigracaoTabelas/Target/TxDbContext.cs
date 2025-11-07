@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
+
+using Microsoft.EntityFrameworkCore;
 
 using MigracaoTabelas.Target.EntityConfiguration;
 
@@ -30,6 +32,7 @@ namespace MigracaoTabelas.Target
         public DbSet<GestaoDocumento> GestaoDocumento { get; set; }
         public DbSet<Cooperado> Cooperado { get; set; }
         public DbSet<CooperadoAgenciaConta> CooperadoAgenciaConta { get; set; }
+        public DbSet<AgenciaSeguradora> AgenciaSeguradora { get; set; }
         public DbSet<Seguro> Seguro { get; set; }
         public DbSet<Parcela> Parcela { get; set; }
         public DbSet<Parametrizacao> Parametrizacao { get; set; }
@@ -51,13 +54,13 @@ namespace MigracaoTabelas.Target
                 var str = Utils.Read("TARGET_DB", "");
                 pBuilder.UseMySQL(str);
             }
-            //#if DEBUG
+#if DEBUG
 
-            //            pBuilder.EnableSensitiveDataLogging(true);
-            //            pBuilder.LogTo(s => Debug.WriteLine(s));
-            //            pBuilder.EnableDetailedErrors(true);
-            //            pBuilder.EnableSensitiveDataLogging(true);
-            //#endif
+            pBuilder.EnableSensitiveDataLogging(true);
+            pBuilder.LogTo(s => Debug.WriteLine(s));
+            pBuilder.EnableDetailedErrors(true);
+            pBuilder.EnableSensitiveDataLogging(true);
+#endif
         }
     }
 }

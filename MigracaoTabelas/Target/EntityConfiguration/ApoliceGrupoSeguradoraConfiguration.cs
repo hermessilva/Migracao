@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using MigracaoTabelas.Target;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
@@ -50,31 +52,27 @@ public class ApoliceGrupoSeguradoraConfiguration : IEntityTypeConfiguration<Apol
 
         builder.Property(x => x.ModalidadeUnico)
             .HasColumnName("modalidade_unico")
-            .HasColumnType("varchar(50)")
-            .HasComment("Valor da modalidade único");
+            .HasMaxLength(50)
+            .HasComment("Valor modalidade unico");
 
-        builder.Property(x => x.ModalidadeAvista)
+        builder.Property(x => x.ModalidadeAVista)
             .HasColumnName("modalidade_avista")
             .HasColumnType("decimal(10,2)")
-            .HasComment("Valor da modalidade à vista");
+            .HasComment("Valor modalidade avista");
 
         builder.Property(x => x.ModalidadeParcelado)
             .HasColumnName("modalidade_parcelado")
             .HasColumnType("decimal(10,2)")
-            .HasComment("Valor da modalidade parcelado");
-
-        builder.Property(x => x.Ordem)
-            .HasColumnName("ordem")
-            .HasComment("Ordem de priorização da seguradora");
+            .HasComment("Valor modalidade parcelado");
 
         // Relacionamentos
-        builder.HasOne(x => x.Agencia)
-            .WithMany(x => x.ApolicesGrupoSeguradora)
+        builder.HasOne(x => x.Agencias)
+            .WithMany(x => x.ApolicesGruposSeguradoras)
             .HasForeignKey(x => x.AgenciaId)
             .OnDelete(DeleteBehavior.NoAction);
 
-        builder.HasOne(x => x.Seguradora)
-            .WithMany(x => x.ApolicesGrupoSeguradora)
+        builder.HasOne(x => x.Seguradoras)
+            .WithMany(x => x.ApolicesGruposSeguradoras)
             .HasForeignKey(x => x.SeguradoraId)
             .OnDelete(DeleteBehavior.NoAction);
     }

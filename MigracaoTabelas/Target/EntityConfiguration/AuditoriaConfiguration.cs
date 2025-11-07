@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using MigracaoTabelas.Target;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
@@ -54,17 +56,10 @@ public class AuditoriaConfiguration : IEntityTypeConfiguration<Auditoria>
         builder.Property(x => x.CriadoEm)
             .HasColumnName("criado_em")
             .HasComment("Data/hora da ação registrada")
-            .HasColumnType("datetime")
-            .IsRequired();
+            .HasColumnType("datetime");
 
-        // Relacionamentos
-        builder.HasOne(x => x.Usuario)
-            .WithMany()
-            .HasForeignKey(x => x.UsuarioId)
-            .OnDelete(DeleteBehavior.NoAction);
-
-        builder.HasOne(x => x.Agencia)
-            .WithMany()
+        builder.HasOne(x => x.Agencias)
+            .WithMany(a => a.Auditorias)
             .HasForeignKey(x => x.AgenciaId)
             .OnDelete(DeleteBehavior.NoAction);
     }

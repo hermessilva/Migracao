@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+using MigracaoTabelas.Target;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
@@ -24,7 +26,7 @@ public class CondicaoSeguradoraConfiguration : IEntityTypeConfiguration<Condicao
         builder.Property(x => x.MaxMesesContrato)
             .HasColumnName("max_meses_contrato")
             .HasColumnType("smallint")
-            .HasComment("Quantidade máxima de meses permitido para o contrato")
+            .HasComment("Quantidade máxima de meses permitidos para o contrato")
             .IsRequired();
 
         builder.Property(x => x.MaxIdade)
@@ -51,20 +53,8 @@ public class CondicaoSeguradoraConfiguration : IEntityTypeConfiguration<Condicao
             .HasComment("Percentual de cobertura para perda de renda")
             .IsRequired();
 
-        builder.Property(x => x.PorcentagemComissaoCorretora)
-            .HasColumnName("porcentagem_comissao_corretora")
-            .HasColumnType("decimal(5,4)")
-            .HasComment("Percentual de comissão da corretora")
-            .IsRequired();
-
-        builder.Property(x => x.PorcentagemComissaoCooperativa)
-            .HasColumnName("porcentagem_comissao_cooperativa")
-            .HasColumnType("decimal(5,4)")
-            .HasComment("Percentual de comissão da cooperativa")
-            .IsRequired();
-
         // Relacionamentos
-        builder.HasOne(x => x.Seguradora)
+        builder.HasOne(x => x.Seguradoras)
             .WithMany(x => x.CondicoesSeguradora)
             .HasForeignKey(x => x.SeguradoraId)
             .OnDelete(DeleteBehavior.NoAction);
