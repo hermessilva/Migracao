@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using MigracaoTabelas.Target;
-
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class AuditoriaConfiguration : IEntityTypeConfiguration<Auditoria>
@@ -43,13 +41,11 @@ public class AuditoriaConfiguration : IEntityTypeConfiguration<Auditoria>
 
         builder.Property(x => x.Antes)
             .HasColumnName("antes")
-            .HasMaxLength(255)
             .HasComment("Payload de dados antes da operação")
             .IsRequired();
 
         builder.Property(x => x.Depois)
             .HasColumnName("depois")
-            .HasMaxLength(255)
             .HasComment("Payload de dados depois da alteração")
             .IsRequired();
 
@@ -61,6 +57,11 @@ public class AuditoriaConfiguration : IEntityTypeConfiguration<Auditoria>
         builder.HasOne(x => x.Agencias)
             .WithMany(a => a.Auditorias)
             .HasForeignKey(x => x.AgenciaId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(x => x.Usuarios)
+            .WithMany()
+            .HasForeignKey(x => x.UsuarioId)
             .OnDelete(DeleteBehavior.NoAction);
     }
 }

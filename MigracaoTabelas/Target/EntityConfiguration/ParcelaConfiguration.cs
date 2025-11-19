@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using MigracaoTabelas.Target;
-
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class ParcelaConfiguration : IEntityTypeConfiguration<Parcela>
@@ -25,8 +23,8 @@ public class ParcelaConfiguration : IEntityTypeConfiguration<Parcela>
 
         builder.Property(x => x.Status)
             .HasColumnName("status")
-            .HasColumnType("tinyint")
-            .HasComment("Identificador do status da parcela (ex.: 1=aberta, 2=quitada, 3=cancelada)")
+            .HasColumnType("enum('Em análise pela Seguradora','Pendente de Documentação','Ativo','Expiração da Vigência do Seguro','Cancelado pelo Cooperado','Cancelado pela Cooperativa','Sinistro','Recusado pela Seguradora','Cancelamento por Prejuízo','Liquidação Antecipada','Cancelado por Renegociação','Cancelado por Aditivo')")
+            .HasComment("Identificador do status da parcela")
             .IsRequired();
 
         builder.Property(x => x.NumeroParcela)

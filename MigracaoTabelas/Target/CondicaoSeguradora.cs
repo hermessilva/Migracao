@@ -9,5 +9,6 @@ public class CondicaoSeguradora
     public decimal PorcentagemCoberturaMorte { get; set; }
     public decimal PorcentagemCoberturaInvalidez { get; set; }
     public decimal PorcentagemCoberturaPerdaRenda { get; set; }
+    public bool Periodicidade30Dias { get; set; } = false;
     public virtual Seguradora Seguradoras { get; set; } = null!;
 }

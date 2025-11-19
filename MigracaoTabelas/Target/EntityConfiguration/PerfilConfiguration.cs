@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using MigracaoTabelas.Target;
-
 namespace MigracaoTabelas.Target.EntityConfiguration;
 public class PerfilConfiguration : IEntityTypeConfiguration<Perfil>
 {
@@ -22,6 +20,12 @@ public class PerfilConfiguration : IEntityTypeConfiguration<Perfil>
             .HasMaxLength(255)
             .IsRequired()
             .HasComment("Nome do perfil");
+
+        builder.Property(x => x.Slug)
+            .HasColumnName("slug")
+            .HasMaxLength(255)
+            .IsRequired()
+            .HasComment("Nome amigavel do perfil");
 
         builder.HasIndex(x => x.Nome)
             .IsUnique();

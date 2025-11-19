@@ -2,18 +2,18 @@ namespace MigracaoTabelas.Target;
 
 public class Usuario
 {
-    public ulong Id { get; private set; }
-    public ulong AgenciaId { get; private set; }
-    public ulong PontoAtendimentoId { get; private set; }
-    public ulong PerfilId { get; private set; }
-    public string Login { get; private set; }
-    public string Nome { get; private set; }
-    public string Email { get; private set; }
-    public string Status { get; private set; }
-    public DateTime CriadoEm { get; private set; }
-    public Perfil Perfils { get; private set; }
-    public Agencia Agencias { get; private set; }
-    public PontoAtendimento PontosAtendimentos { get; private set; }
+    public ulong Id { get; set; }
+    public ulong AgenciaId { get; set; }
+    public ulong PontoAtendimentoId { get; set; }
+    public ulong PerfilId { get; set; }
+    public string Login { get; set; }
+    public string Nome { get; set; }
+    public string Email { get; set; }
+    public string Status { get; set; }
+    public DateTime CriadoEm { get; set; }
+    public Perfil Perfils { get; set; }
+    public Agencia Agencias { get; set; }
+    public PontoAtendimento PontosAtendimentos { get; set; }
 
     public Usuario(string usuarioLogin, string nome, string email, ulong perfilId, ulong agenciaId, ulong pontoAtendimentoId, string status = "Ativo")
     {
@@ -31,7 +31,7 @@ public class Usuario
         CriadoEm = DateTime.UtcNow;
     }
 
-    protected Usuario()
+    public Usuario()
     {
         Login = string.Empty;
         Nome = string.Empty;

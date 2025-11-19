@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using MigracaoTabelas.Target;
-
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class CondicaoSeguradoraConfiguration : IEntityTypeConfiguration<CondicaoSeguradora>
@@ -51,6 +49,12 @@ public class CondicaoSeguradoraConfiguration : IEntityTypeConfiguration<Condicao
             .HasColumnName("porcentagem_cobertura_perda_renda")
             .HasColumnType("decimal(5,4)")
             .HasComment("Percentual de cobertura para perda de renda")
+            .IsRequired();
+
+        builder.Property(x => x.Periodicidade30Dias)
+            .HasColumnName("periodicidade_30dias")
+            .HasColumnType("tinyint(1)")
+            .HasComment("Indica se a periodicidade de vencimento é mensal ou a cada 30 dias")
             .IsRequired();
 
         // Relacionamentos

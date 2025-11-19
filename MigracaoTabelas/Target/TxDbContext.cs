@@ -1,8 +1,4 @@
-using System.Diagnostics;
-
 using Microsoft.EntityFrameworkCore;
-
-using MigracaoTabelas.Target.EntityConfiguration;
 
 namespace MigracaoTabelas.Target
 {
@@ -38,8 +34,7 @@ namespace MigracaoTabelas.Target
         public DbSet<Parametrizacao> Parametrizacao { get; set; }
         public DbSet<ParametrizacaoResposta> ParametrizacaoResposta { get; set; }
         public DbSet<LancamentoEfetivar> LancamentoEfetivar { get; set; }
-        public DbSet<IntegracaoSenior> IntegracaoSenior { get; set; }
-
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

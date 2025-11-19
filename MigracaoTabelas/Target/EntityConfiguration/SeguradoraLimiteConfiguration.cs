@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using MigracaoTabelas.Target;
-
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class SeguradoraLimiteConfiguration : IEntityTypeConfiguration<SeguradoraLimite>
@@ -60,7 +58,7 @@ public class SeguradoraLimiteConfiguration : IEntityTypeConfiguration<Seguradora
             .IsRequired();
 
         builder.HasOne(x => x.Seguradoras)
-            .WithMany()
+            .WithMany(x => x.SeguradorasLimites)
             .HasForeignKey(x => x.SeguradoraId)
             .OnDelete(DeleteBehavior.NoAction);
     }

@@ -1,3 +1,4 @@
+using MigracaoTabelas.Enums;
 using MigracaoTabelas.Source;
 
 namespace MigracaoTabelas.Target;
@@ -9,17 +10,18 @@ public class Parcela
         // Campos de PK 'id' são Identity, não são mapeados diretamente da source.
 
         // Mapeamentos com correspondência direta:
-        this.Status = (byte)(source.SegLiberado ? 1 : 0); // SegLiberado -> Status (0=aberta, 1=quitada)
-        this.NumeroParcela = (ushort)source.SegParcela; // SegParcela -> NumeroParcela
-        this.ValorParcela = source.SegValor; // SegValor -> ValorParcela
-        this.Vencimento = source.SegVcto; // SegVcto -> Vencimento
-        this.Liquidacao = source.SegPgto; // SegPgto -> Liquidacao
-        this.DataUltimoPagamento = source.SegPgto; // SegPgto -> DataUltimoPagamento
+        Status = StatusSeguro.Ativo.AsString();
+
+        NumeroParcela = (ushort)source.SegParcela; // SegParcela -> NumeroParcela
+        ValorParcela = source.SegValor; // SegValor -> ValorParcela
+        Vencimento = source.SegVcto; // SegVcto -> Vencimento
+        Liquidacao = source.SegPgto; // SegPgto -> Liquidacao
+        DataUltimoPagamento = source.SegPgto; // SegPgto -> DataUltimoPagamento
 
         if (source.SegPgto.HasValue)
-            this.ValorPago = source.SegValor; // Se houver pagamento, atribuir o valor pago igual ao valor da parcela
+            ValorPago = source.SegValor; // Se houver pagamento, atribuir o valor pago igual ao valor da parcela
         else
-            this.ValorPago = 0.00m; // Sem pagamento registrado
+            ValorPago = 0.00m; // Sem pagamento registrado
 
         // Campos da Source sem correspondência direta no Target:
         // source.CcoConta; // Usado para buscar SeguroId
@@ -30,7 +32,7 @@ public class Parcela
 
     public ulong Id { get; set; }
     public ulong SeguroId { get; set; }
-    public byte Status { get; set; }
+    public string Status { get; set; }
     public ushort NumeroParcela { get; set; }
     public decimal ValorParcela { get; set; }
     public decimal ValorPago { get; set; }

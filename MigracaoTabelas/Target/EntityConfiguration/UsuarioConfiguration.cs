@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using MigracaoTabelas.Target;
-
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
@@ -19,7 +17,7 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
             .IsRequired();
 
         builder.Property(e => e.Login)
-            .HasColumnName("usuario")
+            .HasColumnName("login")
             .HasComment("Login de acesso do usuário")
             .IsRequired()
             .HasMaxLength(100);
@@ -67,7 +65,7 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
 
         // Relacionamentos
         builder.HasOne(e => e.Perfils)
-            .WithMany()
+            .WithMany(p => p.Usuarios)
             .IsRequired()
             .HasForeignKey(e => e.PerfilId)
             .OnDelete(DeleteBehavior.Restrict);

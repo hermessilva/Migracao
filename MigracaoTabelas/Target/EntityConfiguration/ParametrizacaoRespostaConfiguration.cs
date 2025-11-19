@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using MigracaoTabelas.Target;
-
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class ParametrizacaoRespostaConfiguration : IEntityTypeConfiguration<ParametrizacaoResposta>
@@ -28,11 +26,5 @@ public class ParametrizacaoRespostaConfiguration : IEntityTypeConfiguration<Para
             .HasMaxLength(255)
             .HasComment("Valor de resposta do parâmetro")
             .IsRequired();
-
-        // Relacionamentos
-        builder.HasOne(x => x.Parametrizacoes)
-            .WithMany(x => x.ParametrizacoesRespostas)
-            .HasForeignKey(x => x.ParametrizacaoId)
-            .OnDelete(DeleteBehavior.NoAction);
     }
 }

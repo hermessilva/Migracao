@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using MigracaoTabelas.Target;
-
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class SeguroConfiguration : IEntityTypeConfiguration<Seguro>
@@ -39,8 +37,8 @@ public class SeguroConfiguration : IEntityTypeConfiguration<Seguro>
 
         builder.Property(x => x.Status)
             .HasColumnName("status")
-            .HasColumnType("tinyint")
-            .HasComment("Identificador do status (ex.: 1=aberto, 2=quitado, 3=cancelado)")
+            .HasColumnType("enum('Em análise pela Seguradora','Pendente de Documentação','Ativo','Expiração da Vigência do Seguro','Cancelado pelo Cooperado','Cancelado pela Cooperativa','Sinistro','Recusado pela Seguradora','Cancelamento por Prejuízo','Liquidação Antecipada','Cancelado por Renegociação','Cancelado por Aditivo')")
+            .HasComment("Status do seguro")
             .IsRequired();
 
         builder.Property(x => x.Contrato)
@@ -90,7 +88,7 @@ public class SeguroConfiguration : IEntityTypeConfiguration<Seguro>
 
         builder.Property(x => x.TipoPagamento)
             .HasColumnName("tipo_pagamento")
-            .HasColumnType("tinyint")
+            .HasColumnType("enum('À Vista','Parcelado','Único')")
             .HasComment("Identificador do tipo de pagamento (ex.: 1=à vista, 2=parcelado)")
             .IsRequired();
 
@@ -116,6 +114,10 @@ public class SeguroConfiguration : IEntityTypeConfiguration<Seguro>
             .HasComment("Valor de IOF");
 
         // Relacionamentos
+        builder.HasOne(x => x.AgenciasSeguradoras)
+            .WithMany(x => x.Seguros)
+            .HasForeignKey(x => x.AgenciaSeguradoraId)
+            .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasOne(x => x.CooperadosAgenciasContas)
             .WithMany(x => x.Seguros)
