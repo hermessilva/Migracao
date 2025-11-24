@@ -5,12 +5,12 @@ public class LancamentoEfetivar
     public ulong Id { get; set; }
     public ulong AgenciaId { get; set; }
     public ulong CooperadoId { get; set; }
-    public string ContaCorrente { get; set; } = null!;
+    public string ContaCorrente { get; set; }
     public DateTime? DataMovimentacao { get; set; }
-    public string Descricao { get; set; } = null!;
+    public string Descricao { get; set; }
     public decimal Valor { get; set; }
     public DateTime? DataLancamento { get; set; }
 
-    public virtual Agencia Agencias { get; set; } = null!;
-    public virtual Cooperado Cooperados { get; set; } = null!;
+    public virtual Agencia Agencias { get; set; }
+    public virtual Cooperado Cooperados { get; set; }
 }

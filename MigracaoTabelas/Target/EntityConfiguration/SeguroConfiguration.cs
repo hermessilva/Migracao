@@ -37,7 +37,11 @@ public class SeguroConfiguration : IEntityTypeConfiguration<Seguro>
 
         builder.Property(x => x.Status)
             .HasColumnName("status")
-            .HasColumnType("enum('Em análise pela Seguradora','Pendente de Documentação','Ativo','Expiração da Vigência do Seguro','Cancelado pelo Cooperado','Cancelado pela Cooperativa','Sinistro','Recusado pela Seguradora','Cancelamento por Prejuízo','Liquidação Antecipada','Cancelado por Renegociação','Cancelado por Aditivo')")
+            .HasColumnType("enum('Ativo','Em análise pela Seguradora','Pendente de Documentação','Expiração da Vigência do Seguro','Cancelado pelo Cooperado','Cancelado pela Cooperativa','Sinistro','Recusado pela Seguradora','Cancelamento por Prejuízo','Liquidação Antecipada','Cancelado por Renegociação','Cancelado por Aditivo')")
+            .HasConversion(
+                v => v.AsString(),
+                v => EnumEx.FromString<StatusSeguro>(v)
+            )
             .HasComment("Status do seguro")
             .IsRequired();
 
@@ -89,7 +93,11 @@ public class SeguroConfiguration : IEntityTypeConfiguration<Seguro>
         builder.Property(x => x.TipoPagamento)
             .HasColumnName("tipo_pagamento")
             .HasColumnType("enum('À Vista','Parcelado','Único')")
-            .HasComment("Identificador do tipo de pagamento (ex.: 1=à vista, 2=parcelado)")
+            .HasConversion(
+                v => v.AsString(),
+                v => EnumEx.FromString<TipoPagamentoSeguro>(v)
+            )
+            .HasComment("Identificador do tipo de pagamento (1=à vista, 2=parcelado, 3=Única)")
             .IsRequired();
 
         builder.Property(x => x.EstornoProporcional)

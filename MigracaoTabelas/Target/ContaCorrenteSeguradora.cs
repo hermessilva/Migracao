@@ -11,5 +11,5 @@ public class ContaCorrenteSeguradora
     public string ContaEstornoPrestamista { get; set; }
     public string DescricaoContaEstornoPrestamista { get; set; }
 
-    public virtual Seguradora Seguradoras { get; set; } = null!;
+    public virtual Seguradora Seguradoras { get; set; }
 }

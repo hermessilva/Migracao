@@ -178,7 +178,7 @@ namespace MigracaoTabelas.Worker
             tgt.AgenciaSeguradoraId = GetAgenciaSeguradoraId(pPrestamista, agenciaId);
             tgt.CooperadoAgenciaContaId = cooagct.Id;
             tgt.PontoAtendimentoId = GetPontoAtendimentoId(conta.PaCodigo);
-            tgt.UsuarioId = 21;
+            //tgt.UsuarioId = 21;
 
 
             foreach (var item in parcelasSrc)

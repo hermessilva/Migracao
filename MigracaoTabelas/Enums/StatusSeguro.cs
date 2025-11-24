@@ -47,7 +47,6 @@ namespace MigracaoTabelas.Enums
         CanceladoPorRenegociacao,
 
         [Description("Cancelado por Aditivo")]
-        CanceladoPorAditivo    
+        CanceladoPorAditivo
     }
 }
-        

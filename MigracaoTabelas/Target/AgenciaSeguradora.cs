@@ -6,7 +6,7 @@ public class AgenciaSeguradora
     public ulong AgenciaId { get; set; }
     public ulong SeguradoraId { get; set; }
 
-    public virtual Agencia Agencias { get; set; } = null!;
-    public virtual Seguradora Seguradoras { get; set; } = null!;
+    public virtual Agencia Agencias { get; set; }
+    public virtual Seguradora Seguradoras { get; set; }
     public virtual ICollection<Seguro> Seguros { get; set; } = new List<Seguro>();
 }

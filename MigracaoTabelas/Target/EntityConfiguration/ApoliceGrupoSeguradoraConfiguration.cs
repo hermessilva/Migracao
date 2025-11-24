@@ -36,6 +36,10 @@ public class ApoliceGrupoSeguradoraConfiguration : IEntityTypeConfiguration<Apol
             .HasMaxLength(255)
             .HasComment("Código do grupo da apólice");
 
+        builder.Property(x => x.Ordem)
+            .HasColumnName("Ordem")
+            .HasComment("ordem de prioridade dentro da agência");
+
         builder.Property(x => x.SubGrupo)
             .HasColumnName("subgrupo")
             .HasMaxLength(255)

@@ -3,9 +3,9 @@ namespace MigracaoTabelas.Target;
 public class Cooperado
 {
     public ulong Id { get; set; }
-    public string NumeroDocumento { get; set; } = null!;
-    public string Tipo { get; set; } = null!;
-    public string Nome { get; set; } = null!;
+    public string NumeroDocumento { get; set; }
+    public string Tipo { get; set; }
+    public string Nome { get; set; }
     public string NomeFantasia { get; set; }
     public string Email { get; set; }
 

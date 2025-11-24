@@ -7,5 +7,5 @@ public class ComissaoSeguradora
     public decimal PorcentagemComissaoCorretora { get; set; }
     public decimal PorcentagemComissaoCooperativa { get; set; }
 
-    public virtual Seguradora Seguradoras { get; set; } = null!;
+    public virtual Seguradora Seguradoras { get; set; }
 }

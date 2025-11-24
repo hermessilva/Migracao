@@ -1,4 +1,5 @@
-using MigracaoTabelas.Enums;
+using System.ComponentModel;
+
 using MigracaoTabelas.Source;
 
 namespace MigracaoTabelas.Target;
@@ -15,25 +16,25 @@ public class Seguro
         switch (source.SegCancTipo.Value)
         {
             case 1:
-                Status = StatusSeguro.CanceladoPeloCooperado.AsString();
+                Status = StatusSeguro.CanceladoPeloCooperado;
                 break;
             case 2:
-                Status = StatusSeguro.CanceladoPelaCooperativa.AsString();
+                Status = StatusSeguro.CanceladoPelaCooperativa;
                 break;
             case 3:
-                Status = StatusSeguro.Sinistro.AsString();
+                Status = StatusSeguro.Sinistro;
                 break;
             case 4:
-                Status = StatusSeguro.RecusadoPelaSeguradora.AsString();
+                Status = StatusSeguro.RecusadoPelaSeguradora;
                 break;
             case 5:
-                Status = StatusSeguro.CanceladoPorAditivo.AsString();
+                Status = StatusSeguro.CanceladoPorAditivo;
                 break;
             case 6:
-                Status = StatusSeguro.LiquidacaoAntecipada.AsString();
+                Status = StatusSeguro.LiquidacaoAntecipada;
                 break;
             default:
-                Status = StatusSeguro.Ativo.AsString();
+                Status = StatusSeguro.Ativo;
                 break;
         }
 
@@ -57,7 +58,7 @@ public class Seguro
         switch (source.SegModalidade)
         {
             default:
-                TipoPagamento = Enums.TipoPagamento.AVista.AsString(); // (SEG_MODALIDADE: Modalidade -> tipo_pagamento: Identificador do tipo de pagamento)
+                TipoPagamento = TipoPagamentoSeguro.AVista; // (SEG_MODALIDADE: Modalidade -> tipo_pagamento: Identificador do tipo de pagamento)
                 break;
         }
 
@@ -80,13 +81,16 @@ public class Seguro
         // source.ControleUnimed;
         // source.SqlDeleted;
     }
-    public ulong Id { get; set; }
+    public ulong Id
+    {
+        get; set;
+    }
     public ulong AgenciaSeguradoraId { get; set; }
     public ulong CooperadoAgenciaContaId { get; set; }
     public ulong PontoAtendimentoId { get; set; }
     public ulong? UsuarioId { get; set; }
-    public string Status { get; set; }
-    public string Contrato { get; set; } = null!;
+    public StatusSeguro Status { get; set; }
+    public string Contrato { get; set; }
     public DateTime? InicioVigencia { get; set; }
     public DateTime? FimVigencia { get; set; }
     public uint CodigoGrupo { get; set; }
@@ -94,16 +98,81 @@ public class Seguro
     public DateTime? Vencimento { get; set; }
     public decimal CapitalSegurado { get; set; }
     public decimal PremioTotal { get; set; }
-    public string TipoPagamento { get; set; }
+    public TipoPagamentoSeguro TipoPagamento { get; set; }
     public decimal EstornoProporcional { get; set; }
     public decimal? ValorBase { get; set; }
     public bool? Dps { get; set; }
     public decimal? ValorIof { get; set; }
 
-    public virtual AgenciaSeguradora AgenciasSeguradoras { get; set; } = null!;
-    public virtual CooperadoAgenciaConta CooperadosAgenciasContas { get; set; } = null!;
-    public virtual PontoAtendimento PontosAtendimentos { get; set; } = null!;
+    public virtual AgenciaSeguradora AgenciasSeguradoras { get; set; }
+    public virtual CooperadoAgenciaConta CooperadosAgenciasContas { get; set; }
+    public virtual PontoAtendimento PontosAtendimentos { get; set; }
     public virtual Usuario Usuarios { get; set; }
     public virtual ICollection<Parcela> Parcelas { get; set; } = new List<Parcela>();
     public virtual ICollection<SeguroCancelamento> SegurosCancelamentos { get; set; } = new List<SeguroCancelamento>();
+
+    public void AlterarStatus(StatusSeguro requestStatus)
+    {
+        Status = requestStatus;
+    }
+
+    public static bool PermiteAlteracaoManual(StatusSeguro status)
+    {
+        return status == StatusSeguro.Ativo
+            || status == StatusSeguro.EmAnalisePelaSeguradora
+            || status == StatusSeguro.PendenteDeDocumentacao
+            || status == StatusSeguro.RecusadoPelaSeguradora
+            || status == StatusSeguro.Sinistro;
+    }
+}
+
+public enum TipoPagamentoSeguro
+{
+    [Description("À Vista")]
+    AVista = 1,
+
+    [Description("Parcelado")]
+    Parcelado = 2,
+
+    [Description("Único")]
+    Unico = 3
+}
+
+public enum StatusSeguro
+{
+    [Description("Ativo")]
+    Ativo = 1,
+
+    [Description("Em análise pela Seguradora")]
+    EmAnalisePelaSeguradora = 2,
+
+    [Description("Pendente de Documentação")]
+    PendenteDeDocumentacao = 3,
+
+    [Description("Expiração da Vigência do Seguro")]
+    ExpiracaoDaVigenciaDoSeguro = 4,
+
+    [Description("Cancelado pelo Cooperado")]
+    CanceladoPeloCooperado = 5,
+
+    [Description("Cancelado pela Cooperativa")]
+    CanceladoPelaCooperativa = 6,
+
+    [Description("Sinistro")]
+    Sinistro = 7,
+
+    [Description("Recusado pela Seguradora")]
+    RecusadoPelaSeguradora = 8,
+
+    [Description("Cancelamento por Prejuízo")]
+    CancelamentoPorPrejuizo = 9,
+
+    [Description("Liquidação Antecipada")]
+    LiquidacaoAntecipada = 10,
+
+    [Description("Cancelado por Renegociação")]
+    CanceladoPorRenegociacao = 11,
+
+    [Description("Cancelado por Aditivo")]
+    CanceladoPorAditivo = 12
 }

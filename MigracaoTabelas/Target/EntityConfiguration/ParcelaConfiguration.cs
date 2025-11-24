@@ -23,7 +23,11 @@ public class ParcelaConfiguration : IEntityTypeConfiguration<Parcela>
 
         builder.Property(x => x.Status)
             .HasColumnName("status")
-            .HasColumnType("enum('Em análise pela Seguradora','Pendente de Documentação','Ativo','Expiração da Vigência do Seguro','Cancelado pelo Cooperado','Cancelado pela Cooperativa','Sinistro','Recusado pela Seguradora','Cancelamento por Prejuízo','Liquidação Antecipada','Cancelado por Renegociação','Cancelado por Aditivo')")
+            .HasColumnType("enum('Em Aberto','Pago','Cancelada')")
+            .HasConversion(v =>
+                v.AsString(),
+                v => EnumEx.FromString<StatusParcela>(v)
+            )
             .HasComment("Identificador do status da parcela")
             .IsRequired();
 

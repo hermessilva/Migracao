@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 using Microsoft.EntityFrameworkCore;
 
 
@@ -36,7 +38,7 @@ namespace MigracaoTabelas.Source
             modelBuilder.Entity<SxEpSegPrestamista>(entity =>
             {
                 entity.HasNoKey();
-                entity.ToSqlQuery(@"select pm.* from ep_segprestamista pm where pm.SEG_MODALIDADE = 4");
+                entity.ToSqlQuery(@"select pm.* from ep_segprestamista pm join cc_conta c on c.cco_conta = pm.CCO_CONTA where pm.SEG_MODALIDADE = 4 and c.CCO_SITUACAO = 1");
             });
 
             modelBuilder.Entity<SxEpSegParcela>(entity =>
@@ -52,7 +54,7 @@ namespace MigracaoTabelas.Source
                 entity.Property(e => e.Codigo).HasColumnName("CODIGO");
                 entity.Property(e => e.Nome).HasColumnName("NOME");
 
-                entity.ToSqlQuery(@"select ca.AG_CODIGO as CODIGO ,ca.AG_RAZAO as NOME from unico.cd_agencia ca");
+                entity.ToSqlQuery(@"select ca.AG_CODIGO as CODIGO ,ca.AG_SIGLA as NOME from unico.cd_agencia ca");
             });
 
             modelBuilder.Entity<SxContas>(entity =>

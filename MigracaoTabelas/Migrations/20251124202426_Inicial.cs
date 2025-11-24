@@ -1,10 +1,10 @@
+﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
-
 using MySql.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
-namespace MigracaoTabelas.Target.Migrations
+namespace MigracaoTabelas.Migrations
 {
     /// <inheritdoc />
     public partial class Inicial : Migration
@@ -26,7 +26,8 @@ namespace MigracaoTabelas.Target.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_acao", x => x.id);
-                })
+                },
+                comment: "Catálogo de ações que podem ser executadas nas telas")
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -46,21 +47,6 @@ namespace MigracaoTabelas.Target.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "conta_contabil",
-                columns: table => new
-                {
-                    id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador do registro na tabela")
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    descricao = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil"),
-                    Conta = table.Column<string>(type: "longtext", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_conta_contabil", x => x.id);
-                })
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "cooperado",
                 columns: table => new
                 {
@@ -75,7 +61,8 @@ namespace MigracaoTabelas.Target.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_cooperado", x => x.id);
-                })
+                },
+                comment: "Cadastro de cooperados vinculados a uma agência")
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -89,7 +76,8 @@ namespace MigracaoTabelas.Target.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_parametrizacao", x => x.id);
-                })
+                },
+                comment: "Parametrizações de campos para preechimento")
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -98,7 +86,8 @@ namespace MigracaoTabelas.Target.Migrations
                 {
                     id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador do registro na tabela")
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    nome = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Nome do perfil (único)")
+                    nome = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Nome do perfil"),
+                    slug = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Nome amigavel do perfil")
                 },
                 constraints: table =>
                 {
@@ -129,7 +118,8 @@ namespace MigracaoTabelas.Target.Migrations
                 {
                     id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador do registro na tabela")
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    descricao = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição/nome da tela")
+                    descricao = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição/nome da tela"),
+                    slug = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição amigavel da tela")
                 },
                 constraints: table =>
                 {
@@ -144,14 +134,13 @@ namespace MigracaoTabelas.Target.Migrations
                     id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador do registro na tabela")
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     agencia_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela agencia"),
-                    conta_credito = table.Column<bool>(type: "tinyint(1)", nullable: false, comment: "Indica se é uma conta de crédito"),
-                    conta_debito = table.Column<bool>(type: "tinyint(1)", nullable: false, comment: "Indica se é uma conta de débito"),
-                    conta_credito_comissao = table.Column<bool>(type: "tinyint(1)", nullable: false, comment: "Indica se é uma conta de crédito de comissão"),
-                    conta_debito_comissao = table.Column<bool>(type: "tinyint(1)", nullable: false, comment: "Indica se é uma conta de débito de comissão"),
-                    status = table.Column<string>(type: "enum('Enviado', 'Erro')", nullable: false, comment: "Status integração"),
+                    status = table.Column<string>(type: "enum('Enviado', 'Falha')", nullable: false, comment: "Status integração"),
+                    tipo_lancamento_contabil = table.Column<string>(type: "enum('Seguro Prestamista Contratado', 'Comissão Seguro Prestamista Contratado', 'Cancelamento Seguro Prestamista Parcelado Comissão', 'Cancelamento Seguro Prestamista À Vista Proporcional Comissão', 'Pagamento Seguro Prestamista', 'Recebimento Comissão Seguro Prestamista')", nullable: false, comment: "Tipo de lançamento contábil"),
+                    codigo_pa = table.Column<string>(type: "char(3)", nullable: false, comment: "Código único do ponto de atendimento"),
+                    conta_contabil_debito = table.Column<string>(type: "varchar(255)", nullable: false, comment: "Conta contábil de débito"),
+                    conta_contabil_credito = table.Column<string>(type: "varchar(255)", nullable: false, comment: "Conta contábil de crédito"),
                     data_movimentacao = table.Column<DateTime>(type: "datetime", nullable: false, comment: "Data e hora da movimentação"),
                     valor = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor da movimentação"),
-                    lancamento = table.Column<int>(type: "int", nullable: false, comment: "Número do lançamento no sistema Senior"),
                     descricao = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da integração")
                 },
                 constraints: table =>
@@ -174,7 +163,7 @@ namespace MigracaoTabelas.Target.Migrations
                     agencia_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela agencia"),
                     codigo = table.Column<string>(type: "char(3)", nullable: false, comment: "Código único do ponto de atendimento"),
                     nome = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Nome do ponto de atendimento"),
-                    criado_em = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)", comment: "Data/hora da criação do registro")
+                    criado_em = table.Column<DateTime>(type: "datetime(6)", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP(6)", comment: "Data/hora da criação do registro")
                 },
                 constraints: table =>
                 {
@@ -210,7 +199,8 @@ namespace MigracaoTabelas.Target.Migrations
                         column: x => x.cooperado_id,
                         principalTable: "cooperado",
                         principalColumn: "id");
-                })
+                },
+                comment: "Junção entre cooperados, agencias e contas")
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -221,11 +211,11 @@ namespace MigracaoTabelas.Target.Migrations
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     agencia_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela agencia"),
                     cooperado_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela cooperado"),
-                    conta_corrente = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Número da conta corrente do cooperado"),
-                    data_movimentacao = table.Column<DateTime>(type: "datetime", nullable: true, comment: "Data e hora da movimentação"),
-                    descricao = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição do lançamento a efetivar"),
+                    conta_corrente = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Conta corrente associada ao lançamento"),
+                    data_movimentacao = table.Column<DateTime>(type: "datetime", nullable: true, comment: "Data de movimentação financeira"),
+                    descricao = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição do lançamento"),
                     valor = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor do lançamento"),
-                    data_lancamento = table.Column<DateTime>(type: "date", nullable: true, comment: "Data prevista para o lançamento")
+                    data_lancamento = table.Column<DateTime>(type: "date", nullable: true, comment: "Data de lançamento/registro no sistema")
                 },
                 constraints: table =>
                 {
@@ -240,7 +230,8 @@ namespace MigracaoTabelas.Target.Migrations
                         column: x => x.cooperado_id,
                         principalTable: "cooperado",
                         principalColumn: "id");
-                })
+                },
+                comment: "Lançamentos financeiros que serão/são efetivados")
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -259,6 +250,33 @@ namespace MigracaoTabelas.Target.Migrations
                         name: "FK_parametrizacao_resposta_parametrizacao_parametrizacao_id",
                         column: x => x.parametrizacao_id,
                         principalTable: "parametrizacao",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                },
+                comment: "Resposta dos campos de parametrização")
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "agencia_seguradora",
+                columns: table => new
+                {
+                    id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador do registro na tabela")
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    agencia_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela agencia"),
+                    seguradora_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela seguradora")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_agencia_seguradora", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_agencia_seguradora_agencia_agencia_id",
+                        column: x => x.agencia_id,
+                        principalTable: "agencia",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_agencia_seguradora_seguradora_seguradora_id",
+                        column: x => x.seguradora_id,
+                        principalTable: "seguradora",
                         principalColumn: "id");
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
@@ -274,11 +292,11 @@ namespace MigracaoTabelas.Target.Migrations
                     apolice = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Código da apólice"),
                     grupo = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Código do grupo da apólice"),
                     subgrupo = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Código do subgrupo da apólice"),
+                    Ordem = table.Column<byte>(type: "tinyint unsigned", nullable: false, comment: "ordem de prioridade dentro da agência"),
                     tipo_capital = table.Column<string>(type: "enum('Fixo','Variável')", nullable: false, comment: "Tipo de capital"),
-                    modalidade_unico = table.Column<string>(type: "varchar(50)", nullable: true, comment: "Valor da modalidade único"),
-                    modalidade_avista = table.Column<decimal>(type: "decimal(10,2)", nullable: true, comment: "Valor da modalidade à vista"),
-                    modalidade_parcelado = table.Column<decimal>(type: "decimal(10,2)", nullable: true, comment: "Valor da modalidade parcelado"),
-                    ordem = table.Column<byte>(type: "tinyint unsigned", nullable: true, comment: "Ordem de priorização da seguradora")
+                    modalidade_unico = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, comment: "Valor modalidade unico"),
+                    modalidade_avista = table.Column<decimal>(type: "decimal(10,2)", nullable: true, comment: "Valor modalidade avista"),
+                    modalidade_parcelado = table.Column<decimal>(type: "decimal(10,2)", nullable: true, comment: "Valor modalidade parcelado")
                 },
                 constraints: table =>
                 {
@@ -297,19 +315,40 @@ namespace MigracaoTabelas.Target.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "comissao_seguradora",
+                columns: table => new
+                {
+                    id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador do registro na tabela")
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    seguradora_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela seguradora"),
+                    porcentagem_comissao_corretora = table.Column<decimal>(type: "decimal(5,4)", nullable: false, comment: "Percentual de comissão da corretora"),
+                    porcentagem_comissao_cooperativa = table.Column<decimal>(type: "decimal(5,4)", nullable: false, comment: "Percentual de comissão da cooperativa")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_comissao_seguradora", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_comissao_seguradora_seguradora_seguradora_id",
+                        column: x => x.seguradora_id,
+                        principalTable: "seguradora",
+                        principalColumn: "id");
+                },
+                comment: "Configurações de comissões por seguradora")
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "condicao_seguradora",
                 columns: table => new
                 {
                     id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador do registro na tabela")
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     seguradora_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela seguradora"),
-                    max_meses_contrato = table.Column<short>(type: "smallint", nullable: false, comment: "Quantidade máxima de meses permitido para o contrato"),
+                    max_meses_contrato = table.Column<short>(type: "smallint", nullable: false, comment: "Quantidade máxima de meses permitidos para o contrato"),
                     max_idade = table.Column<short>(type: "smallint", nullable: false, comment: "Idade máxima do proponente"),
                     porcentagem_cobertura_morte = table.Column<decimal>(type: "decimal(5,4)", nullable: false, comment: "Percentual de cobertura para morte"),
                     porcentagem_cobertura_invalidez = table.Column<decimal>(type: "decimal(5,4)", nullable: false, comment: "Percentual de cobertura para invalidez"),
                     porcentagem_cobertura_perda_renda = table.Column<decimal>(type: "decimal(5,4)", nullable: false, comment: "Percentual de cobertura para perda de renda"),
-                    porcentagem_comissao_corretora = table.Column<decimal>(type: "decimal(5,4)", nullable: false, comment: "Percentual de comissão da corretora"),
-                    porcentagem_comissao_cooperativa = table.Column<decimal>(type: "decimal(5,4)", nullable: false, comment: "Percentual de comissão da cooperativa")
+                    periodicidade_30dias = table.Column<bool>(type: "tinyint(1)", nullable: false, comment: "Indica se a periodicidade de vencimento é mensal ou a cada 30 dias")
                 },
                 constraints: table =>
                 {
@@ -323,23 +362,66 @@ namespace MigracaoTabelas.Target.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "conta_corrente_seguradora",
+                columns: table => new
+                {
+                    id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador do registro na tabela")
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    seguradora_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela seguradora"),
+                    conta_corrente_prestamista = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Numero da conta corrente de seguro prestamista"),
+                    descricao_conta_corrente_prestamista = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta corrente de seguro prestamista"),
+                    conta_cancelamento_prestamista = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Numero da conta de cancelamento de seguro prestamista"),
+                    descricao_conta_cancelamento_prestamista = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descricao da conta de cancelamento de seguro prestamista"),
+                    conta_estorno_prestamista = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Numero da conta de estorno de seguro prestamista"),
+                    descricao_conta_estorno_prestamista = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descricao da conta de estorno de seguro prestamista")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_conta_corrente_seguradora", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_conta_corrente_seguradora_seguradora_seguradora_id",
+                        column: x => x.seguradora_id,
+                        principalTable: "seguradora",
+                        principalColumn: "id");
+                },
+                comment: "Junção entre parâmetros de seguradora e contas correntes")
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "contabilizacao_seguradora",
                 columns: table => new
                 {
                     id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador do registro na tabela")
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     seguradora_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela seguradora"),
-                    conta_contabil_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela conta_contabil"),
-                    tipo = table.Column<string>(type: "enum('Crédito','Débito','Crédito Comissão', 'Débito Comissão')", nullable: false, comment: "Tipo de conta")
+                    credito_premio_contratacao = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Código da conta contábil premio de credito"),
+                    descricao_credito_premio_contratacao = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil premio de credito"),
+                    debito_premio_contratacao = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Código da conta contábil premio de debito"),
+                    descricao_debito_premio_contratacao = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil premio de debito"),
+                    credito_comissao_contratacao = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Código da conta contábil comissao de credito "),
+                    descricao_credito_comissao_contratacao = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil comissao de credito"),
+                    debito_comissao_contratacao = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Código da conta contábil comissao de debito"),
+                    descricao_debito_comissao_contratacao = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil comissao de debito"),
+                    credito_cancelamento_comissao_parc_tot = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Código da conta contábil cancelamento parcial total de credito"),
+                    descricao_credito_cancelamento_comissao_parc_tot = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil cancelamento parcial total de credito"),
+                    debito_cancelamento_comissao_parc_tot = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Código da conta contábil cancelamento parcial total de debito"),
+                    descricao_debito_cancelamento_comissao_parc_tot = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil cancelamento parcial total de debito"),
+                    credito_cancelamento_comissao_avista = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Código da conta contábil cancelamento comissao a vista credito"),
+                    descricao_credito_cancelamento_comissao_avista = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil cancelamento comissao a vista credito"),
+                    debito_cancelamento_comissao_avista = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Código da conta contábil cancelamento comissao a vista debito"),
+                    descricao_debito_cancelamento_comissao_avista = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil cancelamento comissao a vista debito"),
+                    credito_valor_pago = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Código da conta contábil valor pago credito"),
+                    descricao_credito_valor_pago = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil valor pago credito"),
+                    debito_valor_pago = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Código da conta contábil valor pago debito"),
+                    descricao_debito_valor_pago = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil valor pago debito"),
+                    credito_comissao_valor_pago = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Código da conta contábil comissao valor pago credito"),
+                    descricao_comissao_credito_valor_pago = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil comissao valor pago credito"),
+                    debito_comissao_valor_pago = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Código da conta contábil comissao valor pago debito"),
+                    descricao_comissao_debito_valor_pago = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil comissao valor pago debito")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_contabilizacao_seguradora", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_contabilizacao_seguradora_conta_contabil_conta_contabil_id",
-                        column: x => x.conta_contabil_id,
-                        principalTable: "conta_contabil",
-                        principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_contabilizacao_seguradora_seguradora_seguradora_id",
                         column: x => x.seguradora_id,
@@ -361,7 +443,7 @@ namespace MigracaoTabelas.Target.Migrations
                     campo = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Identificador do parâmetro"),
                     valor = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Valor de resposta do parâmetro"),
                     ordem = table.Column<int>(type: "int", nullable: false, defaultValue: 0, comment: "Ordem de exibição"),
-                    criado_em = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)", comment: "Data/hora de criação")
+                    criado_em = table.Column<DateTime>(type: "datetime(6)", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP(6)", comment: "Data/hora de criação")
                 },
                 constraints: table =>
                 {
@@ -371,7 +453,8 @@ namespace MigracaoTabelas.Target.Migrations
                         column: x => x.seguradora_id,
                         principalTable: "seguradora",
                         principalColumn: "id");
-                })
+                },
+                comment: "Gestão de documentos")
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -396,41 +479,92 @@ namespace MigracaoTabelas.Target.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "seguradora_limite",
+                columns: table => new
+                {
+                    id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador do registro na tabela")
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    seguradora_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela seguradora"),
+                    idade_inicial = table.Column<short>(type: "smallint", nullable: false, comment: "Idade inicial da faixa"),
+                    idade_final = table.Column<short>(type: "smallint", nullable: false, comment: "Idade final da faixa"),
+                    valor_maximo = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor associado à faixa"),
+                    coeficiente = table.Column<decimal>(type: "decimal(5,4)", nullable: false, comment: "Coeficiente aplicado para cálculos"),
+                    limite_dps = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor limite de exigibilidade para DPS"),
+                    descricao_regra = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição detalhada da regra para o limite DPS")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_seguradora_limite", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_seguradora_limite_seguradora_seguradora_id",
+                        column: x => x.seguradora_id,
+                        principalTable: "seguradora",
+                        principalColumn: "id");
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "tela_acao",
                 columns: table => new
                 {
                     id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador do registro na tabela")
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     tela_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela tela"),
-                    acao_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela ação"),
-                    TelaId1 = table.Column<ulong>(type: "bigint unsigned", nullable: true),
-                    AcaoId1 = table.Column<ulong>(type: "bigint unsigned", nullable: true)
+                    acao_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela acao")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_tela_acao", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_tela_acao_acao_AcaoId1",
-                        column: x => x.AcaoId1,
-                        principalTable: "acao",
-                        principalColumn: "id");
+                    table.UniqueConstraint("AK_tela_acao_tela_id_acao_id", x => new { x.tela_id, x.acao_id });
                     table.ForeignKey(
                         name: "FK_tela_acao_acao_acao_id",
                         column: x => x.acao_id,
                         principalTable: "acao",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_tela_acao_tela_TelaId1",
-                        column: x => x.TelaId1,
-                        principalTable: "tela",
                         principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_tela_acao_tela_tela_id",
                         column: x => x.tela_id,
                         principalTable: "tela",
+                        principalColumn: "id");
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "usuario",
+                columns: table => new
+                {
+                    id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador do registro na tabela")
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    agencia_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira para a Agência"),
+                    ponto_atendimento_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira para Ponto de Atendimento"),
+                    perfil_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira para a Perfil "),
+                    login = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false, comment: "Login de acesso do usuário"),
+                    nome = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false, comment: "Nome completo do usuário"),
+                    email = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "E-mail do usuário"),
+                    status = table.Column<string>(type: "enum('Ativo','Inativo')", nullable: false, comment: "Indica o status do usuário"),
+                    criado_em = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)", comment: "Data/hora de criação do registro")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_usuario", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_usuario_agencia_agencia_id",
+                        column: x => x.agencia_id,
+                        principalTable: "agencia",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_usuario_perfil_perfil_id",
+                        column: x => x.perfil_id,
+                        principalTable: "perfil",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_usuario_ponto_atendimento_ponto_atendimento_id",
+                        column: x => x.ponto_atendimento_id,
+                        principalTable: "ponto_atendimento",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
 
@@ -441,84 +575,33 @@ namespace MigracaoTabelas.Target.Migrations
                     id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador do registro na tabela")
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     tela_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela tela"),
-                    acao_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela ação"),
-                    perfil_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela perfil")
+                    acao_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela acao"),
+                    perfil_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela perfil"),
+                    TelaAcaoId = table.Column<ulong>(type: "bigint unsigned", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_tela_acao_perfil", x => x.id);
+                    table.UniqueConstraint("AK_tela_acao_perfil_tela_id_acao_id_perfil_id", x => new { x.tela_id, x.acao_id, x.perfil_id });
                     table.ForeignKey(
                         name: "FK_tela_acao_perfil_acao_acao_id",
                         column: x => x.acao_id,
                         principalTable: "acao",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_tela_acao_perfil_perfil_perfil_id",
                         column: x => x.perfil_id,
                         principalTable: "perfil",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_tela_acao_perfil_tela_acao_TelaAcaoId",
+                        column: x => x.TelaAcaoId,
+                        principalTable: "tela_acao",
+                        principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_tela_acao_perfil_tela_tela_id",
                         column: x => x.tela_id,
                         principalTable: "tela",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                })
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "usuarios",
-                columns: table => new
-                {
-                    id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador do registro na tabela")
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    usuario = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false, comment: "Login de acesso do usuário"),
-                    nome = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false, comment: "Nome completo do usuário"),
-                    email = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "E-mail do usuário"),
-                    ativo = table.Column<bool>(type: "tinyint(1)", nullable: false, comment: "ENUM('Ativo', 'Inativo') — Indica o status do perfil"),
-                    criado_em = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)", comment: "Data/hora de criação do registro"),
-                    AgenciaId = table.Column<ulong>(type: "bigint unsigned", nullable: true),
-                    PontoAtendimentoId = table.Column<ulong>(type: "bigint unsigned", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_usuarios", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_usuarios_agencia_AgenciaId",
-                        column: x => x.AgenciaId,
-                        principalTable: "agencia",
-                        principalColumn: "id");
-                    table.ForeignKey(
-                        name: "FK_usuarios_ponto_atendimento_PontoAtendimentoId",
-                        column: x => x.PontoAtendimentoId,
-                        principalTable: "ponto_atendimento",
-                        principalColumn: "id");
-                })
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "limite",
-                columns: table => new
-                {
-                    id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador do registro na tabela")
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    condicao_seguradora_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela condicao_seguradora"),
-                    idade_inicial = table.Column<short>(type: "smallint", nullable: false, comment: "Idade mínima para aplicação do limite"),
-                    idade_final = table.Column<short>(type: "smallint", nullable: false, comment: "Idade máxima para aplicação do limite"),
-                    valor = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor máximo permitido para o limite"),
-                    coeficiente = table.Column<decimal>(type: "decimal(5,4)", nullable: false, comment: "Coeficiente aplicado ao cálculo do limite"),
-                    limite_dps = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor limite para exigência de DPS"),
-                    descricao_regra = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição das regras de aplicação do limite")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_limite", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_limite_condicao_seguradora_condicao_seguradora_id",
-                        column: x => x.condicao_seguradora_id,
-                        principalTable: "condicao_seguradora",
                         principalColumn: "id");
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
@@ -533,9 +616,9 @@ namespace MigracaoTabelas.Target.Migrations
                     agencia_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela agencia"),
                     modulo = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Módulo/área do sistema afetado"),
                     operacao = table.Column<string>(type: "enum('Insert','Delete','Update')", nullable: false, comment: "Tipo da operação"),
-                    antes = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Payload de dados antes da operação"),
-                    depois = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Payload de dados depois da alteração"),
-                    criado_em = table.Column<DateTime>(type: "datetime", nullable: false, comment: "Data/hora da ação registrada")
+                    antes = table.Column<string>(type: "longtext", nullable: false, comment: "Payload de dados antes da operação"),
+                    depois = table.Column<string>(type: "longtext", nullable: false, comment: "Payload de dados depois da alteração"),
+                    criado_em = table.Column<DateTime>(type: "datetime", nullable: true, comment: "Data/hora da ação registrada")
                 },
                 constraints: table =>
                 {
@@ -546,9 +629,9 @@ namespace MigracaoTabelas.Target.Migrations
                         principalTable: "agencia",
                         principalColumn: "id");
                     table.ForeignKey(
-                        name: "FK_auditoria_usuarios_usuario_id",
+                        name: "FK_auditoria_usuario_usuario_id",
                         column: x => x.usuario_id,
-                        principalTable: "usuarios",
+                        principalTable: "usuario",
                         principalColumn: "id");
                 })
                 .Annotation("MySQL:Charset", "utf8mb4");
@@ -563,7 +646,7 @@ namespace MigracaoTabelas.Target.Migrations
                     cooperado_agencia_conta_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira na tabela cooperado_agencia_conta"),
                     ponto_atendimento_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira na tabela ponto de atendimento"),
                     usuario_id = table.Column<ulong>(type: "bigint unsigned", nullable: true, comment: "Chave estrangeira na tabela usuario"),
-                    status = table.Column<sbyte>(type: "tinyint", nullable: false, comment: "Identificador do status (ex.: 1=aberto, 2=quitado, 3=cancelado)"),
+                    status = table.Column<string>(type: "enum('Em análise pela Seguradora','Pendente de Documentação','Ativo','Expiração da Vigência do Seguro','Cancelado pelo Cooperado','Cancelado pela Cooperativa','Sinistro','Recusado pela Seguradora','Cancelamento por Prejuízo','Liquidação Antecipada','Cancelado por Renegociação','Cancelado por Aditivo')", nullable: false, comment: "Status do seguro"),
                     contrato = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: false, comment: "Número do contrato do seguro"),
                     inicio_vigencia = table.Column<DateTime>(type: "date", nullable: true, comment: "Início de vigência do seguro"),
                     fim_vigencia = table.Column<DateTime>(type: "date", nullable: true, comment: "Fim de vigência do seguro"),
@@ -572,7 +655,7 @@ namespace MigracaoTabelas.Target.Migrations
                     vencimento = table.Column<DateTime>(type: "date", nullable: true, comment: "Data de vencimento (padrão do contrato ou próxima parcela)"),
                     capital_segurado = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor do capital segurado"),
                     premio_total = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor do prêmio total do seguro"),
-                    tipo_pagamento = table.Column<sbyte>(type: "tinyint", nullable: false, comment: "Identificador do tipo de pagamento (ex.: 1=à vista, 2=parcelado)"),
+                    tipo_pagamento = table.Column<string>(type: "enum('À Vista','Parcelado','Único')", nullable: false, comment: "Identificador do tipo de pagamento (1=à vista, 2=parcelado, 3=Única)"),
                     estorno_proporcional = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor de estorno proporcional quando aplicável"),
                     valor_base = table.Column<decimal>(type: "decimal(10,2)", nullable: true, comment: "Valor Base Segurado"),
                     dps = table.Column<bool>(type: "tinyint(1)", nullable: true, comment: "Informação de Exigência de DPS"),
@@ -581,6 +664,11 @@ namespace MigracaoTabelas.Target.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_seguro", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_seguro_agencia_seguradora_agencia_seguradora_id",
+                        column: x => x.agencia_seguradora_id,
+                        principalTable: "agencia_seguradora",
+                        principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_seguro_cooperado_agencia_conta_cooperado_agencia_conta_id",
                         column: x => x.cooperado_agencia_conta_id,
@@ -592,11 +680,12 @@ namespace MigracaoTabelas.Target.Migrations
                         principalTable: "ponto_atendimento",
                         principalColumn: "id");
                     table.ForeignKey(
-                        name: "FK_seguro_usuarios_usuario_id",
+                        name: "FK_seguro_usuario_usuario_id",
                         column: x => x.usuario_id,
-                        principalTable: "usuarios",
+                        principalTable: "usuario",
                         principalColumn: "id");
-                })
+                },
+                comment: "Contratos de seguros e seus metadados financeiros e relacionamentos")
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -606,13 +695,13 @@ namespace MigracaoTabelas.Target.Migrations
                     id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador do registro na tabela")
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     seguro_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela seguro"),
-                    status = table.Column<sbyte>(type: "tinyint", nullable: false, comment: "Status da parcela (1 - Pendente, 2 - Pago, 3 - Cancelado)"),
-                    numero_parcela = table.Column<short>(type: "smallint", nullable: false, comment: "Número sequencial da parcela"),
-                    valor_parcela = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor original da parcela"),
-                    valor_pago = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor efetivamente pago da parcela"),
+                    status = table.Column<string>(type: "enum('Em Aberto','Pago','Cancelada')", nullable: false, comment: "Identificador do status da parcela"),
+                    numero_parcela = table.Column<short>(type: "smallint", nullable: false, comment: "Número sequencial da parcela dentro do seguro"),
+                    valor_parcela = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor nominal da parcela"),
+                    valor_pago = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor total pago na parcela"),
                     vencimento = table.Column<DateTime>(type: "date", nullable: false, comment: "Data de vencimento da parcela"),
-                    liquidacao = table.Column<DateTime>(type: "datetime", nullable: true, comment: "Data e hora da liquidação da parcela"),
-                    data_ultimo_pagamento = table.Column<DateTime>(type: "datetime", nullable: true, comment: "Data e hora do último pagamento realizado")
+                    liquidacao = table.Column<DateTime>(type: "datetime", nullable: true, comment: "Data de liquidação da parcela"),
+                    data_ultimo_pagamento = table.Column<DateTime>(type: "datetime", nullable: true, comment: "Data do último pagamento registrado")
                 },
                 constraints: table =>
                 {
@@ -622,7 +711,34 @@ namespace MigracaoTabelas.Target.Migrations
                         column: x => x.seguro_id,
                         principalTable: "seguro",
                         principalColumn: "id");
-                })
+                },
+                comment: "Parcelas financeiras vinculadas a um seguro")
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "seguro_cancelamento",
+                columns: table => new
+                {
+                    id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador do registro na tabela")
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    seguro_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela seguro"),
+                    data = table.Column<DateOnly>(type: "date", nullable: false, comment: "Data do cancelamento"),
+                    criado_em = table.Column<DateTime>(type: "datetime", nullable: false, comment: "Data/hora de criação do registro"),
+                    motivo = table.Column<string>(type: "enum('Expiração da Vigência do Seguro','Cancelado pelo Cooperado','Cancelado pela Cooperativa','Sinistro','Recusado pela Seguradora','Cancelamento por Prejuízo','Liquidação Antecipada','Cancelado por Renegociação','Cancelado por Aditivo')", nullable: false, comment: "Motivo do cancelamento"),
+                    valor_restituir = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor que foi restituido ao segurado"),
+                    valor_comissao = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor que foi laçando de abatimento de comissão"),
+                    dias_utilizados = table.Column<int>(type: "int", nullable: false, comment: "Quantidade de dias que foi utilizado o seguro")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_seguro_cancelamento", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_seguro_cancelamento_seguro_seguro_id",
+                        column: x => x.seguro_id,
+                        principalTable: "seguro",
+                        principalColumn: "id");
+                },
+                comment: "Registro de cancelamento de seguro")
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateIndex(
@@ -636,6 +752,16 @@ namespace MigracaoTabelas.Target.Migrations
                 table: "agencia",
                 column: "nome",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_agencia_seguradora_agencia_id",
+                table: "agencia_seguradora",
+                column: "agencia_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_agencia_seguradora_seguradora_id",
+                table: "agencia_seguradora",
+                column: "seguradora_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_apolice_grupo_seguradora_agencia_id",
@@ -658,14 +784,19 @@ namespace MigracaoTabelas.Target.Migrations
                 column: "usuario_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_comissao_seguradora_seguradora_id",
+                table: "comissao_seguradora",
+                column: "seguradora_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_condicao_seguradora_seguradora_id",
                 table: "condicao_seguradora",
                 column: "seguradora_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_contabilizacao_seguradora_conta_contabil_id",
-                table: "contabilizacao_seguradora",
-                column: "conta_contabil_id");
+                name: "IX_conta_corrente_seguradora_seguradora_id",
+                table: "conta_corrente_seguradora",
+                column: "seguradora_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_contabilizacao_seguradora_seguradora_id",
@@ -673,31 +804,25 @@ namespace MigracaoTabelas.Target.Migrations
                 column: "seguradora_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_contabilizacao_seguradora_seguradora_id_conta_contabil_id",
-                table: "contabilizacao_seguradora",
-                columns: new[] { "seguradora_id", "conta_contabil_id" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_cooperado_agencia_conta_agencia_id",
-                table: "cooperado_agencia_conta",
-                column: "agencia_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_cooperado_agencia_conta_conta_corrente",
+                name: "cooperado_agencia_conta_index_10",
                 table: "cooperado_agencia_conta",
                 column: "conta_corrente");
 
             migrationBuilder.CreateIndex(
-                name: "IX_cooperado_agencia_conta_cooperado_id",
+                name: "cooperado_agencia_conta_index_7",
+                table: "cooperado_agencia_conta",
+                columns: new[] { "cooperado_id", "agencia_id", "conta_corrente" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "cooperado_agencia_conta_index_8",
                 table: "cooperado_agencia_conta",
                 column: "cooperado_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_cooperado_agencia_conta_cooperado_id_agencia_id_conta_corren~",
+                name: "cooperado_agencia_conta_index_9",
                 table: "cooperado_agencia_conta",
-                columns: new[] { "cooperado_id", "agencia_id", "conta_corrente" },
-                unique: true);
+                column: "agencia_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_gestao_documento_seguradora_id",
@@ -720,11 +845,6 @@ namespace MigracaoTabelas.Target.Migrations
                 column: "cooperado_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_limite_condicao_seguradora_id",
-                table: "limite",
-                column: "condicao_seguradora_id");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_parametrizacao_resposta_parametrizacao_id",
                 table: "parametrizacao_resposta",
                 column: "parametrizacao_id");
@@ -741,21 +861,21 @@ namespace MigracaoTabelas.Target.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ponto_atendimento_agencia_id",
+                name: "IX_ponto_atendimento_nome",
                 table: "ponto_atendimento",
-                column: "agencia_id");
+                column: "nome",
+                unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ponto_atendimento_agencia_id_codigo",
+                name: "ponto_atendimento_index_0",
                 table: "ponto_atendimento",
                 columns: new[] { "agencia_id", "codigo" },
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ponto_atendimento_nome",
+                name: "ponto_atendimento_index_1",
                 table: "ponto_atendimento",
-                column: "nome",
-                unique: true);
+                column: "agencia_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_proposta_seguradora_seguradora_id",
@@ -767,6 +887,16 @@ namespace MigracaoTabelas.Target.Migrations
                 table: "seguradora",
                 column: "cnpj",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_seguradora_limite_seguradora_id",
+                table: "seguradora_limite",
+                column: "seguradora_id");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_seguro_agencia_seguradora_id",
+                table: "seguro",
+                column: "agencia_seguradora_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_seguro_cooperado_agencia_conta_id",
@@ -784,49 +914,54 @@ namespace MigracaoTabelas.Target.Migrations
                 column: "usuario_id");
 
             migrationBuilder.CreateIndex(
-                name: "idx_tela_acao_acao_id",
-                table: "tela_acao",
-                column: "acao_id");
+                name: "IX_seguro_cancelamento_seguro_id",
+                table: "seguro_cancelamento",
+                column: "seguro_id");
 
             migrationBuilder.CreateIndex(
-                name: "idx_tela_acao_tela_id",
+                name: "tela_acao_index_2",
                 table: "tela_acao",
                 column: "tela_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_tela_acao_AcaoId1",
+                name: "tela_acao_index_3",
                 table: "tela_acao",
-                column: "AcaoId1");
+                column: "acao_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_tela_acao_TelaId1",
-                table: "tela_acao",
-                column: "TelaId1");
+                name: "IX_tela_acao_perfil_TelaAcaoId",
+                table: "tela_acao_perfil",
+                column: "TelaAcaoId");
 
             migrationBuilder.CreateIndex(
-                name: "idx_tela_acao_perfil_acao_id",
+                name: "tela_acao_perfil_index_4",
+                table: "tela_acao_perfil",
+                column: "tela_id");
+
+            migrationBuilder.CreateIndex(
+                name: "tela_acao_perfil_index_5",
                 table: "tela_acao_perfil",
                 column: "acao_id");
 
             migrationBuilder.CreateIndex(
-                name: "idx_tela_acao_perfil_perfil_id",
+                name: "tela_acao_perfil_index_6",
                 table: "tela_acao_perfil",
                 column: "perfil_id");
 
             migrationBuilder.CreateIndex(
-                name: "idx_tela_acao_perfil_tela_id",
-                table: "tela_acao_perfil",
-                column: "tela_id");
+                name: "IX_usuario_agencia_id",
+                table: "usuario",
+                column: "agencia_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_usuarios_AgenciaId",
-                table: "usuarios",
-                column: "AgenciaId");
+                name: "IX_usuario_perfil_id",
+                table: "usuario",
+                column: "perfil_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_usuarios_PontoAtendimentoId",
-                table: "usuarios",
-                column: "PontoAtendimentoId");
+                name: "IX_usuario_ponto_atendimento_id",
+                table: "usuario",
+                column: "ponto_atendimento_id");
         }
 
         /// <inheritdoc />
@@ -837,6 +972,15 @@ namespace MigracaoTabelas.Target.Migrations
 
             migrationBuilder.DropTable(
                 name: "auditoria");
+
+            migrationBuilder.DropTable(
+                name: "comissao_seguradora");
+
+            migrationBuilder.DropTable(
+                name: "condicao_seguradora");
+
+            migrationBuilder.DropTable(
+                name: "conta_corrente_seguradora");
 
             migrationBuilder.DropTable(
                 name: "contabilizacao_seguradora");
@@ -851,9 +995,6 @@ namespace MigracaoTabelas.Target.Migrations
                 name: "lancamento_efetivar");
 
             migrationBuilder.DropTable(
-                name: "limite");
-
-            migrationBuilder.DropTable(
                 name: "parametrizacao_resposta");
 
             migrationBuilder.DropTable(
@@ -863,16 +1004,13 @@ namespace MigracaoTabelas.Target.Migrations
                 name: "proposta_seguradora");
 
             migrationBuilder.DropTable(
-                name: "tela_acao");
+                name: "seguradora_limite");
+
+            migrationBuilder.DropTable(
+                name: "seguro_cancelamento");
 
             migrationBuilder.DropTable(
                 name: "tela_acao_perfil");
-
-            migrationBuilder.DropTable(
-                name: "conta_contabil");
-
-            migrationBuilder.DropTable(
-                name: "condicao_seguradora");
 
             migrationBuilder.DropTable(
                 name: "parametrizacao");
@@ -881,10 +1019,19 @@ namespace MigracaoTabelas.Target.Migrations
                 name: "seguro");
 
             migrationBuilder.DropTable(
-                name: "acao");
+                name: "tela_acao");
 
             migrationBuilder.DropTable(
-                name: "perfil");
+                name: "agencia_seguradora");
+
+            migrationBuilder.DropTable(
+                name: "cooperado_agencia_conta");
+
+            migrationBuilder.DropTable(
+                name: "usuario");
+
+            migrationBuilder.DropTable(
+                name: "acao");
 
             migrationBuilder.DropTable(
                 name: "tela");
@@ -893,13 +1040,10 @@ namespace MigracaoTabelas.Target.Migrations
                 name: "seguradora");
 
             migrationBuilder.DropTable(
-                name: "cooperado_agencia_conta");
-
-            migrationBuilder.DropTable(
-                name: "usuarios");
-
-            migrationBuilder.DropTable(
                 name: "cooperado");
+
+            migrationBuilder.DropTable(
+                name: "perfil");
 
             migrationBuilder.DropTable(
                 name: "ponto_atendimento");

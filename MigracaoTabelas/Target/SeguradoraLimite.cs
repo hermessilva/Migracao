@@ -9,7 +9,7 @@ public class SeguradoraLimite
     public decimal ValorMaximo { get; set; }
     public decimal Coeficiente { get; set; }
     public decimal LimiteDps { get; set; }
-    public string DescricaoRegra { get; set; } = null!;
+    public string DescricaoRegra { get; set; }
 
-    public virtual Seguradora Seguradoras { get; set; } = null!;
+    public virtual Seguradora Seguradoras { get; set; }
 }

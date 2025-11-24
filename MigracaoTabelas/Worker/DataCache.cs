@@ -209,7 +209,7 @@ namespace MigracaoTabelas.Worker
                     Nome = seguradoraSrc.Nome,
                     Cnpj = (seguradoraSrc.Codigo + seguradoraSrc.Cnpj).Substring(0, 14),
                     RazaoSocial = seguradoraSrc.RazaoSocial,
-                    Status = "Ativo"
+                    Status = StatusSeguradora.Ativo
                 };
                 _TContext.Seguradora.Add(seguradoraTgt);
                 _TContext.SaveChanges();

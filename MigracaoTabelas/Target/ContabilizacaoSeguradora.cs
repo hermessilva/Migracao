@@ -4,30 +4,30 @@ public class ContabilizacaoSeguradora
 {
     public ulong Id { get; set; }
     public ulong SeguradoraId { get; set; }
-    public string CreditoPremioContratacao { get; set; } = null!;
-    public string DescricaoCreditoPremioContratacao { get; set; } = null!;
-    public string DebitoPremioContratacao { get; set; } = null!;
-    public string DescricaoDebitoPremioContratacao { get; set; } = null!;
-    public string CreditoComissaoContratacao { get; set; } = null!;
-    public string DescricaoCreditoComissaoContratacao { get; set; } = null!;
-    public string DebitoComissaoContratacao { get; set; } = null!;
-    public string DescricaoDebitoComissaoContratacao { get; set; } = null!;
-    public string CreditoCancelamentoComissaoParcTot { get; set; } = null!;
-    public string DescricaoCreditoCancelamentoComissaoParcTot { get; set; } = null!;
-    public string DebitoCancelamentoComissaoParcTot { get; set; } = null!;
-    public string DescricaoDebitoCancelamentoComissaoParcTot { get; set; } = null!;
-    public string CreditoCancelamentoComissaoAVista { get; set; } = null!;
-    public string DescricaoCreditoCancelamentoComissaoAVista { get; set; } = null!;
-    public string DebitoCancelamentoComissaoAVista { get; set; } = null!;
-    public string DescricaoDebitoCancelamentoComissaoAVista { get; set; } = null!;
-    public string CreditoValorPago { get; set; } = null!;
-    public string DescricaoCreditoValorPago { get; set; } = null!;
-    public string DebitoValorPago { get; set; } = null!;
-    public string DescricaoDebitoValorPago { get; set; } = null!;
-    public string CreditoComissaoValorPago { get; set; } = null!;
-    public string DescricaoComissaoCreditoValorPago { get; set; } = null!;
-    public string DebitoComissaoValorPago { get; set; } = null!;
-    public string DescricaoComissaoDebitoValorPago { get; set; } = null!;
+    public string CreditoPremioContratacao { get; set; }
+    public string DescricaoCreditoPremioContratacao { get; set; }
+    public string DebitoPremioContratacao { get; set; }
+    public string DescricaoDebitoPremioContratacao { get; set; }
+    public string CreditoComissaoContratacao { get; set; }
+    public string DescricaoCreditoComissaoContratacao { get; set; }
+    public string DebitoComissaoContratacao { get; set; }
+    public string DescricaoDebitoComissaoContratacao { get; set; }
+    public string CreditoCancelamentoComissaoParcTot { get; set; }
+    public string DescricaoCreditoCancelamentoComissaoParcTot { get; set; }
+    public string DebitoCancelamentoComissaoParcTot { get; set; }
+    public string DescricaoDebitoCancelamentoComissaoParcTot { get; set; }
+    public string CreditoCancelamentoComissaoAVista { get; set; }
+    public string DescricaoCreditoCancelamentoComissaoAVista { get; set; }
+    public string DebitoCancelamentoComissaoAVista { get; set; }
+    public string DescricaoDebitoCancelamentoComissaoAVista { get; set; }
+    public string CreditoValorPago { get; set; }
+    public string DescricaoCreditoValorPago { get; set; }
+    public string DebitoValorPago { get; set; }
+    public string DescricaoDebitoValorPago { get; set; }
+    public string CreditoComissaoValorPago { get; set; }
+    public string DescricaoComissaoCreditoValorPago { get; set; }
+    public string DebitoComissaoValorPago { get; set; }
+    public string DescricaoComissaoDebitoValorPago { get; set; }
 
-    public virtual Seguradora Seguradoras { get; set; } = null!;
+    public virtual Seguradora Seguradoras { get; set; }
 }

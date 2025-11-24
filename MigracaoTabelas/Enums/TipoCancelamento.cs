@@ -2,7 +2,7 @@ using System.ComponentModel;
 
 namespace MigracaoTabelas.Enums;
 
-public enum TipoCancelamento 
+public enum TipoCancelamento
 {
 
     [Description("Expiração da Vigência do Seguro")]

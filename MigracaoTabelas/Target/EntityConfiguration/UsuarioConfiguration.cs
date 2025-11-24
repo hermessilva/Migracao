@@ -37,7 +37,9 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
         builder.Property(x => x.Status)
             .HasColumnName("status")
             .HasColumnType("enum('Ativo','Inativo')")
-            .HasConversion<string>()
+            .HasConversion(
+                v => v.AsString(),
+                v => EnumEx.FromString<StatusUsuario>(v))
             .HasComment("Indica o status do usuário")
             .IsRequired();
 

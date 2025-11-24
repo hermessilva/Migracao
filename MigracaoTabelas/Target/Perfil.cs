@@ -19,6 +19,10 @@ public class Perfil
         Nome = nome;
     }
 
+    public void AdicionarSlug(string nome)
+    {
+        Slug = ToSnakeCaseConverter.Convert(nome);
+    }
 
     public virtual ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();
     public virtual ICollection<TelaAcaoPerfil> TelasAcoesPerfis { get; set; } = new List<TelaAcaoPerfil>();

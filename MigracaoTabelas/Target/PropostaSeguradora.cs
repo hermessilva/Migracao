@@ -7,5 +7,5 @@ public class PropostaSeguradora
     public string DescricaoSequencial { get; set; }
     public string NumeroSequencial { get; set; }
 
-    public virtual Seguradora Seguradoras { get; set; } = null!;
+    public virtual Seguradora Seguradoras { get; set; }
 }

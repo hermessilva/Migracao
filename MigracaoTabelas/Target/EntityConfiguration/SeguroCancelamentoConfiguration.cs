@@ -36,6 +36,9 @@ public sealed class SeguroCancelamentoConfiguration : IEntityTypeConfiguration<S
         pBuilder.Property(pX => pX.Motivo)
             .HasColumnName("motivo")
             .HasColumnType("enum('Expiração da Vigência do Seguro','Cancelado pelo Cooperado','Cancelado pela Cooperativa','Sinistro','Recusado pela Seguradora','Cancelamento por Prejuízo','Liquidação Antecipada','Cancelado por Renegociação','Cancelado por Aditivo')")
+            .HasConversion(
+                v => v.AsString(),
+                v => EnumEx.FromString<MotivoSeguroCancelamento>(v))
             .HasComment("Motivo do cancelamento")
             .IsRequired();
 

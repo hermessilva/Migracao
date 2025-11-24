@@ -37,7 +37,9 @@ public class SeguradoraConfiguration : IEntityTypeConfiguration<Seguradora>
         builder.Property(x => x.Status)
             .HasColumnName("status")
             .HasColumnType("enum('Ativo','Inativo')")
-            .HasConversion<string>()
+            .HasConversion(
+                v => v.AsString(),
+                v => EnumEx.FromString<StatusSeguradora>(v))
             .HasComment("Status da seguradora")
             .IsRequired();
 

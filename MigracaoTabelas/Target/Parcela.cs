@@ -1,16 +1,23 @@
-using MigracaoTabelas.Enums;
+using System.ComponentModel;
+
 using MigracaoTabelas.Source;
 
 namespace MigracaoTabelas.Target;
 
 public class Parcela
 {
+
     public void Assign(SxEpSegParcela source)
     {
         // Campos de PK 'id' são Identity, não são mapeados diretamente da source.
 
         // Mapeamentos com correspondência direta:
-        Status = StatusSeguro.Ativo.AsString();
+        if (source.SegCancelado.HasValue)
+            Status = StatusParcela.Cancelada; // SegCancelado -> Status
+        else if (source.SegPgto.HasValue)
+            Status = StatusParcela.Pago; // SegPgto -> Status
+        else
+            Status = StatusParcela.Pendente; // Caso contrário, Pendente
 
         NumeroParcela = (ushort)source.SegParcela; // SegParcela -> NumeroParcela
         ValorParcela = source.SegValor; // SegValor -> ValorParcela
@@ -29,10 +36,9 @@ public class Parcela
         // source.ConSeq; // Usado para buscar SeguroId
         // source.SegCancelado; // Sem correspondência no Target
     }
-
     public ulong Id { get; set; }
     public ulong SeguroId { get; set; }
-    public string Status { get; set; }
+    public StatusParcela Status { get; set; }
     public ushort NumeroParcela { get; set; }
     public decimal ValorParcela { get; set; }
     public decimal ValorPago { get; set; }
@@ -40,5 +46,15 @@ public class Parcela
     public DateTime? Liquidacao { get; set; }
     public DateTime? DataUltimoPagamento { get; set; }
 
-    public virtual Seguro Seguros { get; set; } = null!;
+    public virtual Seguro Seguros { get; set; }
+}
+
+public enum StatusParcela
+{
+    [Description("Em Aberto")]
+    Pendente = 1,
+    [Description("Pago")]
+    Pago = 2,
+    [Description("Cancelada")]
+    Cancelada = 3
 }

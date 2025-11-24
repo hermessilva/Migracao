@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace MigracaoTabelas.Target
@@ -10,6 +12,8 @@ namespace MigracaoTabelas.Target
         {
         }
 
+        public DbSet<Auditoria> Auditoria { get; set; }
+
         public DbSet<Usuario> Usuario { get; set; }
         public DbSet<Perfil> Perfil { get; set; }
         public DbSet<Tela> Tela { get; set; }
@@ -18,23 +22,26 @@ namespace MigracaoTabelas.Target
         public DbSet<TelaAcaoPerfil> TelaAcaoPerfil { get; set; }
         public DbSet<Agencia> Agencia { get; set; }
         public DbSet<PontoAtendimento> PontoAtendimento { get; set; }
-        public DbSet<Auditoria> Auditoria { get; set; }
         public DbSet<Seguradora> Seguradora { get; set; }
         public DbSet<CondicaoSeguradora> CondicaoSeguradora { get; set; }
-        public DbSet<CondicaoSeguradoraLimite> CondicaoSeguradoraLimite { get; set; }
-        public DbSet<ContaContabil> ContaContabil { get; set; }
+        public DbSet<SeguradoraLimite> SeguradoraLimite { get; set; }
         public DbSet<ContabilizacaoSeguradora> ContabilizacaoSeguradora { get; set; }
         public DbSet<ApoliceGrupoSeguradora> ApoliceGrupoSeguradora { get; set; }
         public DbSet<GestaoDocumento> GestaoDocumento { get; set; }
         public DbSet<Cooperado> Cooperado { get; set; }
         public DbSet<CooperadoAgenciaConta> CooperadoAgenciaConta { get; set; }
-        public DbSet<AgenciaSeguradora> AgenciaSeguradora { get; set; }
         public DbSet<Seguro> Seguro { get; set; }
+        public DbSet<SeguroCancelamento> SeguroCancelamento { get; set; }
         public DbSet<Parcela> Parcela { get; set; }
         public DbSet<Parametrizacao> Parametrizacao { get; set; }
         public DbSet<ParametrizacaoResposta> ParametrizacaoResposta { get; set; }
         public DbSet<LancamentoEfetivar> LancamentoEfetivar { get; set; }
-        
+        public DbSet<IntegracaoSenior> IntegracaoSenior { get; set; }
+        public DbSet<ComissaoSeguradora> ComissaoSeguradora { get; set; }
+        public DbSet<ContaCorrenteSeguradora> ContaCorrenteSeguradora { get; set; }
+        public DbSet<PropostaSeguradora> PropostaSeguradora { get; set; }
+        public DbSet<AgenciaSeguradora> AgenciaSeguradora { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
