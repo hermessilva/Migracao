@@ -1,5 +1,7 @@
 using System.ComponentModel;
 
+
+
 namespace MigracaoTabelas.Target;
 
 public class IntegracaoSenior
@@ -13,6 +15,7 @@ public class IntegracaoSenior
     public string ContaContabilCredito { get; private set; }
     public DateTime DataMovimentacao { get; private set; }
     public decimal Valor { get; private set; }
+    public int NumeroLancamento { get; private set; }
     public string Descricao { get; private set; }
     public virtual Agencia Agencia { get; private set; }
 
@@ -66,15 +69,18 @@ public enum TipoLancamentoContabilIntegracaoSenior
     [Description("Comissão Seguro Prestamista Contratado")]
     ComissaoSeguroPrestamistaContratado = 2,
 
+    [Description("Cancelamento Seguro Prestamista Parcelado")]
+    CancelamentoSeguroPrestamistaParcelado = 3,
+
     [Description("Cancelamento Seguro Prestamista Parcelado Comissão")]
-    CancelamentoSeguroPrestamistaParceladoComissao = 3,
+    CancelamentoSeguroPrestamistaParceladoComissao = 4,
 
     [Description("Cancelamento Seguro Prestamista À Vista Proporcional Comissão")]
-    CancelamentoSeguroPrestamistaAVistaProporcionalComissao = 4,
+    CancelamentoSeguroPrestamistaAVistaProporcionalComissao = 5,
 
     [Description("Pagamento Seguro Prestamista")]
-    PagamentoSeguroPrestamista = 5,
+    PagamentoSeguroPrestamista = 6,
 
     [Description("Recebimento Comissão Seguro Prestamista")]
-    RecebimentoComissaoSeguroPrestamista = 6
+    RecebimentoComissaoSeguroPrestamista = 7
 }

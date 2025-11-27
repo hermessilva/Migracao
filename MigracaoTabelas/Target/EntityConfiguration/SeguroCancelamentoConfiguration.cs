@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public sealed class SeguroCancelamentoConfiguration : IEntityTypeConfiguration<SeguroCancelamento>
@@ -38,7 +40,7 @@ public sealed class SeguroCancelamentoConfiguration : IEntityTypeConfiguration<S
             .HasColumnType("enum('Expiração da Vigência do Seguro','Cancelado pelo Cooperado','Cancelado pela Cooperativa','Sinistro','Recusado pela Seguradora','Cancelamento por Prejuízo','Liquidação Antecipada','Cancelado por Renegociação','Cancelado por Aditivo')")
             .HasConversion(
                 v => v.AsString(),
-                v => EnumEx.FromString<MotivoSeguroCancelamento>(v))
+                v => EnumHelper.FromString<MotivoSeguroCancelamento>(v))
             .HasComment("Motivo do cancelamento")
             .IsRequired();
 

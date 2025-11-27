@@ -81,11 +81,8 @@ public class Seguro
         // source.ControleUnimed;
         // source.SqlDeleted;
     }
-    public ulong Id
-    {
-        get; set;
-    }
-    public ulong AgenciaSeguradoraId { get; set; }
+    public ulong Id { get; set; }
+    public ulong ApoliceGrupoSeguradoraId { get; set; }
     public ulong CooperadoAgenciaContaId { get; set; }
     public ulong PontoAtendimentoId { get; set; }
     public ulong? UsuarioId { get; set; }
@@ -103,8 +100,10 @@ public class Seguro
     public decimal? ValorBase { get; set; }
     public bool? Dps { get; set; }
     public decimal? ValorIof { get; set; }
+    public TipoCapitalSeguro TipoCapital { get; set; }
+    public bool Periodicidade30Dias { get; set; }
 
-    public virtual AgenciaSeguradora AgenciasSeguradoras { get; set; }
+    public virtual ApoliceGrupoSeguradora ApolicesGruposSeguradoras { get; set; }
     public virtual CooperadoAgenciaConta CooperadosAgenciasContas { get; set; }
     public virtual PontoAtendimento PontosAtendimentos { get; set; }
     public virtual Usuario Usuarios { get; set; }
@@ -136,6 +135,15 @@ public enum TipoPagamentoSeguro
 
     [Description("Único")]
     Unico = 3
+}
+
+public enum TipoCapitalSeguro
+{
+    [Description("Fixo")]
+    Fixo = 1,
+
+    [Description("Variável")]
+    Variavel = 2
 }
 
 public enum StatusSeguro

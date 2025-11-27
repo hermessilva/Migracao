@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class AuditoriaConfiguration : IEntityTypeConfiguration<Auditoria>
@@ -35,18 +36,16 @@ public class AuditoriaConfiguration : IEntityTypeConfiguration<Auditoria>
         builder.Property(x => x.Operacao)
             .HasColumnName("operacao")
             .HasColumnType("enum('Insert','Delete','Update')")
-            .HasConversion<string>()
+            .HasConversion(
+                v => v.ToString(),
+                v => Enum.Parse<OperacaoAuditoria>(v)
+            )
             .HasComment("Tipo da operação")
             .IsRequired();
 
         builder.Property(x => x.Antes)
             .HasColumnName("antes")
             .HasComment("Payload de dados antes da operação")
-            .IsRequired();
-
-        builder.Property(x => x.Depois)
-            .HasColumnName("depois")
-            .HasComment("Payload de dados depois da alteração")
             .IsRequired();
 
         builder.Property(x => x.CriadoEm)

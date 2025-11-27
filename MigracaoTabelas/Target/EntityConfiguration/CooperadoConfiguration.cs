@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class CooperadoConfiguration : IEntityTypeConfiguration<Cooperado>
@@ -25,7 +26,10 @@ public class CooperadoConfiguration : IEntityTypeConfiguration<Cooperado>
         builder.Property(x => x.Tipo)
             .HasColumnName("tipo")
             .HasColumnType("enum('Física','Jurídica')")
-            .HasConversion<string>()
+            .HasConversion(
+                v => v.AsString(),
+                v => EnumHelper.FromString<TipoPessoaCooperado>(v)
+            )
             .HasComment("Tipo de pessoa")
             .IsRequired();
 

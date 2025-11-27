@@ -7,7 +7,7 @@ public class Usuario
     public ulong Id { get; set; }
     public ulong AgenciaId { get; set; }
     public ulong PontoAtendimentoId { get; set; }
-    public ulong PerfilId { get; set; }
+    public ulong? PerfilId { get; set; }
     public string Login { get; set; }
     public string Nome { get; set; }
     public string Email { get; set; }
@@ -17,7 +17,7 @@ public class Usuario
     public Agencia Agencias { get; set; }
     public PontoAtendimento PontosAtendimentos { get; set; }
 
-    public Usuario(string usuarioLogin, string nome, string email, ulong perfilId, ulong agenciaId, ulong pontoAtendimentoId, StatusUsuario status = StatusUsuario.Ativo)
+    public Usuario(string usuarioLogin, string nome, string email, ulong? perfilId, ulong agenciaId, ulong pontoAtendimentoId, StatusUsuario status = StatusUsuario.Ativo)
     {
         ValidarUsuarioLogin(usuarioLogin);
         ValidarNome(nome);
@@ -44,7 +44,7 @@ public class Usuario
         string usuarioLogin,
         string nome,
         string email,
-        ulong perfilId,
+        ulong? perfilId,
         ulong agenciaId,
         ulong pontoAtendimentoId,
         StatusUsuario status = StatusUsuario.Ativo)
@@ -53,7 +53,7 @@ public class Usuario
     }
 
     public void Atualizar(
-        ulong perfilId,
+        ulong? perfilId,
         ulong agenciaId,
         ulong pontoAtendimentoId)
     {
@@ -65,7 +65,7 @@ public class Usuario
     public void AtualizarComDadosSensiveis(
         string nome,
         string email,
-        ulong perfilId,
+        ulong? perfilId,
         ulong agenciaId,
         ulong pontoAtendimentoId)
     {

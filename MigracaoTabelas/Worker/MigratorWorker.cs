@@ -175,7 +175,6 @@ namespace MigracaoTabelas.Worker
             var (cooagct, cooperado, conta) = GetCooperadoId(pPrestamista);
             var agenciaId = GetAgenciaId();
 
-            tgt.AgenciaSeguradoraId = GetAgenciaSeguradoraId(pPrestamista, agenciaId);
             tgt.CooperadoAgenciaContaId = cooagct.Id;
             tgt.PontoAtendimentoId = GetPontoAtendimentoId(conta.PaCodigo);
             //tgt.UsuarioId = 21;

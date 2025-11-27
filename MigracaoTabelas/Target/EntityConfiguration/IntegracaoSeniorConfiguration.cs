@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class IntegracaoSeniorConfiguration : IEntityTypeConfiguration<IntegracaoSenior>
@@ -52,6 +54,12 @@ public class IntegracaoSeniorConfiguration : IEntityTypeConfiguration<Integracao
             .HasComment("Valor da movimentação")
             .IsRequired();
 
+        builder.Property(x => x.NumeroLancamento)
+            .HasColumnName("numero_lancamento")
+            .HasColumnType("int")
+            .HasComment("Identificador do lançamento associado")
+            .IsRequired();
+
         builder.Property(x => x.Descricao)
             .HasColumnName("descricao")
             .HasMaxLength(255)
@@ -60,10 +68,10 @@ public class IntegracaoSeniorConfiguration : IEntityTypeConfiguration<Integracao
 
         builder.Property(x => x.TipoLancamentoContabil)
             .HasColumnName("tipo_lancamento_contabil")
-            .HasColumnType("enum('Seguro Prestamista Contratado', 'Comissão Seguro Prestamista Contratado', 'Cancelamento Seguro Prestamista Parcelado Comissão', 'Cancelamento Seguro Prestamista À Vista Proporcional Comissão', 'Pagamento Seguro Prestamista', 'Recebimento Comissão Seguro Prestamista')")
+            .HasColumnType("enum('Seguro Prestamista Contratado', 'Comissão Seguro Prestamista Contratado', 'Cancelamento Seguro Prestamista Parcelado', 'Cancelamento Seguro Prestamista Parcelado Comissão', 'Cancelamento Seguro Prestamista À Vista Proporcional Comissão', 'Pagamento Seguro Prestamista', 'Recebimento Comissão Seguro Prestamista')")
             .HasConversion(v =>
                 v.AsString(),
-                v => EnumEx.FromString<TipoLancamentoContabilIntegracaoSenior>(v)
+                v => EnumHelper.FromString<TipoLancamentoContabilIntegracaoSenior>(v)
             )
             .HasComment("Tipo de lançamento contábil")
             .IsRequired();

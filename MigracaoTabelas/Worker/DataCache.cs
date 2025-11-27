@@ -145,7 +145,7 @@ namespace MigracaoTabelas.Worker
                     {
                         NumeroDocumento = cooperado.NumeroDocumento,
                         Nome = cooperado.Nome,
-                        Tipo = cooperado.Tipo == "F" ? "Física" : "Jurídica",
+                        Tipo = cooperado.Tipo == "F" ? TipoPessoaCooperado.Fisica : TipoPessoaCooperado.Juridica,
                         NomeFantasia = cooperado.NomeFantasia,
                         Email = cooperado.Email,
                     };

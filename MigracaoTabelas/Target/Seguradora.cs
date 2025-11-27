@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 
 namespace MigracaoTabelas.Target;
 
@@ -28,7 +29,6 @@ public class Seguradora
 
     public virtual ICollection<CondicaoSeguradora> CondicoesSeguradora { get; set; } = new List<CondicaoSeguradora>();
     public virtual ICollection<GestaoDocumento> GestoesDocumentos { get; set; } = new List<GestaoDocumento>();
-    public virtual ICollection<ApoliceGrupoSeguradora> ApolicesGruposSeguradoras { get; set; } = new List<ApoliceGrupoSeguradora>();
     public virtual ICollection<ContabilizacaoSeguradora> ContabilizacoesSeguradoras { get; set; } = new List<ContabilizacaoSeguradora>();
     public virtual ICollection<ContaCorrenteSeguradora> ContasCorrentes { get; set; } = new List<ContaCorrenteSeguradora>();
     public virtual ICollection<PropostaSeguradora> PropostasSeguradoras { get; set; } = new List<PropostaSeguradora>();
@@ -104,6 +104,7 @@ public enum StatusSeguradora
 {
     [Description("Ativo")]
     Ativo = 1,
+
     [Description("Inativo")]
     Inativo = 2
 }

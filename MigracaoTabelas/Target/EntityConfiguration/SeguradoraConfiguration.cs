@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class SeguradoraConfiguration : IEntityTypeConfiguration<Seguradora>
@@ -39,7 +41,7 @@ public class SeguradoraConfiguration : IEntityTypeConfiguration<Seguradora>
             .HasColumnType("enum('Ativo','Inativo')")
             .HasConversion(
                 v => v.AsString(),
-                v => EnumEx.FromString<StatusSeguradora>(v))
+                v => EnumHelper.FromString<StatusSeguradora>(v))
             .HasComment("Status da seguradora")
             .IsRequired();
 

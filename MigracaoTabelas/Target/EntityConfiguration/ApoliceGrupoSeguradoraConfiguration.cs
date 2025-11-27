@@ -16,14 +16,9 @@ public class ApoliceGrupoSeguradoraConfiguration : IEntityTypeConfiguration<Apol
             .HasComment("Identificador do registro na tabela")
             .IsRequired();
 
-        builder.Property(x => x.AgenciaId)
-            .HasColumnName("agencia_id")
-            .HasComment("Chave estrangeira da tabela agencia")
-            .IsRequired();
-
-        builder.Property(x => x.SeguradoraId)
-            .HasColumnName("seguradora_id")
-            .HasComment("Chave estrangeira da tabela seguradora")
+        builder.Property(x => x.AgenciaSeguradoraId)
+            .HasColumnName("agencia_seguradora_id")
+            .HasComment("Chave estrangeira da tabela agencia_seguradora")
             .IsRequired();
 
         builder.Property(x => x.Apolice)
@@ -35,10 +30,6 @@ public class ApoliceGrupoSeguradoraConfiguration : IEntityTypeConfiguration<Apol
             .HasColumnName("grupo")
             .HasMaxLength(255)
             .HasComment("Código do grupo da apólice");
-
-        builder.Property(x => x.Ordem)
-            .HasColumnName("Ordem")
-            .HasComment("ordem de prioridade dentro da agência");
 
         builder.Property(x => x.SubGrupo)
             .HasColumnName("subgrupo")
@@ -68,14 +59,9 @@ public class ApoliceGrupoSeguradoraConfiguration : IEntityTypeConfiguration<Apol
             .HasComment("Valor modalidade parcelado");
 
         // Relacionamentos
-        builder.HasOne(x => x.Agencias)
+        builder.HasOne(x => x.AgenciasSeguradoras)
             .WithMany(x => x.ApolicesGruposSeguradoras)
-            .HasForeignKey(x => x.AgenciaId)
-            .OnDelete(DeleteBehavior.NoAction);
-
-        builder.HasOne(x => x.Seguradoras)
-            .WithMany(x => x.ApolicesGruposSeguradoras)
-            .HasForeignKey(x => x.SeguradoraId)
+            .HasForeignKey(x => x.AgenciaSeguradoraId)
             .OnDelete(DeleteBehavior.NoAction);
     }
 }

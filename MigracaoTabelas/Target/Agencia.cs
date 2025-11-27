@@ -9,7 +9,6 @@ public class Agencia
 
     public virtual ICollection<PontoAtendimento> PontosAtendimentos { get; set; } = new List<PontoAtendimento>();
     public virtual ICollection<Usuario> Usuarios { get; set; } = new List<Usuario>();
-    public virtual ICollection<ApoliceGrupoSeguradora> ApolicesGruposSeguradoras { get; set; } = new List<ApoliceGrupoSeguradora>();
     public virtual ICollection<CooperadoAgenciaConta> CooperadosAgenciasContas { get; set; } = new List<CooperadoAgenciaConta>();
     public virtual ICollection<LancamentoEfetivar> LancamentosEfetivar { get; set; } = new List<LancamentoEfetivar>();
     public virtual ICollection<IntegracaoSenior> IntegracoesSeniores { get; set; } = new List<IntegracaoSenior>();

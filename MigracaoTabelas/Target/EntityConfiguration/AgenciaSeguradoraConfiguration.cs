@@ -26,6 +26,11 @@ public class AgenciaSeguradoraConfiguration : IEntityTypeConfiguration<AgenciaSe
             .HasComment("Chave estrangeira da tabela seguradora")
             .IsRequired();
 
+        builder.Property(x => x.Ordem)
+            .HasColumnName("ordem")
+            .HasComment("ordem de prioridade dentro da agência")
+            .IsRequired();
+
         // Relacionamentos
         builder.HasOne(x => x.Agencias)
             .WithMany(x => x.AgenciasSeguradoras)

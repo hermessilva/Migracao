@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
@@ -39,7 +41,7 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
             .HasColumnType("enum('Ativo','Inativo')")
             .HasConversion(
                 v => v.AsString(),
-                v => EnumEx.FromString<StatusUsuario>(v))
+                v => EnumHelper.FromString<StatusUsuario>(v))
             .HasComment("Indica o status do usuário")
             .IsRequired();
 
@@ -52,8 +54,7 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
         // Propriedades de chave estrangeira
         builder.Property(e => e.PerfilId)
            .HasColumnName("perfil_id")
-           .HasComment("Chave estrangeira para a Perfil ")
-           .IsRequired();
+           .HasComment("Chave estrangeira para a tabela perfil opcional para o perfil principal do usuário");
 
         builder.Property(e => e.AgenciaId)
             .HasColumnName("agencia_id")
@@ -68,7 +69,6 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
         // Relacionamentos
         builder.HasOne(e => e.Perfils)
             .WithMany(p => p.Usuarios)
-            .IsRequired()
             .HasForeignKey(e => e.PerfilId)
             .OnDelete(DeleteBehavior.Restrict);
 

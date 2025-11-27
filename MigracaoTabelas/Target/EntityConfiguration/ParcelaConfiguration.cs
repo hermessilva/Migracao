@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class ParcelaConfiguration : IEntityTypeConfiguration<Parcela>
@@ -26,7 +28,7 @@ public class ParcelaConfiguration : IEntityTypeConfiguration<Parcela>
             .HasColumnType("enum('Em Aberto','Pago','Cancelada')")
             .HasConversion(v =>
                 v.AsString(),
-                v => EnumEx.FromString<StatusParcela>(v)
+                v => EnumHelper.FromString<StatusParcela>(v)
             )
             .HasComment("Identificador do status da parcela")
             .IsRequired();

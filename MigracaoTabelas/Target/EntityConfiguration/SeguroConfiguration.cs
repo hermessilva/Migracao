@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class SeguroConfiguration : IEntityTypeConfiguration<Seguro>
@@ -16,9 +18,9 @@ public class SeguroConfiguration : IEntityTypeConfiguration<Seguro>
             .HasComment("Identificador do registro na tabela")
             .IsRequired();
 
-        builder.Property(x => x.AgenciaSeguradoraId)
-            .HasColumnName("agencia_seguradora_id")
-            .HasComment("Chave estrangeira na tabela agencia_seguradora")
+        builder.Property(x => x.ApoliceGrupoSeguradoraId)
+            .HasColumnName("apolice_grupo_seguradora_id")
+            .HasComment("Chave estrangeira na tabela apolice_grupo_seguradora")
             .IsRequired();
 
         builder.Property(x => x.CooperadoAgenciaContaId)
@@ -37,10 +39,10 @@ public class SeguroConfiguration : IEntityTypeConfiguration<Seguro>
 
         builder.Property(x => x.Status)
             .HasColumnName("status")
-            .HasColumnType("enum('Ativo','Em análise pela Seguradora','Pendente de Documentação','Expiração da Vigência do Seguro','Cancelado pelo Cooperado','Cancelado pela Cooperativa','Sinistro','Recusado pela Seguradora','Cancelamento por Prejuízo','Liquidação Antecipada','Cancelado por Renegociação','Cancelado por Aditivo')")
+            .HasColumnType("enum('Em análise pela Seguradora','Pendente de Documentação','Ativo','Expiração da Vigência do Seguro','Cancelado pelo Cooperado','Cancelado pela Cooperativa','Sinistro','Recusado pela Seguradora','Cancelamento por Prejuízo','Liquidação Antecipada','Cancelado por Renegociação','Cancelado por Aditivo')")
             .HasConversion(
                 v => v.AsString(),
-                v => EnumEx.FromString<StatusSeguro>(v)
+                v => EnumHelper.FromString<StatusSeguro>(v)
             )
             .HasComment("Status do seguro")
             .IsRequired();
@@ -95,7 +97,7 @@ public class SeguroConfiguration : IEntityTypeConfiguration<Seguro>
             .HasColumnType("enum('À Vista','Parcelado','Único')")
             .HasConversion(
                 v => v.AsString(),
-                v => EnumEx.FromString<TipoPagamentoSeguro>(v)
+                v => EnumHelper.FromString<TipoPagamentoSeguro>(v)
             )
             .HasComment("Identificador do tipo de pagamento (1=à vista, 2=parcelado, 3=Única)")
             .IsRequired();
@@ -121,10 +123,27 @@ public class SeguroConfiguration : IEntityTypeConfiguration<Seguro>
             .HasColumnType("decimal(10,2)")
             .HasComment("Valor de IOF");
 
+        builder.Property(x => x.TipoCapital)
+            .HasColumnName("tipo_capital")
+            .HasColumnType("enum('Fixo','Variável')")
+            .HasConversion(
+                v => v.AsString(),
+                v => EnumHelper.FromString<TipoCapitalSeguro>(v)
+            )
+            .HasComment("Tipo de capital")
+            .IsRequired();
+
+        builder.Property(x => x.Periodicidade30Dias)
+            .HasColumnName("periodicidade_30dias")
+            .HasColumnType("tinyint(1)")
+            .HasDefaultValue(false)
+            .HasComment("Indica se a periodicidade de vencimento é mensal ou a cada 30 dias")
+            .IsRequired();
+
         // Relacionamentos
-        builder.HasOne(x => x.AgenciasSeguradoras)
+        builder.HasOne(x => x.ApolicesGruposSeguradoras)
             .WithMany(x => x.Seguros)
-            .HasForeignKey(x => x.AgenciaSeguradoraId)
+            .HasForeignKey(x => x.ApoliceGrupoSeguradoraId)
             .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasOne(x => x.CooperadosAgenciasContas)
