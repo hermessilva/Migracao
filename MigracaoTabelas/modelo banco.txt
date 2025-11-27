@@ -1,0 +1,496 @@
+  // ================================
+  // AGÊNCIAS / PONTOS DE ATENDIMENTO
+  // ================================
+
+    Table agencia [headercolor: #79AD51] {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    codigo char(4) [not null, unique, note: 'Código único da agência']
+    nome varchar(255) [unique, not null, note: 'Nome da agência']
+    criado_em datetime [not null, default: `now()`, note: 'Data/hora de criação do registro']
+    note: 'Armazena informações das Agências'
+  }
+
+  Table ponto_atendimento {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    agencia_id bigint [not null, note: 'Chave estrangeira da tabela agencia']
+    codigo char(3) [not null, note: 'Código do ponto de atendimento dentro de uma agência']
+    nome varchar(255) [unique, not null, note: 'Nome do ponto de atendimento']
+    criado_em datetime [default: `now()`, note: 'Data/hora de criação do registro']
+
+    indexes {
+      (agencia_id, codigo) [unique]
+      agencia_id
+    }
+    note: 'Armazena informações de Pontos de atendimento de cada Agência'
+  }
+
+  Ref: ponto_atendimento.agencia_id > agencia.id
+
+  // ================================
+  // USUÁRIOS / PERFIS / TELAS & AÇÕES
+  // ================================
+
+    Table perfil [headercolor: #CA4242] {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    nome varchar(255) [unique, not null, note: 'Nome do perfil']
+    slug varcha(50) [unique, not null, note: "Descrição amigável do perfi"]
+    note: 'Tabela de perfis que agrupam permissões de acesso'
+  }
+
+    Table usuario [headercolor: #CA4242] {
+    id BIGINT [pk, increment, note: 'Identificador do registro na tabela']
+    agencia_id bigint [not null, note: 'Chave estrangeira para a agência']
+    ponto_atendimento_id BIGINT [not null, note: 'Chave estrangeira para o ponto de atendimento vinculado']
+    perfil_id BIGINT [note: 'Chave estrangeira para a tabela perfil opcional para o perfil principal do usuário']
+    login varchar(255) [not null, note: 'Login de acesso do usuário']
+    nome varchar(255) [not null, note: 'Nome completo do usuário']
+    email varchar(255) [not null, note: 'E-mail do usuário']
+    status enum [not null, note: 'ENUM(\'Ativo\', \'Inativo\') — Indica o status do perfil']
+    criado_em datetime [default: `now()`, note: 'Data/hora de criação do registro']
+    note: 'Tabela de usuários do sistema'
+  }
+
+  Ref: usuario.agencia_id > agencia.id
+  Ref: usuario.ponto_atendimento_id > ponto_atendimento.id
+  Ref: usuario.perfil_id > perfil.id
+
+    Table tela [headercolor: #CA4242] {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    slug varcha(50) [unique, not null, note: "Descrição amigável da tela"]
+    descricao varchar(255) [not null, note: 'Descrição/nome da tela']
+    note: 'Catálogo de telas (módulos/páginas) do sistema'
+  }
+
+    Table acao [headercolor: #CA4242] {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    descricao varchar(255) [not null, note: 'Descrição da ação (ex.: Visualizar, Editar, Excluir)']
+    note: 'Catálogo de ações que podem ser executadas nas telas'
+  }
+
+    Table tela_acao [headercolor: #CA4242] {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    tela_id bigint [not null, note: 'Chave estrangeira da tabela tela']
+    acao_id bigint [not null, note: 'Chave estrangeira da tabela acao']
+
+    indexes {
+      (tela_id, acao_id) [pk]
+      tela_id
+      acao_id
+    }
+    note: 'Junção N:N definindo quais ações pertencem a cada tela'
+  }
+
+  Ref: tela_acao.tela_id > tela.id
+  Ref: tela_acao.acao_id > acao.id
+
+    Table tela_acao_perfil [headercolor: #CA4242] {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    tela_id bigint [not null, note: 'Chave estrangeira da tabela tela']
+    acao_id bigint [not null, note: 'Chave estrangeira da tabela acao']
+    perfil_id bigint [not null, note: 'Chave estrangeira da tabela perfil']
+
+    indexes {
+      (tela_id, acao_id, perfil_id) [pk]
+      tela_id
+      acao_id
+      perfil_id
+    }
+    note: 'Permissões: quais perfis podem executar determinadas ações em determinadas telas'
+  }
+
+  Ref: tela_acao_perfil.tela_id > tela.id
+  Ref: tela_acao_perfil.acao_id > acao.id
+  Ref: tela_acao_perfil.perfil_id > perfil.id
+
+  // ================================
+  // LOGS
+  // ================================
+
+  Table auditoria {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    usuario_id bigint [not null, note: 'Chave estrangeira da tabela usuario']
+    agencia_id bigint [not null, note: 'Chave estrangeira da tabela agencia']
+    modulo varchar(255)  [not null, note: 'Módulo/área do sistema afetado']
+    operacao enum('Insert', 'Delete', 'Update') [not null, note: 'Tipo da operação']
+    antes varchar(255) [not null, note: 'Payload de dados antes da alteração']
+    criado_em datetime [note: 'Data/hora da ação registrada']
+    note: 'Tabela de auditoria de eventos do sistema'
+  }
+
+  Ref: auditoria.usuario_id > usuario.id
+  Ref: auditoria.agencia_id > agencia.id
+
+  // ========================================================
+  // SEGURADORAS / PARÂMETROS / LIMITES / APOLICE_GRUPOS
+  // ========================================================
+
+    Table seguradora [headercolor: #A15CF5] {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    nome varchar(255) [not null, note: 'Nome fantasia da seguradora']
+    cnpj char(14) [unique, not null, note: 'CNPJ da seguradora']
+    razao_social varchar(255) [not null, note: 'Razão social da seguradora']
+    status enum('Ativo', 'Inativo') [not null, note: 'Status da seguradora']
+    note: 'Armazena os dados da seguradora'
+  }
+
+    Table condicao_seguradora [headercolor: #A15CF5] {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    seguradora_id bigint [not null, note: 'Chave estrangeira da tabela seguradora']
+    max_meses_contrato smallint [not null, note: 'Quantidade máxima de meses permitidos para o contrato']
+    max_idade smallint [not null, note: 'Idade máxima do proponente']
+    porcentagem_cobertura_morte decimal(5,4) [not null, note: 'Percentual de cobertura para morte']
+    porcentagem_cobertura_invalidez decimal(5,4) [not null, note: 'Percentual de cobertura para invalidez']
+    porcentagem_cobertura_perda_renda decimal(5,4) [not null, note: 'Percentual de cobertura para perda de renda']
+    periodicidade_30dias  tinyint(1) [not null, default: `false`, note: 'Indica se a periodicidade de vencimento é mensal ou a cada 30 dias']
+    note: 'Parâmetros financeiros/operacionais aplicados por seguradora'
+  }
+
+  Ref: condicao_seguradora.seguradora_id > seguradora.id
+
+    Table seguradora_limite [headercolor: #EB801B] {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    seguradora_id bigint [not null, note: 'Chave estrangeira da tabela seguradora']
+    idade_inicial smallint [not null, note: 'Idade inicial da faixa']
+    idade_final smallint [not null, note: 'Idade final da faixa']
+    valor_maximo decimal(10,2) [not null, note: 'Valor associado à faixa']
+    coeficiente decimal(5,4) [not null, note: 'Coeficiente aplicado para cálculos']
+    limite_dps decimal(10,2) [not null, note: 'Valor limite de exigibilidade para DPS']
+    descricao_regra varchar(255) [not null, note: 'Descrição detalhada da regra para o limite DPS']
+    note: 'Faixas e coeficientes utilizados em regras de cálculo'
+  }
+
+  Ref: seguradora_limite.seguradora_id > seguradora.id 
+
+    Table apolice_grupo_seguradora [headercolor: #EB801B] {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    agencia_seguradora_id bigint [not null, note: 'Chave estrangeira da tabela agencia']
+    apolice varchar(255) [note: 'Código da apólice']
+    grupo varchar(255) [note: 'Código do grupo da apólice']
+    subgrupo varchar(255) [note: 'Código do subgrupo da apólice']    
+    tipo_capital enum('Fixo', 'Variável') [not null, note: 'Tipo de capital']
+    modalidade_unico varchar(50) [note: 'Valor modalidade unico']    
+    modalidade_avista decimal(10,2) [note: 'Valor modalidade avista']    
+    modalidade_parcelado decimal(10,2) [note: 'Valor modalidade parcelado']    
+
+    note: 'Grupos/configurações agregadas por seguradora e agência'
+  }
+
+  Ref: apolice_grupo_seguradora.agencia_seguradora_id > agencia_seguradora.id
+
+    Table proposta_seguradora [headercolor: #A15CF5] {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    seguradora_id bigint [not null, note: 'Chave estrangeira da tabela de seguradora']
+    descricao_sequencial varchar(255) [note: 'Descrição do sequencial da proposta']
+    numero_sequencial varchar(255) [note: 'Sequencial da proposta']
+  }
+
+  Ref: proposta_seguradora.seguradora_id > seguradora.id
+
+  // ================================
+  // CONTABILIDADE
+  // ================================
+
+    Table contabilizacao_seguradora [headercolor: #A15CF5] {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    seguradora_id bigint [not null, note: 'Chave estrangeira da tabela seguradora']
+    credito_premio_contratacao varchar(50) [not null, note: 'Código da conta contábil premio de credito']
+    descricao_credito_premio_contratacao varchar(255) [not null, note: 'Descrição da conta contábil premio de credito']
+    debito_premio_contratacao varchar(50) [not null, note: 'Código da conta contábil premio de debito']
+    descricao_debito_premio_contratacao varchar(255) [not null, note: 'Descrição da conta contábil premio de debito']
+    credito_comissao_contratacao varchar(50) [not null, note: 'Código da conta contábil comissao de credito ']
+    descricao_credito_comissao_contratacao varchar(255) [not null, note: 'Descrição da conta contábil comissao de credito']
+    debito_comissao_contratacao varchar(50) [not null, note: 'Código da conta contábil comissao de debito']
+    descricao_debito_comissao_contratacao varchar(255) [not null, note: 'Descrição da conta contábil comissao de debito']
+    credito_cancelamento_comissao_parc_tot varchar(50) [not null, note: 'Código da conta contábil cancelamento parcial total de credito']
+    descricao_credito_cancelamento_comissao_parc_tot varchar(255) [not null, note: 'Descrição da conta contábil cancelamento parcial total de credito']
+    debito_cancelamento_comissao_parc_tot varchar(50) [not null, note: 'Código da conta contábil cancelamento parcial total de debito']
+    descricao_debito_cancelamento_comissao_parc_tot varchar(255) [not null, note: 'Descrição da conta contábil cancelamento parcial total de debito']
+    credito_cancelamento_comissao_avista varchar(50) [not null, note: 'Código da conta contábil cancelamento comissao a vista credito']
+    descricao_credito_cancelamento_comissao_avista varchar(255) [not null, note: 'Descrição da conta contábil cancelamento comissao a vista credito']
+    debito_cancelamento_comissao_avista varchar(50) [not null, note: 'Código da conta contábil cancelamento comissao a vista debito']
+    descricao_debito_cancelamento_comissao_avista varchar(255) [not null, note: 'Descrição da conta contábil cancelamento comissao a vista debito']
+    credito_valor_pago varchar(50) [not null, note: 'Código da conta contábil valor pago credito']
+    descricao_credito_valor_pago varchar(255) [not null, note: 'Descrição da conta contábil valor pago credito']
+    debito_valor_pago varchar(50) [not null, note: 'Código da conta contábil valor pago debito']
+    descricao_debito_valor_pago varchar(255) [not null, note: 'Descrição da conta contábil valor pago debito']
+    credito_comissao_valor_pago varchar(50) [not null, note: 'Código da conta contábil comissao valor pago credito']
+    descricao_comissao_credito_valor_pago varchar(255) [not null, note: 'Descrição da conta contábil comissao valor pago credito']
+    debito_comissao_valor_pago varchar(50) [not null, note: 'Código da conta contábil comissao valor pago debito']
+    descricao_comissao_debito_valor_pago varchar(255) [not null, note: 'Descrição da conta contábil comissao valor pago debito']
+    note: 'Junção entre parâmetros de seguradora e contas contábeis'
+  }
+
+  Ref: contabilizacao_seguradora.seguradora_id > seguradora.id 
+
+  // ================================
+  // CONTA CORRENTE
+  // ================================
+
+    Table conta_corrente_seguradora [headercolor: #A15CF5] {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    seguradora_id bigint [not null, note: 'Chave estrangeira da tabela seguradora']
+    conta_corrente_prestamista varchar(50) [not null, note: 'Numero da conta corrente de seguro prestamista']
+    descricao_conta_corrente_prestamista varchar(255) [not null, note: 'Descrição da conta corrente de seguro prestamista']
+    conta_cancelamento_prestamista varchar(50) [not null, note: 'Numero da conta de cancelamento de seguro prestamista']
+    descricao_conta_cancelamento_prestamista varchar(255) [not null, note: 'Descrição da conta de cancelamento de seguro prestamista']
+    conta_estorno_prestamista varchar(50) [not null, note: 'Numero da conta de estorno de seguro prestamista']
+    descricao_conta_estorno_prestamista varchar(255) [not null, note: 'Descrição da conta de estorno de seguro prestamista']
+    note: 'Junção entre parâmetros de seguradora e contas correntes'
+  }
+
+  Ref: conta_corrente_seguradora.seguradora_id > seguradora.id 
+
+  // ================================
+  // COMISSAO SEGURADORA
+  // ================================
+
+    Table comissao_seguradora [headercolor: #A15CF5] {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    seguradora_id bigint [not null, note: 'Chave estrangeira da tabela seguradora']
+    porcentagem_comissao_corretora decimal(5,4) [not null, note: 'Percentual de comissão da corretora']
+    porcentagem_comissao_cooperativa decimal(5,4) [not null, note: 'Percentual de comissão da cooperativa']
+    note: 'Junção entre parâmetros de seguradora e comissoes'
+  }
+
+  Ref: comissao_seguradora.seguradora_id > seguradora.id 
+
+  // ================================
+  // DOCUMENTOS / PRIORIZAÇÕES
+  // ================================
+
+    Table gestao_documento [headercolor: #EB801B] { 
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    seguradora_id bigint [not null, note: 'Chave estrangeira da tabela seguradora']
+    nome_documento varchar(255) [not null, note: 'Nome/título do documento']
+    versao smallint [not null, note: 'Versão do documento']
+    label varchar(255) [not null, note: 'Nome amigável do parâmetro']
+    campo varchar(255) [not null, note: 'Identificador do parâmetro']
+    valor varchar(255) [not null, note: 'Valor de resposta do parâmetro']
+    ordem int [not null, default: 0, note: 'Ordem de exibição']
+    criado_em datetime [default: `now()`, note: 'Data/hora de criação']
+    note: 'Gestão de documentos'
+  }
+
+  Ref: gestao_documento.seguradora_id > seguradora.id
+
+  // ================================
+  // COOPERADOS
+  // ================================
+
+  Table cooperado {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    numero_documento varchar(14) [not null, note: 'Documento do cooperado (CPF/CNPJ sem formatação)']
+    tipo enum('Física', 'Jurídica') [not null, note: 'Tipo de pessoa']
+    nome varchar(255) [not null, note: 'Nome/Razão social do cooperado']
+    nome_fantasia varchar(255) [note: 'Nome fantasia (para PJ)']
+    email varchar(255) [note: 'E-mail de contato']
+    note: 'Cadastro de cooperados vinculados a uma agência'
+  }
+
+  Table cooperado_agencia_conta{
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    cooperado_id bigint [not null, note: 'Chave estrangeira da tabela cooperado']
+    agencia_id bigint [not null, note: 'Chave estrangeira da tabela agencia']
+    conta_corrente char(9) [not null, note: 'Código da conta corrente']
+
+    indexes {
+      (cooperado_id, agencia_id, conta_corrente) [unique]
+      cooperado_id
+      agencia_id
+      conta_corrente
+    }
+    note: 'Junção entre cooperados, agencias e contas'
+
+  }
+
+  Ref: cooperado_agencia_conta.cooperado_id > cooperado.id
+  Ref: cooperado_agencia_conta.agencia_id > agencia.id
+
+  // ================================
+  // SEGUROS / PARCELAS
+  // ================================
+
+
+  enum status_seguro {
+    "Em análise pela Seguradora"
+    "Pendente de documentação"
+    "Ativo"
+    "Expiração da vigência do seguro"
+    "Cancelado pelo cooperado"
+    "Cancelado pela cooperativa"
+    "Sinistro"
+    "Recusado pela seguradora"
+    "Cancelamento por prejuízo"
+    "Liquidação antecipada"
+    "Cancelado por renegociação"
+    "Cancelado por aditivo"
+}
+
+enum tipo_pagamento {
+     "À Vista"      
+     "Parcelado"      
+     "Único"
+}
+
+    Table seguro [headercolor: #1E69FD] {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    cooperado_agencia_conta_id bigint [not null, note: 'Chave estrangeira na tabela cooperado_agencia_conta']
+    ponto_atendimento_id bigint [not null, note: 'Chave estrangeira na tabela ponto de atendimento']
+    seguro_parametro_id bigint [not null, note: 'Chave estrangeira na tabela ponto de atendimento']
+    usuario_id bigint [note: 'Chave estrangeira na tabela usuario']
+    status status_seguro [not null, note: 'Status do seguro']
+    contrato varchar(10) [not null, note: 'Número do contrato do seguro']
+    inicio_vigencia date [note: 'Início de vigência do seguro']
+    fim_vigencia date [note: 'Fim de vigência do seguro']
+    codigo_grupo int [not null, note: 'Identificador do grupo (código) do contrato']
+    quantidade_parcelas smallint [not null, note: 'Quantidade total de parcelas do seguro']
+    vencimento date [note: 'Data de vencimento (padrão do contrato ou próxima parcela)']
+    capital_segurado decimal(10,2) [not null, note: 'Valor do capital segurado']
+    premio_total decimal(10,2) [not null, note: 'Valor do prêmio total do seguro']
+    tipo_pagamento tipo_pagamento [not null, note: 'Tipo do pagamento']
+    estorno_proporcional decimal(10,2) [not null, note: 'Valor de estorno proporcional quando aplicável']
+    valor_base decimal(10,2) [note: 'Valor Base Segurado']
+    dps tinyint(1) [note: 'Informação de Exigência de DPS']
+    valor_iof decimal(10,2) [note: 'Valor de IOF']
+
+    note: 'Contratos de seguros e seus metadados financeiros e relacionamentos'
+  }
+
+  Ref: seguro.cooperado_agencia_conta_id > cooperado_agencia_conta.id
+  Ref: seguro.ponto_atendimento_id > ponto_atendimento.id
+  Ref: seguro.usuario_id > usuario.id
+  Ref: seguro.seguro_parametro_id > seguro_parametro.id
+
+  Table seguro_parametro [headercolor: #1E69FD]{
+    id bigint [pk, increment, note: 'Identificador do registro na tabela'] 
+    tipo_capital enum('Fixo', 'Variável') [not null, note: 'Tipo de capital']
+    periodicidade_30dias  tinyint(1) [not null, default: `false`, note: 'Indica se a periodicidade de vencimento é mensal ou a cada 30 dias']
+    coeficiente decimal(5,4) [not null, note: 'Coeficiente aplicado para cálculos']
+    Note:'Parametros de contratação do seguro, para cálculos de parcelas e cancelamento'
+  }
+
+  //Restrição de seguradora por agencia
+  Table agencia_seguradora{
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    agencia_id int [not null, note: 'Identificadora da agencia']
+    seguradora_id int [not null, note: 'Identificador da seguradora']
+    ordem tinyint [not null, note: 'ordem de prioridade dentro da agência']
+    note: 'Vinculo para relacionar agencias com seguradoras'
+  }
+
+  Ref: agencia_seguradora.agencia_id > agencia.id
+  Ref: agencia_seguradora.seguradora_id > seguradora.id
+
+    Table parcela [headercolor: #1E69FD] {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    seguro_id bigint [not null, note: 'Chave estrangeira da tabela seguro']
+    status status_seguro [not null, note: 'Identificador do status da parcela']
+    numero_parcela smallint [not null, note: 'Número sequencial da parcela dentro do seguro']
+    valor_parcela decimal(10,2) [not null, note: 'Valor nominal da parcela']
+    valor_original decimal(10,2) [not null, note: 'Valor original calculado']
+    valor_pago decimal(10,2) [not null, note: 'Valor total pago na parcela']
+    vencimento date [not null, note: 'Data de vencimento da parcela']
+    liquidacao datetime [note: 'Data de liquidação da parcela']
+    data_ultimo_pagamento datetime [note: 'Data do último pagamento registrado']
+    note: 'Parcelas financeiras vinculadas a um seguro'
+  }
+
+  Ref: parcela.seguro_id > seguro.id 
+
+  // ================================================
+  // PARAMETRIZAÇÕES / PARAMETRIZAÇÕES RESPOSTAS
+  // ================================================
+
+  Table parametrizacao{
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    descricao varchar(255) [not null, note: 'Descrição do item']
+    note: 'Parametrizações de campos para preechimento'
+  }
+
+  Table parametrizacao_resposta{
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    parametrizacao_id bigint [not null, note: 'Chave estrangeira da tabela parametrizacao']
+    resposta varchar(255) [not null, note: 'Valor de resposta do parâmetro']
+    note: 'Resposta dos campos de parametrização'
+  }
+  
+  Ref: parametrizacao_resposta.parametrizacao_id > parametrizacao.id 
+  // ================================
+  // LANÇAMENTOS / INTEGRAÇÕES
+  // ================================
+
+  Table lancamento_efetivar {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    agencia_id bigint [not null, note: 'Chave estrangeira da tabela agencia']
+    cooperado_id bigint [not null, note: 'Chave estrangeira da tabela cooperado']
+    conta_corrente varchar(255) [not null, note: 'Conta corrente associada ao lançamento']
+    data_movimentacao datetime [note: 'Data de movimentação financeira']
+    descricao varchar(255) [not null, note: 'Descrição do lançamento']
+    valor decimal(10,2) [not null, note: 'Valor do lançamento']
+    data_lancamento date [note: 'Data de lançamento/registro no sistema']
+    note: 'Lançamentos financeiros que serão/são efetivados'
+  }
+
+  Ref: lancamento_efetivar.agencia_id > agencia.id
+  Ref: lancamento_efetivar.cooperado_id > cooperado.id
+
+
+enum tipo_lancamento {
+    "Seguro Prestamista Contratado"
+    "Comissão Seguro Prestamista Contratado"
+    "Cancelamento Seguro Prestamista Parcelado"
+    "Cancelamento Seguro Prestamista Parcelado Comissão"      
+    "Cancelamento Seguro Prestamista À Vista Proporcional Comissão" 
+    "Pagamento Seguro Prestamista" 
+    "Recebimento Comissão Seguro Prestamista"
+}
+
+  Table integracao_senior {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    agencia_id bigint [not null, note: 'Chave estrangeira da tabela agência']
+    conta_contabil_credito varchar(255) [not null, note: 'Conta contábil de crédito']
+    conta_contabil_debito varchar(255) [not null, note: 'Conta contábil de débito']
+    status enum('Enviado', 'Falha') [not null, note: 'Status integração']
+    data_movimentacao datetime [not null, note: 'Data de movimentação a integrar']
+    valor decimal(10,2) [not null, note: 'Valor a integrar']
+    numero_lancamento int [not null, note: 'Identificador do lançamento associado']
+    descricao varchar(255) [not null, note: 'Descrição do item de integração']
+    tipo_lancamento_contabil tipo_lancamento [not null, note: 'Tipo de pessoa']
+    codigo_pa char(3) [not null, note: 'Código do ponto de atendimento'] 
+    note: 'Fila/controle de integrações financeiras com sistema Sênior'
+  }
+
+  Ref: integracao_senior.agencia_id > agencia.id 
+
+  enum status_seg_cancel {
+    "Em análise pela Seguradora"
+    "Pendente de documentação"
+    "Ativo"
+    "Expiração da vigência do seguro"
+    "Cancelado pelo cooperado"
+    "Cancelado pela cooperativa"
+    "Sinistro"
+    "Recusado pela seguradora"
+    "Cancelamento por prejuízo"
+    "Liquidação antecipada"
+    "Cancelado por renegociação"
+    "Cancelado por aditivo"
+}
+
+Table seguro_cancelamento [headercolor: #1E69FD] {
+    id bigint [pk, increment, note: 'Identificador do registro na tabela']
+    seguro_id  bigint [not null, note: 'Chave estrangeira da tabela seguro']
+    data date [not null, default: `now()`, note: 'Data do cancelamento']
+    criado_em datetime [not null, default: `now()`, note: 'Data/hora de criação do registro']
+    motivo status_seg_cancel [not null, note: 'Tipo de cancelado']
+    valor_restituir decimal(10,2) [not null, note: 'Valor que foi restituido ao segurado']
+    valor_comissao decimal(10,2) [not null, note: 'Valor que foi laçando de abatimento de comissão']
+    dias_utilizados int [not null, note: 'Quantidade de dias que foi utilizado o seguro']
+    note: 'Registro de cancelamento de seguro'
+  }
+      
+Ref: seguro_cancelamento.seguro_id > seguro.id 
+
+
+
+
