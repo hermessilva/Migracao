@@ -19,15 +19,18 @@ public class PerfilConfiguration : IEntityTypeConfiguration<Perfil>
             .HasColumnName("nome")
             .HasMaxLength(255)
             .IsRequired()
-            .HasComment("Nome do perfil");
+            .HasComment("Nome descritivo do perfil de acesso");
 
         builder.Property(x => x.Slug)
             .HasColumnName("slug")
-            .HasMaxLength(255)
+            .HasMaxLength(50)
             .IsRequired()
-            .HasComment("Nome amigavel do perfil");
+            .HasComment("Identificador amigável do perfil para uso em URLs e código");
 
         builder.HasIndex(x => x.Nome)
+            .IsUnique();
+
+        builder.HasIndex(x => x.Slug)
             .IsUnique();
     }
 }

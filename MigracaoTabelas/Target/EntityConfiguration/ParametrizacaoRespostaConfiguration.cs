@@ -7,24 +7,30 @@ public class ParametrizacaoRespostaConfiguration : IEntityTypeConfiguration<Para
 {
     public void Configure(EntityTypeBuilder<ParametrizacaoResposta> builder)
     {
-        builder.ToTable("parametrizacao_resposta", t => t.HasComment("Resposta dos campos de parametrização"));
+        builder.ToTable("parametrizacao_resposta", t => t.HasComment("Opções de resposta disponíveis para cada campo de parametrização"));
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasColumnName("id")
             .ValueGeneratedOnAdd()
-            .HasComment("Identificador do registro na tabela")
+            .HasComment("Identificador único do registro na tabela")
             .IsRequired();
 
         builder.Property(x => x.ParametrizacaoId)
             .HasColumnName("parametrizacao_id")
-            .HasComment("Chave estrangeira da tabela parametrizacao")
+            .HasComment("Chave estrangeira referenciando a tabela parametrizacao")
             .IsRequired();
 
         builder.Property(x => x.Resposta)
             .HasColumnName("resposta")
             .HasMaxLength(255)
-            .HasComment("Valor de resposta do parâmetro")
+            .HasComment("Valor de resposta ou opção disponível para o campo de parametrização")
             .IsRequired();
+
+        // Relacionamentos
+        builder.HasOne(x => x.Parametrizacoes)
+            .WithMany(x => x.ParametrizacoesRespostas)
+            .HasForeignKey(x => x.ParametrizacaoId)
+            .OnDelete(DeleteBehavior.NoAction);
     }
 }

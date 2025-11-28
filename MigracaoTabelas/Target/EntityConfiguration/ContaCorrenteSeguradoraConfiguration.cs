@@ -86,5 +86,10 @@ public class ContaCorrenteSeguradoraConfiguration : IEntityTypeConfiguration<Con
             .WithMany(x => x.ContasCorrentes)
             .HasForeignKey(x => x.SeguradoraId)
             .OnDelete(DeleteBehavior.NoAction);
+
+        // Índice único
+        builder.HasIndex(x => x.SeguradoraId)
+            .IsUnique()
+            .HasDatabaseName("conta_corrente_seguradora_index_4");
     }
 }

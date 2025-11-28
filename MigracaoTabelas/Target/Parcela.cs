@@ -9,38 +9,32 @@ public class Parcela
 
     public void Assign(SxEpSegParcela source)
     {
-        // Campos de PK 'id' são Identity, não são mapeados diretamente da source.
-
-        // Mapeamentos com correspondência direta:
         if (source.SegCancelado.HasValue)
-            Status = StatusParcela.Cancelada; // SegCancelado -> Status
+            Status = StatusSeguro.CanceladoPeloCooperado;
         else if (source.SegPgto.HasValue)
-            Status = StatusParcela.Pago; // SegPgto -> Status
+            Status = StatusSeguro.Ativo;
         else
-            Status = StatusParcela.Pendente; // Caso contrário, Pendente
+            Status = StatusSeguro.EmAnalisePelaSeguradora;
 
-        NumeroParcela = (ushort)source.SegParcela; // SegParcela -> NumeroParcela
-        ValorParcela = source.SegValor; // SegValor -> ValorParcela
-        Vencimento = source.SegVcto; // SegVcto -> Vencimento
-        Liquidacao = source.SegPgto; // SegPgto -> Liquidacao
-        DataUltimoPagamento = source.SegPgto; // SegPgto -> DataUltimoPagamento
+        NumeroParcela = (short)source.SegParcela;
+        ValorParcela = source.SegValor;
+        ValorOriginal = source.SegValor;
+        Vencimento = source.SegVcto;
+        Liquidacao = source.SegPgto;
+        DataUltimoPagamento = source.SegPgto;
 
         if (source.SegPgto.HasValue)
-            ValorPago = source.SegValor; // Se houver pagamento, atribuir o valor pago igual ao valor da parcela
+            ValorPago = source.SegValor;
         else
-            ValorPago = 0.00m; // Sem pagamento registrado
-
-        // Campos da Source sem correspondência direta no Target:
-        // source.CcoConta; // Usado para buscar SeguroId
-        // source.SegContrato; // Usado para buscar SeguroId
-        // source.ConSeq; // Usado para buscar SeguroId
-        // source.SegCancelado; // Sem correspondência no Target
+            ValorPago = 0.00m;
     }
+
     public ulong Id { get; set; }
     public ulong SeguroId { get; set; }
     public StatusParcela Status { get; set; }
     public ushort NumeroParcela { get; set; }
     public decimal ValorParcela { get; set; }
+    public decimal ValorOriginal { get; set; }
     public decimal ValorPago { get; set; }
     public DateTime Vencimento { get; set; }
     public DateTime? Liquidacao { get; set; }

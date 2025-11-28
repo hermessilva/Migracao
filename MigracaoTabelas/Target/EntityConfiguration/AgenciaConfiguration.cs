@@ -7,31 +7,31 @@ public class AgenciaConfiguration : IEntityTypeConfiguration<Agencia>
 {
     public void Configure(EntityTypeBuilder<Agencia> builder)
     {
-        builder.ToTable("agencia");
+        builder.ToTable("agencia", t => t.HasComment("Armazena informações cadastrais das agências da cooperativa"));
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasColumnName("id")
             .ValueGeneratedOnAdd()
-            .HasComment("Identificador do registro na tabela")
+            .HasComment("Identificador único do registro na tabela")
             .IsRequired();
 
         builder.Property(x => x.Codigo)
             .HasColumnName("codigo")
             .HasColumnType("char(4)")
-            .HasComment("Código único da agência")
+            .HasComment("Código único da agência no formato de 4 caracteres")
             .IsRequired();
 
         builder.Property(x => x.Nome)
             .HasColumnName("nome")
             .HasMaxLength(255)
-            .HasComment("Nome da agência")
+            .HasComment("Nome completo da agência")
             .IsRequired();
 
         builder.Property(x => x.CriadoEm)
             .HasColumnName("criado_em")
             .HasDefaultValueSql("CURRENT_TIMESTAMP(6)")
-            .HasComment("Data/hora da criação do registro")
+            .HasComment("Data e hora de criação do registro")
             .IsRequired();
 
         builder.HasIndex(x => x.Codigo)

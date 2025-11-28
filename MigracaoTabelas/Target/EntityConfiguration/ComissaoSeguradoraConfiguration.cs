@@ -37,5 +37,10 @@ public sealed class ComissaoSeguradoraConfiguration : IEntityTypeConfiguration<C
             .WithMany(pX => pX.ComissoesSeguradoras)
             .HasForeignKey(pX => pX.SeguradoraId)
             .OnDelete(DeleteBehavior.NoAction);
+
+        // Índice único
+        pBuilder.HasIndex(pX => pX.SeguradoraId)
+            .IsUnique()
+            .HasDatabaseName("comissao_seguradora_index_5");
     }
 }

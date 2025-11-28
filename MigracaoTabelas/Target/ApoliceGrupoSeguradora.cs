@@ -15,7 +15,6 @@ public class ApoliceGrupoSeguradora
     public decimal? ModalidadeParcelado { get; set; }
 
     public virtual AgenciaSeguradora AgenciasSeguradoras { get; set; }
-    public virtual ICollection<Seguro> Seguros { get; set; } = new List<Seguro>();
 }
 
 public enum TipoCapitalApoliceGrupoSeguradora

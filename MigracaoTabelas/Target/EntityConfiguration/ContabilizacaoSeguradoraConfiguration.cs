@@ -170,5 +170,10 @@ public class ContabilizacaoSeguradoraConfiguration : IEntityTypeConfiguration<Co
             .WithMany(x => x.ContabilizacoesSeguradoras)
             .HasForeignKey(x => x.SeguradoraId)
             .OnDelete(DeleteBehavior.NoAction);
+
+        // Índice único
+        builder.HasIndex(x => x.SeguradoraId)
+            .IsUnique()
+            .HasDatabaseName("contabilizacao_seguradora_index_3");
     }
 }

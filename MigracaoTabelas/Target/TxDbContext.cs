@@ -31,6 +31,7 @@ namespace MigracaoTabelas.Target
         public DbSet<Cooperado> Cooperado { get; set; }
         public DbSet<CooperadoAgenciaConta> CooperadoAgenciaConta { get; set; }
         public DbSet<Seguro> Seguro { get; set; }
+        public DbSet<SeguroParametro> SeguroParametro { get; set; }
         public DbSet<SeguroCancelamento> SeguroCancelamento { get; set; }
         public DbSet<Parcela> Parcela { get; set; }
         public DbSet<Parametrizacao> Parametrizacao { get; set; }

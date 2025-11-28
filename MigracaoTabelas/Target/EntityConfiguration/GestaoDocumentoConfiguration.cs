@@ -7,60 +7,60 @@ public class GestaoDocumentoConfiguration : IEntityTypeConfiguration<GestaoDocum
 {
     public void Configure(EntityTypeBuilder<GestaoDocumento> builder)
     {
-        builder.ToTable("gestao_documento", t => t.HasComment("Gestão de documentos"));
+        builder.ToTable("gestao_documento", t => t.HasComment("Gestão de templates e campos de documentos por seguradora para geração automática"));
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasColumnName("id")
             .ValueGeneratedOnAdd()
-            .HasComment("Identificador do registro na tabela")
+            .HasComment("Identificador único do registro na tabela")
             .IsRequired();
 
         builder.Property(x => x.SeguradoraId)
             .HasColumnName("seguradora_id")
-            .HasComment("Chave estrangeira da tabela seguradora")
+            .HasComment("Chave estrangeira referenciando a tabela seguradora")
             .IsRequired();
 
         builder.Property(x => x.NomeDocumento)
             .HasColumnName("nome_documento")
             .HasMaxLength(255)
-            .HasComment("Nome/título do documento")
+            .HasComment("Nome ou título do documento a ser gerado")
             .IsRequired();
 
         builder.Property(x => x.Versao)
             .HasColumnName("versao")
             .HasColumnType("smallint")
-            .HasComment("Versão do documento")
+            .HasComment("Número da versão do documento para controle de alterações")
             .IsRequired();
 
         builder.Property(x => x.Label)
             .HasColumnName("label")
             .HasMaxLength(255)
-            .HasComment("Nome amigável do parâmetro")
+            .HasComment("Rótulo amigável do campo para exibição ao usuário")
             .IsRequired();
 
         builder.Property(x => x.Campo)
             .HasColumnName("campo")
             .HasMaxLength(255)
-            .HasComment("Identificador do parâmetro")
+            .HasComment("Identificador técnico do campo no documento")
             .IsRequired();
 
         builder.Property(x => x.Valor)
             .HasColumnName("valor")
             .HasMaxLength(255)
-            .HasComment("Valor de resposta do parâmetro")
+            .HasComment("Valor padrão ou resposta configurada para o campo")
             .IsRequired();
 
         builder.Property(x => x.Ordem)
             .HasColumnName("ordem")
             .HasColumnType("int")
-            .HasComment("Ordem de exibição")
+            .HasComment("Ordem de exibição do campo no documento")
             .HasDefaultValue(0)
             .IsRequired();
 
         builder.Property(x => x.CriadoEm)
             .HasColumnName("criado_em")
-            .HasComment("Data/hora de criação")
+            .HasComment("Data e hora de criação do registro")
             .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
 
         // Relacionamentos

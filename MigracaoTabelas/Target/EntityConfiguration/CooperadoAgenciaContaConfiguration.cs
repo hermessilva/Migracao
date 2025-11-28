@@ -46,15 +46,9 @@ public class CooperadoAgenciaContaConfiguration : IEntityTypeConfiguration<Coope
         // Índices
         builder.HasIndex(x => new { x.CooperadoId, x.AgenciaId, x.ContaCorrente })
             .IsUnique()
-            .HasDatabaseName("cooperado_agencia_conta_index_7");
-
-        builder.HasIndex(x => x.CooperadoId)
-            .HasDatabaseName("cooperado_agencia_conta_index_8");
-
-        builder.HasIndex(x => x.AgenciaId)
-            .HasDatabaseName("cooperado_agencia_conta_index_9");
+            .HasDatabaseName("cooperado_agencia_conta_index_6");
 
         builder.HasIndex(x => x.ContaCorrente)
-            .HasDatabaseName("cooperado_agencia_conta_index_10");
+            .HasDatabaseName("cooperado_agencia_conta_index_7");
     }
 }

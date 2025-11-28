@@ -44,7 +44,7 @@ public class Seguro
         FimVigencia = source.SegFim;                                           // (SEG_FIM: Final do Contrato -> fim_vigencia: Fim de vigência do seguro)
 
         // Quantidade de parcelas: preferir valor informado (SegMeses); fallback para quantidade de parcelas de navegação
-        QuantidadeParcelas = (ushort)(source.SegMeses ?? 0);                             // (SEG_MESES: Nº de Meses do Seguro -> quantidade_parcelas: Quantidade total de parcelas)
+        QuantidadeParcelas = (short)(source.SegMeses ?? 0);                             // (SEG_MESES: Nº de Meses do Seguro -> quantidade_parcelas: Quantidade total de parcelas)
 
 
         // Vencimento: manter como fim de vigência, até haver regra específica
@@ -82,16 +82,16 @@ public class Seguro
         // source.SqlDeleted;
     }
     public ulong Id { get; set; }
-    public ulong ApoliceGrupoSeguradoraId { get; set; }
     public ulong CooperadoAgenciaContaId { get; set; }
     public ulong PontoAtendimentoId { get; set; }
+    public ulong SeguroParametroId { get; set; }
     public ulong? UsuarioId { get; set; }
     public StatusSeguro Status { get; set; }
     public string Contrato { get; set; }
     public DateTime? InicioVigencia { get; set; }
     public DateTime? FimVigencia { get; set; }
-    public uint CodigoGrupo { get; set; }
-    public ushort QuantidadeParcelas { get; set; }
+    public int CodigoGrupo { get; set; }
+    public short QuantidadeParcelas { get; set; }
     public DateTime? Vencimento { get; set; }
     public decimal CapitalSegurado { get; set; }
     public decimal PremioTotal { get; set; }
@@ -100,12 +100,10 @@ public class Seguro
     public decimal? ValorBase { get; set; }
     public bool? Dps { get; set; }
     public decimal? ValorIof { get; set; }
-    public TipoCapitalSeguro TipoCapital { get; set; }
-    public bool Periodicidade30Dias { get; set; }
 
-    public virtual ApoliceGrupoSeguradora ApolicesGruposSeguradoras { get; set; }
     public virtual CooperadoAgenciaConta CooperadosAgenciasContas { get; set; }
     public virtual PontoAtendimento PontosAtendimentos { get; set; }
+    public virtual SeguroParametro SeguroParametro { get; set; }
     public virtual Usuario Usuarios { get; set; }
     public virtual ICollection<Parcela> Parcelas { get; set; } = new List<Parcela>();
     public virtual ICollection<SeguroCancelamento> SegurosCancelamentos { get; set; } = new List<SeguroCancelamento>();

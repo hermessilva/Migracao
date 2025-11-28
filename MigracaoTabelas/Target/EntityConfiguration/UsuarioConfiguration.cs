@@ -1,38 +1,50 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-
-
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
 {
     public void Configure(EntityTypeBuilder<Usuario> builder)
     {
-        builder.ToTable("usuario");
+        builder.ToTable("usuario", t => t.HasComment("Tabela de usuários do sistema com suas credenciais e vínculos organizacionais"));
 
         builder.HasKey(e => e.Id);
 
         builder.Property(e => e.Id)
             .HasColumnName("id")
-            .HasComment("Identificador do registro na tabela")
+            .HasComment("Identificador único do registro na tabela")
             .IsRequired();
+
+        builder.Property(e => e.AgenciaId)
+            .HasColumnName("agencia_id")
+            .HasComment("Chave estrangeira referenciando a tabela agencia")
+            .IsRequired();
+
+        builder.Property(e => e.PontoAtendimentoId)
+            .HasColumnName("ponto_atendimento_id")
+            .HasComment("Chave estrangeira referenciando a tabela ponto_atendimento")
+            .IsRequired();
+
+        builder.Property(e => e.PerfilId)
+           .HasColumnName("perfil_id")
+           .HasComment("Chave estrangeira opcional referenciando a tabela perfil para o perfil principal do usuário");
 
         builder.Property(e => e.Login)
             .HasColumnName("login")
-            .HasComment("Login de acesso do usuário")
+            .HasComment("Login de acesso do usuário ao sistema")
             .IsRequired()
-            .HasMaxLength(100);
+            .HasMaxLength(255);
 
         builder.Property(e => e.Nome)
             .HasColumnName("nome")
             .HasComment("Nome completo do usuário")
             .IsRequired()
-            .HasMaxLength(100);
+            .HasMaxLength(255);
 
         builder.Property(e => e.Email)
             .HasColumnName("email")
-            .HasComment("E-mail do usuário")
+            .HasComment("Endereço de e-mail do usuário para contato e notificações")
             .IsRequired()
             .HasMaxLength(255);
 
@@ -42,29 +54,13 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
             .HasConversion(
                 v => v.AsString(),
                 v => EnumHelper.FromString<StatusUsuario>(v))
-            .HasComment("Indica o status do usuário")
+            .HasComment("Status do usuário: Ativo ou Inativo")
             .IsRequired();
-
 
         builder.Property(e => e.CriadoEm)
             .HasColumnName("criado_em")
-            .HasComment("Data/hora de criação do registro")
+            .HasComment("Data e hora de criação do registro")
             .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
-
-        // Propriedades de chave estrangeira
-        builder.Property(e => e.PerfilId)
-           .HasColumnName("perfil_id")
-           .HasComment("Chave estrangeira para a tabela perfil opcional para o perfil principal do usuário");
-
-        builder.Property(e => e.AgenciaId)
-            .HasColumnName("agencia_id")
-            .HasComment("Chave estrangeira para a Agência")
-            .IsRequired();
-
-        builder.Property(e => e.PontoAtendimentoId)
-            .HasColumnName("ponto_atendimento_id")
-            .HasComment("Chave estrangeira para Ponto de Atendimento")
-            .IsRequired();
 
         // Relacionamentos
         builder.HasOne(e => e.Perfils)

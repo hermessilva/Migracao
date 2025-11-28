@@ -7,54 +7,54 @@ public class SeguradoraLimiteConfiguration : IEntityTypeConfiguration<Seguradora
 {
     public void Configure(EntityTypeBuilder<SeguradoraLimite> builder)
     {
-        builder.ToTable("seguradora_limite");
+        builder.ToTable("seguradora_limite", t => t.HasComment("Define faixas etárias, coeficientes e limites de DPS por seguradora para cálculo de prêmios"));
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
             .HasColumnName("id")
             .ValueGeneratedOnAdd()
-            .HasComment("Identificador do registro na tabela")
+            .HasComment("Identificador único do registro na tabela")
             .IsRequired();
 
         builder.Property(x => x.SeguradoraId)
             .HasColumnName("seguradora_id")
-            .HasComment("Chave estrangeira da tabela seguradora")
+            .HasComment("Chave estrangeira referenciando a tabela seguradora")
             .IsRequired();
 
         builder.Property(x => x.IdadeInicial)
             .HasColumnName("idade_inicial")
             .HasColumnType("smallint")
-            .HasComment("Idade inicial da faixa")
+            .HasComment("Idade inicial da faixa etária para aplicação da regra")
             .IsRequired();
 
         builder.Property(x => x.IdadeFinal)
             .HasColumnName("idade_final")
             .HasColumnType("smallint")
-            .HasComment("Idade final da faixa")
+            .HasComment("Idade final da faixa etária para aplicação da regra")
             .IsRequired();
 
         builder.Property(x => x.ValorMaximo)
             .HasColumnName("valor_maximo")
             .HasColumnType("decimal(10,2)")
-            .HasComment("Valor associado à faixa")
+            .HasComment("Valor máximo de capital segurado permitido para a faixa")
             .IsRequired();
 
         builder.Property(x => x.Coeficiente)
             .HasColumnName("coeficiente")
             .HasColumnType("decimal(5,4)")
-            .HasComment("Coeficiente aplicado para cálculos")
+            .HasComment("Coeficiente multiplicador para cálculo do prêmio")
             .IsRequired();
 
         builder.Property(x => x.LimiteDps)
             .HasColumnName("limite_dps")
             .HasColumnType("decimal(10,2)")
-            .HasComment("Valor limite de exigibilidade para DPS")
+            .HasComment("Valor limite de capital segurado que exige Declaração Pessoal de Saúde (DPS)")
             .IsRequired();
 
         builder.Property(x => x.DescricaoRegra)
             .HasColumnName("descricao_regra")
             .HasMaxLength(255)
-            .HasComment("Descrição detalhada da regra para o limite DPS")
+            .HasComment("Descrição textual detalhada da regra aplicada para o limite e DPS")
             .IsRequired();
 
         builder.HasOne(x => x.Seguradoras)
