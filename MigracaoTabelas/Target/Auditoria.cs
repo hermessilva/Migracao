@@ -1,5 +1,6 @@
 namespace MigracaoTabelas.Target;
 
+
 public class Auditoria
 {
     public ulong Id { get; set; }

@@ -13,6 +13,7 @@ public class ApoliceGrupoSeguradora
     public string ModalidadeUnico { get; set; }
     public decimal? ModalidadeAVista { get; set; }
     public decimal? ModalidadeParcelado { get; set; }
+    public virtual ICollection<Seguro> Seguros { get; set; } = new List<Seguro>();
 
     public virtual AgenciaSeguradora AgenciasSeguradoras { get; set; }
 }

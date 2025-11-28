@@ -1,5 +1,7 @@
 using System.ComponentModel;
 
+using Seguros.Helpers;
+
 
 
 namespace MigracaoTabelas.Target;

@@ -1,6 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using MigracaoTabelas.Target;
+
+using Seguros.Helpers;
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class IntegracaoSeniorConfiguration : IEntityTypeConfiguration<IntegracaoSenior>

@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using MigracaoTabelas.Target;
 
+using Seguros.Helpers;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
@@ -21,6 +23,10 @@ public class SeguroConfiguration : IEntityTypeConfiguration<Seguro>
         builder.Property(x => x.CooperadoAgenciaContaId)
             .HasColumnName("cooperado_agencia_conta_id")
             .HasComment("Chave estrangeira referenciando a tabela cooperado_agencia_conta")
+            .IsRequired();
+        builder.Property(x => x.ApoliceGrupoSeguradoraId)
+            .HasColumnName("apolice_grupo_seguradora_id")
+            .HasComment("Chave estrangeira referenciando a tabela apolice_grupo_seguradora indicando a apolice contratada")
             .IsRequired();
 
         builder.Property(x => x.PontoAtendimentoId)
@@ -137,6 +143,11 @@ public class SeguroConfiguration : IEntityTypeConfiguration<Seguro>
         builder.HasOne(x => x.Usuarios)
             .WithMany()
             .HasForeignKey(x => x.UsuarioId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(x => x.ApolicesGruposSeguradoras)
+            .WithMany(x => x.Seguros)
+            .HasForeignKey(x => x.ApoliceGrupoSeguradoraId)
             .OnDelete(DeleteBehavior.NoAction);
 
         builder.HasOne(x => x.SeguroParametro)

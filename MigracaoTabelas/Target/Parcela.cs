@@ -10,13 +10,11 @@ public class Parcela
     public void Assign(SxEpSegParcela source)
     {
         if (source.SegCancelado.HasValue)
-            Status = StatusSeguro.CanceladoPeloCooperado;
-        else if (source.SegPgto.HasValue)
-            Status = StatusSeguro.Ativo;
-        else
-            Status = StatusSeguro.EmAnalisePelaSeguradora;
+            Status = StatusParcela.Pago;
+        else if (!source.SegPgto.HasValue)
+            Status = StatusParcela.Pendente;
 
-        NumeroParcela = (short)source.SegParcela;
+        NumeroParcela = (ushort)source.SegParcela;
         ValorParcela = source.SegValor;
         ValorOriginal = source.SegValor;
         Vencimento = source.SegVcto;

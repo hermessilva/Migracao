@@ -84,6 +84,7 @@ public class Seguro
     public ulong Id { get; set; }
     public ulong CooperadoAgenciaContaId { get; set; }
     public ulong PontoAtendimentoId { get; set; }
+    public ulong ApoliceGrupoSeguradoraId { get; set; }
     public ulong SeguroParametroId { get; set; }
     public ulong? UsuarioId { get; set; }
     public StatusSeguro Status { get; set; }
@@ -102,6 +103,7 @@ public class Seguro
     public decimal? ValorIof { get; set; }
 
     public virtual CooperadoAgenciaConta CooperadosAgenciasContas { get; set; }
+    public virtual ApoliceGrupoSeguradora ApolicesGruposSeguradoras { get; set; }
     public virtual PontoAtendimento PontosAtendimentos { get; set; }
     public virtual SeguroParametro SeguroParametro { get; set; }
     public virtual Usuario Usuarios { get; set; }

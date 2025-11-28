@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using Seguros.Helpers;
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
