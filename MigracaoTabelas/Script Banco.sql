@@ -1,83 +1,82 @@
+
 CREATE TABLE `agencia` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
   `codigo` char(4) UNIQUE NOT NULL COMMENT 'Código único da agência no formato de 4 caracteres',
   `nome` varchar(255) UNIQUE NOT NULL COMMENT 'Nome completo da agência',
   `criado_em` datetime NOT NULL DEFAULT (now()) COMMENT 'Data e hora de criação do registro'
 );
 
 CREATE TABLE `ponto_atendimento` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `agencia_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela agencia',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `agencia_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela agencia',
   `codigo` char(3) NOT NULL COMMENT 'Código do ponto de atendimento no formato de 3 caracteres, único dentro de uma agência',
   `nome` varchar(255) UNIQUE NOT NULL COMMENT 'Nome completo do ponto de atendimento',
   `criado_em` datetime DEFAULT (now()) COMMENT 'Data e hora de criação do registro'
 );
 
 CREATE TABLE `perfil` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
   `nome` varchar(255) UNIQUE NOT NULL COMMENT 'Nome descritivo do perfil de acesso',
   `slug` varchar(50) UNIQUE NOT NULL COMMENT 'Identificador amigável do perfil para uso em URLs e código'
 );
 
 CREATE TABLE `usuario` (
-  `id` BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `agencia_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela agencia',
-  `ponto_atendimento_id` BIGINT NOT NULL COMMENT 'Chave estrangeira referenciando a tabela ponto_atendimento',
-  `perfil_id` BIGINT COMMENT 'Chave estrangeira opcional referenciando a tabela perfil para o perfil principal do usuário',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `agencia_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela agencia',
+  `ponto_atendimento_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela ponto_atendimento',
+  `perfil_id` bigint unsigned COMMENT 'Chave estrangeira opcional referenciando a tabela perfil para o perfil principal do usuário',
   `login` varchar(255) NOT NULL COMMENT 'Login de acesso do usuário ao sistema',
   `nome` varchar(255) NOT NULL COMMENT 'Nome completo do usuário',
   `email` varchar(255) NOT NULL COMMENT 'Endereço de e-mail do usuário para contato e notificações',
-  `status` enum NOT NULL COMMENT 'Status do usuário: Ativo ou Inativo',
+  `status` enum('Ativo','Inativo') NOT NULL COMMENT 'Indica o status do perfil',
   `criado_em` datetime DEFAULT (now()) COMMENT 'Data e hora de criação do registro'
 );
 
 CREATE TABLE `tela` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
   `slug` varchar(50) UNIQUE NOT NULL COMMENT 'Identificador amigável da tela para uso em URLs e código',
   `descricao` varchar(255) NOT NULL COMMENT 'Nome ou descrição completa da tela'
 );
 
 CREATE TABLE `acao` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
   `descricao` varchar(255) NOT NULL COMMENT 'Descrição da ação disponível (ex.: Visualizar, Editar, Excluir, Aprovar)'
 );
 
 CREATE TABLE `tela_acao` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `tela_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela tela',
-  `acao_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela acao',
-  PRIMARY KEY (`tela_id`, `acao_id`)
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `tela_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela tela',
+  `acao_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela acao'
 );
 
 CREATE TABLE `tela_acao_perfil` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `tela_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela tela',
-  `acao_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela acao',
-  `perfil_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela perfil',
-  PRIMARY KEY (`tela_id`, `acao_id`, `perfil_id`)
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `tela_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela tela',
+  `acao_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela acao',
+  `perfil_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela perfil'
 );
 
 CREATE TABLE `auditoria` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `usuario_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela usuario que realizou a ação',
-  `agencia_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela agencia onde a ação foi realizada',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `usuario_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela usuario que realizou a ação',
+  `agencia_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela agencia onde a ação foi realizada',
   `modulo` varchar(255) NOT NULL COMMENT 'Nome do módulo ou área do sistema onde a operação foi realizada',
-  `operacao` enum(Insert,Delete,Update) NOT NULL COMMENT 'Tipo da operação realizada: Insert (inserção), Delete (exclusão) ou Update (atualização)',
-  `antes` varchar(255) NOT NULL COMMENT 'Dados do registro antes da alteração em formato JSON ou serializado',
+  `operacao` enum('Insert','Delete','Update') NOT NULL COMMENT 'Tipo da operação realizada: Insert (inserção), Delete (exclusão) ou Update (atualização)',
+  `antes` text NOT NULL COMMENT 'Dados do registro antes da alteração em formato JSON ou serializado',
   `criado_em` datetime COMMENT 'Data e hora em que a ação foi registrada'
 );
 
 CREATE TABLE `seguradora` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
   `nome` varchar(255) NOT NULL COMMENT 'Nome fantasia da seguradora',
   `cnpj` char(14) UNIQUE NOT NULL COMMENT 'CNPJ da seguradora sem formatação (apenas números)',
   `razao_social` varchar(255) NOT NULL COMMENT 'Razão social completa da seguradora',
-  `status` enum(Ativo,Inativo) NOT NULL COMMENT 'Status atual da seguradora: Ativo ou Inativo'
+  `status` enum('Ativo','Inativo') NOT NULL COMMENT 'Status atual da seguradora: Ativo ou Inativo'
 );
 
 CREATE TABLE `condicao_seguradora` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `seguradora_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguradora',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `seguradora_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguradora',
   `max_meses_contrato` smallint NOT NULL COMMENT 'Quantidade máxima de meses permitidos para vigência do contrato',
   `max_idade` smallint NOT NULL COMMENT 'Idade máxima permitida do proponente para contratação do seguro',
   `porcentagem_cobertura_morte` decimal(5,4) NOT NULL COMMENT 'Percentual de cobertura para sinistro por morte (ex: 1.0000 = 100%)',
@@ -87,38 +86,38 @@ CREATE TABLE `condicao_seguradora` (
 );
 
 CREATE TABLE `seguradora_limite` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `seguradora_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguradora',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `seguradora_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguradora',
   `idade_inicial` smallint NOT NULL COMMENT 'Idade inicial da faixa etária para aplicação da regra',
   `idade_final` smallint NOT NULL COMMENT 'Idade final da faixa etária para aplicação da regra',
   `valor_maximo` decimal(10,2) NOT NULL COMMENT 'Valor máximo de capital segurado permitido para a faixa',
-  `coeficiente` decimal(5,4) NOT NULL COMMENT 'Coeficiente multiplicador para cálculo do prêmio',
+  `coeficiente` decimal(8,7) NOT NULL COMMENT 'Coeficiente multiplicador para cálculo do prêmio',
   `limite_dps` decimal(10,2) NOT NULL COMMENT 'Valor limite de capital segurado que exige Declaração Pessoal de Saúde (DPS)',
   `descricao_regra` varchar(255) NOT NULL COMMENT 'Descrição textual detalhada da regra aplicada para o limite e DPS'
 );
 
 CREATE TABLE `apolice_grupo_seguradora` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `agencia_seguradora_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela agencia_seguradora',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `agencia_seguradora_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela agencia_seguradora',
   `apolice` varchar(255) COMMENT 'Número ou código da apólice contratada',
   `grupo` varchar(255) COMMENT 'Código do grupo dentro da apólice',
   `subgrupo` varchar(255) COMMENT 'Código do subgrupo dentro do grupo da apólice',
-  `tipo_capital` enum(Fixo,Variável) NOT NULL COMMENT 'Tipo de capital segurado: Fixo (valor constante) ou Variável (acompanha saldo devedor)',
+  `tipo_capital` enum('Fixo','Variável') NOT NULL COMMENT 'Tipo de capital segurado: Fixo (valor constante) ou Variável (acompanha saldo devedor)',
   `modalidade_unico` varchar(50) COMMENT 'Identificador ou código da modalidade de pagamento único',
   `modalidade_avista` decimal(10,2) COMMENT 'Valor ou taxa para modalidade de pagamento à vista',
   `modalidade_parcelado` decimal(10,2) COMMENT 'Valor ou taxa para modalidade de pagamento parcelado'
 );
 
 CREATE TABLE `proposta_seguradora` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `seguradora_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguradora',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `seguradora_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguradora',
   `descricao_sequencial` varchar(255) COMMENT 'Descrição ou prefixo do formato do número sequencial da proposta',
   `numero_sequencial` varchar(255) COMMENT 'Último número sequencial utilizado para geração de propostas'
 );
 
 CREATE TABLE `contabilizacao_seguradora` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `seguradora_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguradora',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `seguradora_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguradora',
   `credito_premio_contratacao` varchar(50) NOT NULL COMMENT 'Código da conta contábil de crédito para lançamento do prêmio na contratação',
   `descricao_credito_premio_contratacao` varchar(255) NOT NULL COMMENT 'Descrição da conta contábil de crédito do prêmio na contratação',
   `debito_premio_contratacao` varchar(50) NOT NULL COMMENT 'Código da conta contábil de débito para lançamento do prêmio na contratação',
@@ -142,12 +141,20 @@ CREATE TABLE `contabilizacao_seguradora` (
   `credito_comissao_valor_pago` varchar(50) NOT NULL COMMENT 'Código da conta contábil de crédito para comissão sobre valor pago',
   `descricao_comissao_credito_valor_pago` varchar(255) NOT NULL COMMENT 'Descrição da conta contábil de crédito para comissão sobre valor pago',
   `debito_comissao_valor_pago` varchar(50) NOT NULL COMMENT 'Código da conta contábil de débito para comissão sobre valor pago',
-  `descricao_comissao_debito_valor_pago` varchar(255) NOT NULL COMMENT 'Descrição da conta contábil de débito para comissão sobre valor pago'
+  `descricao_comissao_debito_valor_pago` varchar(255) NOT NULL COMMENT 'Descrição da conta contábil de débito para comissão sobre valor pago',
+  `debito_premio_parcela` varchar(50) NOT NULL COMMENT 'Código da conta contábil debito premio parcela',
+  `descricao_debito_premio_parcela` varchar(255) NOT NULL COMMENT 'Descrição da conta contábil de débito para comissão sobre valor pago',
+  `credito_premio_parcela` varchar(50) NOT NULL COMMENT 'Código da conta contábil credito premio parcela',
+  `descricao_credito_premio_parcela` varchar(255) NOT NULL COMMENT 'Descrição da conta contábil credito premio parcela',
+  `debito_comissao_parcela` varchar(50) NOT NULL COMMENT 'Código da conta contábil debito comissao parcela',
+  `descricao_debito_comissao_parcela` varchar(255) NOT NULL COMMENT 'Descrição da conta contábil debito comissao parcela',
+  `credito_comissao_parcela` varchar(50) NOT NULL COMMENT 'Código da conta contábil credito comissao parcela',
+  `descricao_credito_comissao_parcela` varchar(255) NOT NULL COMMENT 'Descrição da conta contábil credito comissao parcela'
 );
 
 CREATE TABLE `conta_corrente_seguradora` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `seguradora_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguradora',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `seguradora_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguradora',
   `conta_corrente_prestamista` varchar(50) NOT NULL COMMENT 'Número da conta corrente para operações de seguro prestamista',
   `descricao_conta_corrente_prestamista` varchar(255) NOT NULL COMMENT 'Descrição da conta corrente para operações de seguro prestamista',
   `conta_cancelamento_prestamista` varchar(50) NOT NULL COMMENT 'Número da conta para lançamentos de cancelamento de seguro prestamista',
@@ -157,15 +164,15 @@ CREATE TABLE `conta_corrente_seguradora` (
 );
 
 CREATE TABLE `comissao_seguradora` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `seguradora_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguradora',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `seguradora_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguradora',
   `porcentagem_comissao_corretora` decimal(5,4) NOT NULL COMMENT 'Percentual de comissão destinado à corretora (ex: 0.1500 = 15%)',
   `porcentagem_comissao_cooperativa` decimal(5,4) NOT NULL COMMENT 'Percentual de comissão destinado à cooperativa (ex: 0.0500 = 5%)'
 );
 
 CREATE TABLE `gestao_documento` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `seguradora_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguradora',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `seguradora_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguradora',
   `nome_documento` varchar(255) NOT NULL COMMENT 'Nome ou título do documento a ser gerado',
   `versao` smallint NOT NULL COMMENT 'Número da versão do documento para controle de alterações',
   `label` varchar(255) NOT NULL COMMENT 'Rótulo amigável do campo para exibição ao usuário',
@@ -176,27 +183,28 @@ CREATE TABLE `gestao_documento` (
 );
 
 CREATE TABLE `cooperado` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
   `numero_documento` varchar(14) NOT NULL COMMENT 'Documento de identificação do cooperado (CPF com 11 dígitos ou CNPJ com 14 dígitos, sem formatação)',
-  `tipo` enum(Física,Jurídica) NOT NULL COMMENT 'Tipo de pessoa: Física (CPF) ou Jurídica (CNPJ)',
+  `tipo` enum('Física','Jurídica') NOT NULL COMMENT 'Tipo de pessoa: Física (CPF) ou Jurídica (CNPJ)',
   `nome` varchar(255) NOT NULL COMMENT 'Nome completo (pessoa física) ou razão social (pessoa jurídica) do cooperado',
   `nome_fantasia` varchar(255) COMMENT 'Nome fantasia do cooperado (aplicável apenas para pessoa jurídica)',
   `email` varchar(255) COMMENT 'Endereço de e-mail para contato e comunicações com o cooperado'
 );
 
 CREATE TABLE `cooperado_agencia_conta` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `cooperado_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela cooperado',
-  `agencia_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela agencia',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `cooperado_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela cooperado',
+  `agencia_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela agencia',
   `conta_corrente` char(9) NOT NULL COMMENT 'Número da conta corrente do cooperado na agência (9 caracteres)'
 );
 
 CREATE TABLE `seguro` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `cooperado_agencia_conta_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela cooperado_agencia_conta',
-  `ponto_atendimento_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela ponto_atendimento onde o seguro foi contratado',
-  `seguro_parametro_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguro_parametro com os parâmetros de cálculo',
-  `usuario_id` bigint COMMENT 'Chave estrangeira referenciando a tabela usuario responsável pela contratação',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `usuario_id` bigint unsigned COMMENT 'Chave estrangeira referenciando a tabela usuario responsável pela contratação',
+  `ponto_atendimento_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela ponto_atendimento onde o seguro foi contratado',
+  `cooperado_agencia_conta_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela cooperado_agencia_conta',
+  `apolice_grupo_seguradora_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela apolice_grupo_seguradora indicando a apolice contratada',
+  `seguro_parametro_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguro_parametro com os parâmetros de cálculo',
   `status` ENUM ('Em análise pela Seguradora', 'Pendente de documentação', 'Ativo', 'Expiração da vigência do seguro', 'Cancelado pelo cooperado', 'Cancelado pela cooperativa', 'Sinistro', 'Recusado pela seguradora', 'Cancelamento por prejuízo', 'Liquidação antecipada', 'Cancelado por renegociação', 'Cancelado por aditivo') NOT NULL COMMENT 'Status atual do seguro conforme enum status_seguro',
   `contrato` varchar(10) NOT NULL COMMENT 'Número do contrato de crédito vinculado ao seguro',
   `inicio_vigencia` date COMMENT 'Data de início da vigência do seguro',
@@ -214,23 +222,26 @@ CREATE TABLE `seguro` (
 );
 
 CREATE TABLE `seguro_parametro` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `tipo_capital` enum(Fixo,Variável) NOT NULL COMMENT 'Tipo de capital segurado: Fixo (valor constante) ou Variável (acompanha saldo devedor)',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `tipo_capital` enum('Fixo','Variável') NOT NULL COMMENT 'Tipo de capital segurado: Fixo (valor constante) ou Variável (acompanha saldo devedor)',
   `periodicidade_30dias` tinyint(1) NOT NULL DEFAULT (false) COMMENT 'Indica se a periodicidade de vencimento é a cada 30 dias (true) ou mensal no mesmo dia (false)',
-  `coeficiente` decimal(5,4) NOT NULL COMMENT 'Coeficiente multiplicador utilizado para cálculo do prêmio e estornos'
+  `coeficiente` decimal(8,7) NOT NULL COMMENT 'Coeficiente multiplicador utilizado para cálculo do prêmio e estornos',
+  `IOF` decimal(5,4) NOT NULL COMMENT 'Porcentual de IOF cobrado no seguro',
+  `porcentagem_comissao_corretora` decimal(5,4) NOT NULL COMMENT 'Percentual de comissão destinado à corretora (ex: 0.1500 = 15%)',
+  `porcentagem_comissao_cooperativa` decimal(5,4) NOT NULL COMMENT 'Percentual de comissão destinado à cooperativa (ex: 0.0500 = 5%)'
 );
 
 CREATE TABLE `agencia_seguradora` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `agencia_id` int NOT NULL COMMENT 'Chave estrangeira referenciando a tabela agencia',
-  `seguradora_id` int NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguradora',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `agencia_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela agencia',
+  `seguradora_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguradora',
   `ordem` tinyint NOT NULL COMMENT 'Ordem de prioridade da seguradora dentro da agência (menor = maior prioridade)'
 );
 
 CREATE TABLE `parcela` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `seguro_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguro',
-  `status` ENUM ('Em análise pela Seguradora', 'Pendente de documentação', 'Ativo', 'Expiração da vigência do seguro', 'Cancelado pelo cooperado', 'Cancelado pela cooperativa', 'Sinistro', 'Recusado pela seguradora', 'Cancelamento por prejuízo', 'Liquidação antecipada', 'Cancelado por renegociação', 'Cancelado por aditivo') NOT NULL COMMENT 'Status atual da parcela conforme enum status_seguro',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `seguro_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguro',
+  `status` enum('Em Aberto','Pago','Cancelada') NOT NULL COMMENT 'Status atual da parcela conforme enum status_seguro',
   `numero_parcela` smallint NOT NULL COMMENT 'Número sequencial da parcela dentro do seguro (1, 2, 3...)',
   `valor_parcela` decimal(10,2) NOT NULL COMMENT 'Valor nominal atual da parcela a ser cobrado',
   `valor_original` decimal(10,2) NOT NULL COMMENT 'Valor original da parcela calculado na contratação',
@@ -241,20 +252,20 @@ CREATE TABLE `parcela` (
 );
 
 CREATE TABLE `parametrizacao` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
   `descricao` varchar(255) NOT NULL COMMENT 'Descrição ou nome do campo de parametrização configurável'
 );
 
 CREATE TABLE `parametrizacao_resposta` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `parametrizacao_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela parametrizacao',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `parametrizacao_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela parametrizacao',
   `resposta` varchar(255) NOT NULL COMMENT 'Valor de resposta ou opção disponível para o campo de parametrização'
 );
 
 CREATE TABLE `lancamento_efetivar` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `agencia_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela agencia',
-  `cooperado_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela cooperado',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `agencia_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela agencia',
+  `cooperado_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela cooperado',
   `conta_corrente` varchar(255) NOT NULL COMMENT 'Número da conta corrente do cooperado para débito/crédito do lançamento',
   `data_movimentacao` datetime COMMENT 'Data e hora da movimentação financeira no sistema de origem',
   `descricao` varchar(255) NOT NULL COMMENT 'Descrição detalhada do lançamento a ser efetivado',
@@ -263,22 +274,21 @@ CREATE TABLE `lancamento_efetivar` (
 );
 
 CREATE TABLE `integracao_senior` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `agencia_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela agencia',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `agencia_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela agencia',
   `conta_contabil_credito` varchar(255) NOT NULL COMMENT 'Código da conta contábil de crédito para o lançamento',
   `conta_contabil_debito` varchar(255) NOT NULL COMMENT 'Código da conta contábil de débito para o lançamento',
-  `status` enum(Enviado,Falha) NOT NULL COMMENT 'Status da integração: Enviado (sucesso) ou Falha (erro no envio)',
+  `status` enum('Enviado','Falha') NOT NULL COMMENT 'Status da integração: Enviado (sucesso) ou Falha (erro no envio)',
   `data_movimentacao` datetime NOT NULL COMMENT 'Data e hora da movimentação a ser integrada',
   `valor` decimal(10,2) NOT NULL COMMENT 'Valor monetário do lançamento a ser integrado',
-  `numero_lancamento` int NOT NULL COMMENT 'Número sequencial do lançamento no sistema de origem',
   `descricao` varchar(255) NOT NULL COMMENT 'Descrição detalhada do lançamento para identificação',
-  `tipo_lancamento_contabil` ENUM ('Seguro Prestamista Contratado', 'Comissão Seguro Prestamista Contratado', 'Cancelamento Seguro Prestamista Parcelado', 'Cancelamento Seguro Prestamista Parcelado Comissão', 'Cancelamento Seguro Prestamista À Vista Proporcional Comissão', 'Pagamento Seguro Prestamista', 'Recebimento Comissão Seguro Prestamista') NOT NULL COMMENT 'Tipo do lançamento contábil conforme enum tipo_lancamento',
+  `tipo_lancamento_contabil` ENUM ('Seguro Prestamista Contratado', 'Comissão Seguro Prestamista Contratado', 'Cancelamento Seguro Prestamista Parcelado', 'Cancelamento Seguro Prestamista Parcelado Comissão', 'Cancelamento Seguro Prestamista À Vista Proporcional Comissão', 'Pagamento Seguro Prestamista', 'Recebimento Comissão Seguro Prestamista', 'Recebimento Premio Seguro Prestamista Parcelado', 'Recebimento Comissão Seguro Prestamista Parcelado') NOT NULL COMMENT 'Tipo do lançamento contábil conforme enum tipo_lancamento',
   `codigo_pa` char(3) NOT NULL COMMENT 'Código do ponto de atendimento de origem do lançamento'
 );
 
 CREATE TABLE `seguro_cancelamento` (
-  `id` bigint PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
-  `seguro_id` bigint NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguro',
+  `id` bigint unsigned PRIMARY KEY AUTO_INCREMENT COMMENT 'Identificador único do registro na tabela',
+  `seguro_id` bigint unsigned NOT NULL COMMENT 'Chave estrangeira referenciando a tabela seguro',
   `data` date NOT NULL DEFAULT (now()) COMMENT 'Data efetiva do cancelamento do seguro',
   `criado_em` datetime NOT NULL DEFAULT (now()) COMMENT 'Data e hora de criação do registro de cancelamento',
   `motivo` ENUM ('Em análise pela Seguradora', 'Pendente de documentação', 'Ativo', 'Expiração da vigência do seguro', 'Cancelado pelo cooperado', 'Cancelado pela cooperativa', 'Sinistro', 'Recusado pela seguradora', 'Cancelamento por prejuízo', 'Liquidação antecipada', 'Cancelado por renegociação', 'Cancelado por aditivo') NOT NULL COMMENT 'Motivo do cancelamento conforme enum status_seg_cancel',
@@ -289,21 +299,11 @@ CREATE TABLE `seguro_cancelamento` (
 
 CREATE UNIQUE INDEX `ponto_atendimento_index_0` ON `ponto_atendimento` (`agencia_id`, `codigo`);
 
-CREATE UNIQUE INDEX `condicao_seguradora_index_1` ON `condicao_seguradora` (`seguradora_id`);
+CREATE UNIQUE INDEX `cooperado_agencia_conta_index_5` ON `cooperado_agencia_conta` (`cooperado_id`, `agencia_id`, `conta_corrente`);
 
-CREATE UNIQUE INDEX `proposta_seguradora_index_2` ON `proposta_seguradora` (`seguradora_id`);
+CREATE INDEX `cooperado_agencia_conta_index_6` ON `cooperado_agencia_conta` (`conta_corrente`);
 
-CREATE UNIQUE INDEX `contabilizacao_seguradora_index_3` ON `contabilizacao_seguradora` (`seguradora_id`);
-
-CREATE UNIQUE INDEX `conta_corrente_seguradora_index_4` ON `conta_corrente_seguradora` (`seguradora_id`);
-
-CREATE UNIQUE INDEX `comissao_seguradora_index_5` ON `comissao_seguradora` (`seguradora_id`);
-
-CREATE UNIQUE INDEX `cooperado_agencia_conta_index_6` ON `cooperado_agencia_conta` (`cooperado_id`, `agencia_id`, `conta_corrente`);
-
-CREATE INDEX `cooperado_agencia_conta_index_7` ON `cooperado_agencia_conta` (`conta_corrente`);
-
-CREATE UNIQUE INDEX `seguro_index_8` ON `seguro` (`seguro_parametro_id`);
+CREATE UNIQUE INDEX `seguro_index_7` ON `seguro` (`seguro_parametro_id`);
 
 ALTER TABLE `agencia` COMMENT = 'Armazena informações cadastrais das agências da cooperativa';
 
@@ -404,6 +404,8 @@ ALTER TABLE `gestao_documento` ADD FOREIGN KEY (`seguradora_id`) REFERENCES `seg
 ALTER TABLE `cooperado_agencia_conta` ADD FOREIGN KEY (`cooperado_id`) REFERENCES `cooperado` (`id`);
 
 ALTER TABLE `cooperado_agencia_conta` ADD FOREIGN KEY (`agencia_id`) REFERENCES `agencia` (`id`);
+
+ALTER TABLE `seguro` ADD FOREIGN KEY (`apolice_grupo_seguradora_id`) REFERENCES `apolice_grupo_seguradora` (`id`);
 
 ALTER TABLE `seguro` ADD FOREIGN KEY (`cooperado_agencia_conta_id`) REFERENCES `cooperado_agencia_conta` (`id`);
 

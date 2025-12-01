@@ -45,8 +45,8 @@ public class PontoAtendimentoConfiguration : IEntityTypeConfiguration<PontoAtend
             .OnDelete(DeleteBehavior.NoAction);
 
         // Índices
-        //builder.HasIndex(x => x.Nome)
-        //    .IsUnique();
+        builder.HasIndex(x => x.Nome)
+            .IsUnique();
 
         builder.HasIndex(x => new { x.AgenciaId, x.Codigo })
             .IsUnique()

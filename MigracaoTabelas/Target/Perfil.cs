@@ -1,4 +1,3 @@
-
 namespace MigracaoTabelas.Target;
 
 public class Perfil

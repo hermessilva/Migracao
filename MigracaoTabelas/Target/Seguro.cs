@@ -1,6 +1,8 @@
 using System.ComponentModel;
 
 using MigracaoTabelas.Source;
+using MigracaoTabelas.Target;
+
 
 namespace MigracaoTabelas.Target;
 

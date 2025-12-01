@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 
 using MigracaoTabelas.Source;
 
@@ -34,11 +35,47 @@ public class Parcela
     public decimal ValorParcela { get; set; }
     public decimal ValorOriginal { get; set; }
     public decimal ValorPago { get; set; }
+    [NotMapped]
+    public decimal ValorAPagar => ValorParcela - ValorPago;
     public DateTime Vencimento { get; set; }
     public DateTime? Liquidacao { get; set; }
     public DateTime? DataUltimoPagamento { get; set; }
 
-    public virtual Seguro Seguros { get; set; }
+    public virtual Seguro Seguros { get; set; } = null!;
+
+    public void PagarManualmente(decimal valor)
+    {
+        ValidarPagamentoManual(valor);
+        ValorPago += valor;
+        var agora = DateTime.Now;
+        DataUltimoPagamento = agora;
+        if (ValorAPagar == 0)
+        {
+            Status = StatusParcela.Pago;
+            Liquidacao = agora;
+        }
+
+    }
+
+    private void ValidarPagamentoManual(decimal valor)
+    {
+        if (valor <= 0)
+            throw new ArgumentException("Valor do pagamento deve ser maior que zero.", nameof(valor));
+        if (valor > ValorAPagar)
+            throw new ApplicationException($"Valor do pagamento excede o valor a pagar. Valor a pagar {ValorAPagar}, ValorPagamento = {valor}");
+        if (Status != StatusParcela.Pendente && Status != StatusParcela.Cancelada)
+            throw new ApplicationException(
+                $"Não é permitido pagamento manual para parcela com status diferente de 'Pendente' ou 'Cancelado. Parcela.Status = {Status}");
+        if (Status == StatusParcela.Cancelada)
+        {
+            var canceladaPagavel =
+                Seguros.Status == StatusSeguro.ExpiracaoDaVigenciaDoSeguro ||
+                Seguros.SegurosCancelamentos.FirstOrDefault(sc => sc.SeguroId == SeguroId)?.Motivo ==
+                 MotivoSeguroCancelamento.CanceladoPelaCooperativa;//TODO: Mudar para enum Solicitado Agencia
+            if (!canceladaPagavel)
+                throw new ApplicationException($"Não é permitido pagamento manual para parcelas canceladas com motivo {Seguros.SegurosCancelamentos.Where(sc => sc.SeguroId == SeguroId).FirstOrDefault().Motivo}");
+        }
+    }
 }
 
 public enum StatusParcela

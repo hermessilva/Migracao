@@ -29,5 +29,18 @@ public class ContabilizacaoSeguradora
     public string DebitoComissaoValorPago { get; set; }
     public string DescricaoComissaoDebitoValorPago { get; set; }
 
+    public string DebitoPremioParcela { get; set; }
+    public string DescricaoDebitoPremioParcela { get; set; }
+
+    public string CreditoPremioParcela { get; set; }
+    public string DescricaoCreditoPremioParcela { get; set; }
+
+    public string DebitoComissaoParcela { get; set; }
+    public string DescricaoDebitoComissaoParcela { get; set; }
+
+    public string CreditoComissaoParcela { get; set; }
+
+    public string DescricaoCreditoComissaoParcela { get; set; }
+
     public virtual Seguradora Seguradoras { get; set; }
 }

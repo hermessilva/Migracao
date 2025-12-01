@@ -1,5 +1,3 @@
-using System.Diagnostics;
-
 using Microsoft.EntityFrameworkCore;
 
 
@@ -30,9 +28,65 @@ namespace MigracaoTabelas.Source
             modelBuilder.Entity<SxSeguradoras>(entity =>
             {
                 entity.HasNoKey();
-                entity.ToSqlQuery(@"select PST_CODIGO as Codigo, pst_nome as nome,'00000000000000' as cnpj,pst_nome  as razaosocial,'00000000' as cep,
-                                    'RUA' as rua,'COMPLEMENTO' as complemento,'0' as numero,  'BAIRRO' as bairro,
-                                    'CIDADE' as cidade,  'UF' as uf,  'TELEFONE' as telefone,  'EMAIL' as email from unico.cd_prestamista ");
+                entity.ToSqlQuery(@"SELECT 
+                    PST_CODIGO AS Codigo,
+                    PST_NOME AS Nome,
+                    PST_CHEQUE AS Cheque,
+                    PST_ECR AS Ecr,
+                    PST_DESCONTO AS Desconto,
+                    PST_EMPRESTIMO AS Emprestimo,
+                    PST_LIMITE30 AS Limite30,
+                    PST_COEF30 AS Coef30,
+                    PST_DPS30 AS Dps30,
+                    PST_LIMITE35 AS Limite35,
+                    PST_COEF35 AS Coef35,
+                    PST_DPS35 AS Dps35,
+                    PST_LIMITE40 AS Limite40,
+                    PST_COEF40 AS Coef40,
+                    PST_DPS40 AS Dps40,
+                    PST_LIMITE45 AS Limite45,
+                    PST_COEF45 AS Coef45,
+                    PST_DPS45 AS Dps45,
+                    PST_LIMITE50 AS Limite50,
+                    PST_COEF50 AS Coef50,
+                    PST_DPS50 AS Dps50,
+                    PST_LIMITE55 AS Limite55,
+                    PST_COEF55 AS Coef55,
+                    PST_DPS55 AS Dps55,
+                    PST_LIMITE60 AS Limite60,
+                    PST_COEF60 AS Coef60,
+                    PST_DPS60 AS Dps60,
+                    PST_LIMITE65 AS Limite65,
+                    PST_COEF65 AS Coef65,
+                    PST_DPS65 AS Dps65,
+                    PST_LIMITE70 AS Limite70,
+                    PST_COEF70 AS Coef70,
+                    PST_DPS70 AS Dps70,
+                    PST_LIMITE75 AS Limite75,
+                    PST_COEF75 AS Coef75,
+                    PST_DPS75 AS Dps75,
+                    PST_LIMITE80 AS Limite80,
+                    PST_COEF80 AS Coef80,
+                    PST_DPS80 AS Dps80,
+                    PST_LIMITE85 AS Limite85,
+                    PST_COEF85 AS Coef85,
+                    PST_DPS85 AS Dps85,
+                    PST_MAXMESES AS MaxMeses,
+                    PST_MINDIAS AS MinDias,
+                    PST_VALORDPS AS ValorDps,
+                    PST_LIMITEIDADE AS LimiteIdade,
+                    EDITANDO AS Editando,
+                    PST_ATIVO AS Ativo,
+                    CONTA_CONTABIL_CREDITO AS ContaContabilCredito,
+                    CONTA_CONTABIL_DEBITO AS ContaContabilDebito,
+                    CONTA_CONTABIL_CREDITO_COMISSAO AS ContaContabilCreditoComissao,
+                    CONTA_CONTABIL_DEBITO_COMISSAO AS ContaContabilDebitoComissao,
+                    CONTA_CONTABIL_CREDITO_4966 AS ContaContabilCredito4966,
+                    CONTA_CONTABIL_DEBITO_4966 AS ContaContabilDebito4966,
+                    CONTA_CONTABIL_CREDITO_COMISSAO_4966 AS ContaContabilCreditoComissao4966,
+                    CONTA_CONTABIL_DEBITO_COMISSAO_4966 AS ContaContabilDebitoComissao4966,
+                    PORCENTAGEM_COMISSAO AS PorcentagemComissao
+                FROM unico.cd_prestamista");
             });
 
             modelBuilder.Entity<SxEpSegPrestamista>(entity =>

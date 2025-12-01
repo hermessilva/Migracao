@@ -215,10 +215,7 @@ namespace MigracaoTabelas.Worker
                 var seguradoraSrc = pSContext.Seguradoras.Where(s => s.Codigo == pCodigo).FirstOrDefault();
                 if (seguradoraSrc == null)
                     throw new Exception($"Seguradora [{pCodigo}] não encontrada.");
-                var seguradora = CriarSeguradora(
-                    seguradoraSrc.Nome,
-                    StatusSeguradora.Ativo,
-                    (seguradoraSrc.Codigo + seguradoraSrc.Cnpj).Substring(0, 14), 120, 75, 0.1m, 0.1m, 0.1m, true);
+                var seguradora = CriarSeguradora(seguradoraSrc);
 
                 _TContext.Seguradora.Add(seguradora);
                 _TContext.SaveChanges();
@@ -227,62 +224,269 @@ namespace MigracaoTabelas.Worker
             }
         }
 
-        private static Seguradora CriarSeguradora(string nome, StatusSeguradora status, string cnpj, ushort maxMesesContrato, ushort maxIdade, decimal coberturaMorte, decimal coberturaInvalidez, decimal coberturaPerdaRenda, bool periodicidade30Dias)
+        private static Seguradora CriarSeguradora(SxSeguradoras src)
         {
+            // Gera CNPJ fictício baseado no código (14 dígitos)
+            var cnpj = (src.Codigo.PadRight(14, '0')).Substring(0, 14);
+
             var seguradora = new Seguradora
             {
-                Nome = nome,
-                Status = status,
+                Nome = src.Nome,
+                Status = src.Ativo ? StatusSeguradora.Ativo : StatusSeguradora.Inativo,
                 Cnpj = cnpj,
-                RazaoSocial = nome
+                RazaoSocial = src.Nome
             };
 
+            // ComissaoSeguradora - utiliza PorcentagemComissao da fonte
+            seguradora.ComissoesSeguradoras.Add(new ComissaoSeguradora
+            {
+                PorcentagemComissaoCorretora = 0.15m,
+                PorcentagemComissaoCooperativa = src.PorcentagemComissao,
+            });
+
+            // CondicaoSeguradora - utiliza MaxMeses e LimiteIdade da fonte
             seguradora.CondicoesSeguradora.Add(new CondicaoSeguradora
             {
-                MaxMesesContrato = maxMesesContrato,
-                MaxIdade = maxIdade,
-                PorcentagemCoberturaMorte = coberturaMorte,
-                PorcentagemCoberturaInvalidez = coberturaInvalidez,
-                PorcentagemCoberturaPerdaRenda = coberturaPerdaRenda,
-                Periodicidade30Dias = periodicidade30Dias
+                MaxMesesContrato = (ushort)src.MaxMeses,
+                MaxIdade = (ushort)src.LimiteIdade,
+                PorcentagemCoberturaMorte = 0.1m,
+                PorcentagemCoberturaInvalidez = 0.1m,
+                PorcentagemCoberturaPerdaRenda = 0.1m,
+                Periodicidade30Dias = true
             });
 
+            // ContabilizacaoSeguradora - utiliza as contas contábeis da fonte
             seguradora.ContabilizacoesSeguradoras.Add(new ContabilizacaoSeguradora
             {
-                CreditoPremioContratacao = string.Empty,
-                DescricaoCreditoPremioContratacao = string.Empty,
-                DebitoPremioContratacao = string.Empty,
-                DescricaoDebitoPremioContratacao = string.Empty,
-                CreditoComissaoContratacao = string.Empty,
-                DescricaoCreditoComissaoContratacao = string.Empty,
-                DebitoComissaoContratacao = string.Empty,
-                DescricaoDebitoComissaoContratacao = string.Empty,
-                CreditoCancelamentoComissaoParcTot = string.Empty,
-                DescricaoCreditoCancelamentoComissaoParcTot = string.Empty,
-                DebitoCancelamentoComissaoParcTot = string.Empty,
-                DescricaoDebitoCancelamentoComissaoParcTot = string.Empty,
-                CreditoCancelamentoComissaoAVista = string.Empty,
-                DescricaoCreditoCancelamentoComissaoAVista = string.Empty,
-                DebitoCancelamentoComissaoAVista = string.Empty,
-                DescricaoDebitoCancelamentoComissaoAVista = string.Empty,
-                CreditoValorPago = string.Empty,
-                DescricaoCreditoValorPago = string.Empty,
-                DebitoValorPago = string.Empty,
-                DescricaoDebitoValorPago = string.Empty,
-                CreditoComissaoValorPago = string.Empty,
-                DescricaoComissaoCreditoValorPago = string.Empty,
-                DebitoComissaoValorPago = string.Empty,
-                DescricaoComissaoDebitoValorPago = string.Empty
+                // Contas de Prêmio na Contratação
+                CreditoPremioContratacao = src.ContaContabilCredito ?? string.Empty,
+                DescricaoCreditoPremioContratacao = "Conta Contábil de Crédito de SEGP contratado",
+                DebitoPremioContratacao = src.ContaContabilDebito ?? string.Empty,
+                DescricaoDebitoPremioContratacao = "Conta Contábil de Débito de SEGP contratado",
+
+                // Contas de Comissão na Contratação
+                CreditoComissaoContratacao = src.ContaContabilCreditoComissao ?? string.Empty,
+                DescricaoCreditoComissaoContratacao = "Conta Contábil de Crédito de SEGP COMISSÃO contratado",
+                DebitoComissaoContratacao = src.ContaContabilDebitoComissao ?? string.Empty,
+                DescricaoDebitoComissaoContratacao = "Conta Contábil de Débito de SEGP COMISSÃO contratado",
+
+                // Contas de Cancelamento Parcial/Total (4966)
+                CreditoCancelamentoComissaoParcTot = src.ContaContabilCredito4966 ?? string.Empty,
+                DescricaoCreditoCancelamentoComissaoParcTot = "Conta Contábil de Crédito de SEGP contratado 4966",
+                DebitoCancelamentoComissaoParcTot = src.ContaContabilDebito4966 ?? string.Empty,
+                DescricaoDebitoCancelamentoComissaoParcTot = "Conta Contábil de Débito de SEGP contratado 4966",
+
+                // Contas de Cancelamento À Vista (Comissão 4966)
+                CreditoCancelamentoComissaoAVista = src.ContaContabilCreditoComissao4966 ?? string.Empty,
+                DescricaoCreditoCancelamentoComissaoAVista = "Conta Contábil de Crédito de SEGP COMISSÃO contratado 4966",
+                DebitoCancelamentoComissaoAVista = src.ContaContabilDebitoComissao4966 ?? string.Empty,
+                DescricaoDebitoCancelamentoComissaoAVista = "Conta Contábil de Débito de SEGP COMISSÃO contratado 4966",
+
+                // Contas de Valor Pago
+                CreditoValorPago = src.ContaContabilCredito ?? string.Empty,
+                DescricaoCreditoValorPago = "Conta Contábil de Crédito - Valor Pago",
+                DebitoValorPago = src.ContaContabilDebito ?? string.Empty,
+                DescricaoDebitoValorPago = "Conta Contábil de Débito - Valor Pago",
+
+                // Contas de Comissão Valor Pago
+                CreditoComissaoValorPago = src.ContaContabilCreditoComissao ?? string.Empty,
+                DescricaoComissaoCreditoValorPago = "Conta Contábil de Crédito - Comissão Valor Pago",
+                DebitoComissaoValorPago = src.ContaContabilDebitoComissao ?? string.Empty,
+                DescricaoComissaoDebitoValorPago = "Conta Contábil de Débito - Comissão Valor Pago",
+
+                DebitoPremioParcela = string.Empty,
+                DescricaoDebitoPremioParcela = "Conta Contábil de Débito - Prêmio Parcela",
+                CreditoPremioParcela = string.Empty,
+                DescricaoCreditoPremioParcela = "Conta Contábil de Crédito - Prêmio Parcela",
+                DebitoComissaoParcela =  string.Empty,
+                DescricaoDebitoComissaoParcela = "Conta Contábil de Débito - Comissão Parcela",
+                CreditoComissaoParcela = string.Empty,
+                DescricaoCreditoComissaoParcela = "Conta Contábil de Crédito - Comissão Parcela"
+
             });
 
-            seguradora.SeguradorasLimites.Add(new SeguradoraLimite
+            // SeguradoraLimite - cria um registro para cada faixa etária com valores da fonte
+            // Faixa 18-30 anos
+            if (src.Limite30 > 0 || src.Coef30 > 0)
             {
-                IdadeInicial = 18,
-                IdadeFinal = 90,
-                Coeficiente = 0.0005m,
-                ValorMaximo = 1000000m, // 1 Milhão
-                DescricaoRegra = "Regra Padrão Teste"
-            });
+                seguradora.SeguradorasLimites.Add(new SeguradoraLimite
+                {
+                    IdadeInicial = 18,
+                    IdadeFinal = 30,
+                    Coeficiente = src.Coef30,
+                    ValorMaximo = src.Limite30,
+                    LimiteDps = src.Dps30 ? src.ValorDps : 0,
+                    DescricaoRegra = "Faixa até 30 anos"
+                });
+            }
+
+            // Faixa 31-35 anos
+            if (src.Limite35 > 0 || src.Coef35 > 0)
+            {
+                seguradora.SeguradorasLimites.Add(new SeguradoraLimite
+                {
+                    IdadeInicial = 31,
+                    IdadeFinal = 35,
+                    Coeficiente = src.Coef35,
+                    ValorMaximo = src.Limite35,
+                    LimiteDps = src.Dps35 ? src.ValorDps : 0,
+                    DescricaoRegra = "Faixa 31 a 35 anos"
+                });
+            }
+
+            // Faixa 36-40 anos
+            if (src.Limite40 > 0 || src.Coef40 > 0)
+            {
+                seguradora.SeguradorasLimites.Add(new SeguradoraLimite
+                {
+                    IdadeInicial = 36,
+                    IdadeFinal = 40,
+                    Coeficiente = src.Coef40,
+                    ValorMaximo = src.Limite40,
+                    LimiteDps = src.Dps40 ? src.ValorDps : 0,
+                    DescricaoRegra = "Faixa 36 a 40 anos"
+                });
+            }
+
+            // Faixa 41-45 anos
+            if (src.Limite45 > 0 || src.Coef45 > 0)
+            {
+                seguradora.SeguradorasLimites.Add(new SeguradoraLimite
+                {
+                    IdadeInicial = 41,
+                    IdadeFinal = 45,
+                    Coeficiente = src.Coef45,
+                    ValorMaximo = src.Limite45,
+                    LimiteDps = src.Dps45 ? src.ValorDps : 0,
+                    DescricaoRegra = "Faixa 41 a 45 anos"
+                });
+            }
+
+            // Faixa 46-50 anos
+            if (src.Limite50 > 0 || src.Coef50 > 0)
+            {
+                seguradora.SeguradorasLimites.Add(new SeguradoraLimite
+                {
+                    IdadeInicial = 46,
+                    IdadeFinal = 50,
+                    Coeficiente = src.Coef50,
+                    ValorMaximo = src.Limite50,
+                    LimiteDps = src.Dps50 ? src.ValorDps : 0,
+                    DescricaoRegra = "Faixa 46 a 50 anos"
+                });
+            }
+
+            // Faixa 51-55 anos
+            if (src.Limite55 > 0 || src.Coef55 > 0)
+            {
+                seguradora.SeguradorasLimites.Add(new SeguradoraLimite
+                {
+                    IdadeInicial = 51,
+                    IdadeFinal = 55,
+                    Coeficiente = src.Coef55,
+                    ValorMaximo = src.Limite55,
+                    LimiteDps = src.Dps55 ? src.ValorDps : 0,
+                    DescricaoRegra = "Faixa 51 a 55 anos"
+                });
+            }
+
+            // Faixa 56-60 anos
+            if (src.Limite60 > 0 || src.Coef60 > 0)
+            {
+                seguradora.SeguradorasLimites.Add(new SeguradoraLimite
+                {
+                    IdadeInicial = 56,
+                    IdadeFinal = 60,
+                    Coeficiente = src.Coef60,
+                    ValorMaximo = src.Limite60,
+                    LimiteDps = src.Dps60 ? src.ValorDps : 0,
+                    DescricaoRegra = "Faixa 56 a 60 anos"
+                });
+            }
+
+            // Faixa 61-65 anos
+            if (src.Limite65 > 0 || src.Coef65 > 0)
+            {
+                seguradora.SeguradorasLimites.Add(new SeguradoraLimite
+                {
+                    IdadeInicial = 61,
+                    IdadeFinal = 65,
+                    Coeficiente = src.Coef65,
+                    ValorMaximo = src.Limite65,
+                    LimiteDps = src.Dps65 ? src.ValorDps : 0,
+                    DescricaoRegra = "Faixa 61 a 65 anos"
+                });
+            }
+
+            // Faixa 66-70 anos
+            if (src.Limite70 > 0 || src.Coef70 > 0)
+            {
+                seguradora.SeguradorasLimites.Add(new SeguradoraLimite
+                {
+                    IdadeInicial = 66,
+                    IdadeFinal = 70,
+                    Coeficiente = src.Coef70,
+                    ValorMaximo = src.Limite70,
+                    LimiteDps = src.Dps70 ? src.ValorDps : 0,
+                    DescricaoRegra = "Faixa 66 a 70 anos"
+                });
+            }
+
+            // Faixa 71-75 anos
+            if (src.Limite75 > 0 || src.Coef75 > 0)
+            {
+                seguradora.SeguradorasLimites.Add(new SeguradoraLimite
+                {
+                    IdadeInicial = 71,
+                    IdadeFinal = 75,
+                    Coeficiente = src.Coef75,
+                    ValorMaximo = src.Limite75,
+                    LimiteDps = src.Dps75 ? src.ValorDps : 0,
+                    DescricaoRegra = "Faixa 71 a 75 anos"
+                });
+            }
+
+            // Faixa 76-80 anos
+            if (src.Limite80 > 0 || src.Coef80 > 0)
+            {
+                seguradora.SeguradorasLimites.Add(new SeguradoraLimite
+                {
+                    IdadeInicial = 76,
+                    IdadeFinal = 80,
+                    Coeficiente = src.Coef80,
+                    ValorMaximo = src.Limite80,
+                    LimiteDps = src.Dps80 ? src.ValorDps : 0,
+                    DescricaoRegra = "Faixa 76 a 80 anos"
+                });
+            }
+
+            // Faixa 81-85 anos
+            if (src.Limite85 > 0 || src.Coef85 > 0)
+            {
+                seguradora.SeguradorasLimites.Add(new SeguradoraLimite
+                {
+                    IdadeInicial = 81,
+                    IdadeFinal = 85,
+                    Coeficiente = src.Coef85,
+                    ValorMaximo = src.Limite85,
+                    LimiteDps = src.Dps85 ? src.ValorDps : 0,
+                    DescricaoRegra = "Faixa 81 a 85 anos"
+                });
+            }
+
+            // Se nenhuma faixa foi definida, cria uma faixa padrão
+            if (!seguradora.SeguradorasLimites.Any())
+            {
+                seguradora.SeguradorasLimites.Add(new SeguradoraLimite
+                {
+                    IdadeInicial = 18,
+                    IdadeFinal = (ushort)src.LimiteIdade,
+                    Coeficiente = 0.0005m,
+                    ValorMaximo = 1000000m,
+                    LimiteDps = src.ValorDps,
+                    DescricaoRegra = "Faixa Padrão"
+                });
+            }
 
             return seguradora;
         }

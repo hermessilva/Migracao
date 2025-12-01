@@ -1,8 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-using MigracaoTabelas.Target;
-
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class ContabilizacaoSeguradoraConfiguration : IEntityTypeConfiguration<ContabilizacaoSeguradora>
@@ -165,6 +162,54 @@ public class ContabilizacaoSeguradoraConfiguration : IEntityTypeConfiguration<Co
             .HasColumnName("descricao_comissao_debito_valor_pago")
             .HasMaxLength(255)
             .HasComment("Descrição da conta contábil comissao valor pago debito")
+            .IsRequired();
+
+        builder.Property(x => x.DebitoPremioParcela)
+            .HasColumnName("debito_premio_parcela")
+            .HasMaxLength(50)
+            .HasComment("Código da conta contábil debito premio parcela")
+            .IsRequired();
+
+        builder.Property(x => x.DescricaoDebitoPremioParcela)
+            .HasColumnName("descricao_debito_premio_parcela")
+            .HasMaxLength(255)
+            .HasComment("Descrição da conta contábil debito premio parcela")
+            .IsRequired();
+        
+        builder.Property(x => x.CreditoPremioParcela)
+            .HasColumnName("credito_premio_parcela")
+            .HasMaxLength(50)
+            .HasComment("Código da conta contábil credito premio parcela")
+            .IsRequired();
+
+        builder.Property(x => x.DescricaoCreditoPremioParcela)
+            .HasColumnName("descricao_credito_premio_parcela")
+            .HasMaxLength(255)
+            .HasComment("Descrição da conta contábil credito premio parcela")
+            .IsRequired();
+
+        builder.Property(x => x.DebitoComissaoParcela)
+            .HasColumnName("debito_comissao_parcela")
+            .HasMaxLength(50)
+            .HasComment("Código da conta contábil debito comissao parcela")
+            .IsRequired();
+
+        builder.Property(x => x.DescricaoDebitoComissaoParcela)
+            .HasColumnName("descricao_debito_comissao_parcela")
+            .HasMaxLength(255)
+            .HasComment("Descrição da conta contábil debito comissao parcela")
+            .IsRequired();
+
+        builder.Property(x => x.CreditoComissaoParcela)
+            .HasColumnName("credito_comissao_parcela")
+            .HasMaxLength(50)
+            .HasComment("Código da conta contábil credito comissao parcela")
+            .IsRequired();
+
+        builder.Property(x => x.DescricaoCreditoComissaoParcela)
+            .HasColumnName("descricao_credito_comissao_parcela")
+            .HasMaxLength(255)
+            .HasComment("Descrição da conta contábil credito comissao parcela")
             .IsRequired();
 
         // Relacionamentos

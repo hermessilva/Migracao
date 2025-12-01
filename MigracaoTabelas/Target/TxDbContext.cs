@@ -1,6 +1,7 @@
-using System.Diagnostics;
-
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 
 namespace MigracaoTabelas.Target
 {
@@ -50,6 +51,11 @@ namespace MigracaoTabelas.Target
 
         }
 
+        protected override void ConfigureConventions(ModelConfigurationBuilder builder)
+        {
+            builder.Conventions.Add(_ => (IConvention)new NoForeignKeyIndexConvention());
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder pBuilder)
         {
             if (!pBuilder.IsConfigured)
@@ -66,5 +72,26 @@ namespace MigracaoTabelas.Target
 #endif
         }
     }
+    public sealed class NoForeignKeyIndexConvention : IForeignKeyAddedConvention
+    {
+        public void ProcessForeignKeyAdded(
+            IConventionForeignKeyBuilder relationshipBuilder,
+            IConventionContext<IConventionForeignKeyBuilder> context)
+        {
+            var fk = relationshipBuilder.Metadata;
+            var entity = fk.DeclaringEntityType;
+
+            // Localiza o índice criado automaticamente pela convenção
+            var index = entity.FindIndex(fk.Properties);
+            if (index == null)
+                return;
+
+            // Verifica se foi criado por convenção (implícito)
+            var source = index.GetConfigurationSource();
+            if (source == ConfigurationSource.Convention)
+                entity.RemoveIndex(index);
+        }
+    }
 }
+
 

@@ -116,7 +116,7 @@ namespace MigracaoTabelas.Worker
                     processados++;
 
                     parcnt += Migrate(parcelas, seguros, prestamista);
-                    if (seguros.Count > 100)
+                    if (seguros.Count > 0)
                     {
                         _TContext.AddRange(seguros);
                         _TContext.SaveChanges();
@@ -181,10 +181,17 @@ namespace MigracaoTabelas.Worker
 
             //tgt.UsuarioId = 21;
 
+            // Obtém a seguradora para buscar as comissões
+            var seguradora = _DataCache.GetSeguradora(_SContext, pPrestamista.PstCodigo);
+            var comissao = seguradora.ComissoesSeguradoras.FirstOrDefault();
+
             var spar = new SeguroParametro();
             spar.TipoCapital = TipoCapitalSeguro.Fixo;
             spar.Periodicidade30Dias = true;
             spar.Coeficiente = 0.0003M;
+            spar.Iof = 0.0038M;
+            spar.PorcentagemComissaoCorretora = comissao?.PorcentagemComissaoCorretora ?? 0.15M;
+            spar.PorcentagemComissaoCooperativa = comissao?.PorcentagemComissaoCooperativa ?? 0.05M;
             tgt.SeguroParametro = spar;
 
             foreach (var item in parcelasSrc)

@@ -424,6 +424,13 @@ namespace MigracaoTabelas.Migrations
                         .HasColumnName("credito_comissao_contratacao")
                         .HasComment("Código da conta contábil comissao de credito ");
 
+                    b.Property<string>("CreditoComissaoParcela")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("credito_comissao_parcela")
+                        .HasComment("Código da conta contábil credito comissao parcela");
+
                     b.Property<string>("CreditoComissaoValorPago")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -437,6 +444,13 @@ namespace MigracaoTabelas.Migrations
                         .HasColumnType("varchar(50)")
                         .HasColumnName("credito_premio_contratacao")
                         .HasComment("Código da conta contábil premio de credito");
+
+                    b.Property<string>("CreditoPremioParcela")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("credito_premio_parcela")
+                        .HasComment("Código da conta contábil credito premio parcela");
 
                     b.Property<string>("CreditoValorPago")
                         .IsRequired()
@@ -466,6 +480,13 @@ namespace MigracaoTabelas.Migrations
                         .HasColumnName("debito_comissao_contratacao")
                         .HasComment("Código da conta contábil comissao de debito");
 
+                    b.Property<string>("DebitoComissaoParcela")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("debito_comissao_parcela")
+                        .HasComment("Código da conta contábil debito comissao parcela");
+
                     b.Property<string>("DebitoComissaoValorPago")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -479,6 +500,13 @@ namespace MigracaoTabelas.Migrations
                         .HasColumnType("varchar(50)")
                         .HasColumnName("debito_premio_contratacao")
                         .HasComment("Código da conta contábil premio de debito");
+
+                    b.Property<string>("DebitoPremioParcela")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("debito_premio_parcela")
+                        .HasComment("Código da conta contábil debito premio parcela");
 
                     b.Property<string>("DebitoValorPago")
                         .IsRequired()
@@ -522,12 +550,22 @@ namespace MigracaoTabelas.Migrations
                         .HasColumnName("descricao_credito_comissao_contratacao")
                         .HasComment("Descrição da conta contábil comissao de credito");
 
+                    b.Property<string>("DescricaoCreditoComissaoParcela")
+                        .HasColumnType("longtext");
+
                     b.Property<string>("DescricaoCreditoPremioContratacao")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
                         .HasColumnName("descricao_credito_premio_contratacao")
                         .HasComment("Descrição da conta contábil premio de credito");
+
+                    b.Property<string>("DescricaoCreditoPremioParcela")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("descricao_credito_premio_parcela")
+                        .HasComment("Descrição da conta contábil credito premio parcela");
 
                     b.Property<string>("DescricaoCreditoValorPago")
                         .IsRequired()
@@ -557,12 +595,26 @@ namespace MigracaoTabelas.Migrations
                         .HasColumnName("descricao_debito_comissao_contratacao")
                         .HasComment("Descrição da conta contábil comissao de debito");
 
+                    b.Property<string>("DescricaoDebitoComissaoParcela")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("descricao_debito_comissao_parcela")
+                        .HasComment("Descrição da conta contábil debito comissao parcela");
+
                     b.Property<string>("DescricaoDebitoPremioContratacao")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
                         .HasColumnName("descricao_debito_premio_contratacao")
                         .HasComment("Descrição da conta contábil premio de debito");
+
+                    b.Property<string>("DescricaoDebitoPremioParcela")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("descricao_debito_premio_parcela")
+                        .HasComment("Descrição da conta contábil debito premio parcela");
 
                     b.Property<string>("DescricaoDebitoValorPago")
                         .IsRequired()
@@ -787,11 +839,6 @@ namespace MigracaoTabelas.Migrations
                         .HasColumnName("descricao")
                         .HasComment("Descrição detalhada do lançamento para identificação");
 
-                    b.Property<int>("NumeroLancamento")
-                        .HasColumnType("int")
-                        .HasColumnName("numero_lancamento")
-                        .HasComment("Número sequencial do lançamento no sistema de origem");
-
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("enum('Enviado','Falha')")
@@ -800,7 +847,7 @@ namespace MigracaoTabelas.Migrations
 
                     b.Property<string>("TipoLancamentoContabil")
                         .IsRequired()
-                        .HasColumnType("enum('Seguro Prestamista Contratado','Comissão Seguro Prestamista Contratado','Cancelamento Seguro Prestamista Parcelado','Cancelamento Seguro Prestamista Parcelado Comissão','Cancelamento Seguro Prestamista À Vista Proporcional Comissão','Pagamento Seguro Prestamista','Recebimento Comissão Seguro Prestamista')")
+                        .HasColumnType("enum('Seguro Prestamista Contratado', 'Comissão Seguro Prestamista Contratado', 'Cancelamento Seguro Prestamista Parcelado Comissão', 'Cancelamento Seguro Prestamista À Vista Proporcional Comissão', 'Pagamento Seguro Prestamista', 'Recebimento Comissão Seguro Prestamista', 'Recebimento Premio Seguro Prestamista Parcelado', 'Recebimento Comissão Seguro Prestamista Parcelado')")
                         .HasColumnName("tipo_lancamento_contabil")
                         .HasComment("Tipo do lançamento contábil conforme enum tipo_lancamento");
 
@@ -1165,7 +1212,7 @@ namespace MigracaoTabelas.Migrations
                         .HasComment("Identificador único do registro na tabela");
 
                     b.Property<decimal>("Coeficiente")
-                        .HasColumnType("decimal(5,4)")
+                        .HasColumnType("decimal(8,7)")
                         .HasColumnName("coeficiente")
                         .HasComment("Coeficiente multiplicador para cálculo do prêmio");
 
@@ -1401,9 +1448,14 @@ namespace MigracaoTabelas.Migrations
                         .HasComment("Identificador único do registro na tabela");
 
                     b.Property<decimal>("Coeficiente")
-                        .HasColumnType("decimal(5,4)")
+                        .HasColumnType("decimal(8,7)")
                         .HasColumnName("coeficiente")
                         .HasComment("Coeficiente multiplicador utilizado para cálculo do prêmio e estornos");
+
+                    b.Property<decimal>("Iof")
+                        .HasColumnType("decimal(5,4)")
+                        .HasColumnName("iof")
+                        .HasComment("Porcentual de IOF cobrado no seguro");
 
                     b.Property<bool>("Periodicidade30Dias")
                         .ValueGeneratedOnAdd()
@@ -1411,6 +1463,16 @@ namespace MigracaoTabelas.Migrations
                         .HasDefaultValue(false)
                         .HasColumnName("periodicidade_30dias")
                         .HasComment("Indica se a periodicidade de vencimento é a cada 30 dias (true) ou mensal no mesmo dia (false)");
+
+                    b.Property<decimal>("PorcentagemComissaoCooperativa")
+                        .HasColumnType("decimal(5,4)")
+                        .HasColumnName("porcentagem_comissao_cooperativa")
+                        .HasComment("Percentual de comissão destinado à cooperativa (ex: 0.0500 = 5%)");
+
+                    b.Property<decimal>("PorcentagemComissaoCorretora")
+                        .HasColumnType("decimal(5,4)")
+                        .HasColumnName("porcentagem_comissao_corretora")
+                        .HasComment("Percentual de comissão destinado à corretora (ex: 0.1500 = 15%)");
 
                     b.Property<string>("TipoCapital")
                         .IsRequired()

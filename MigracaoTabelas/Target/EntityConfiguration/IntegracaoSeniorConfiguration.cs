@@ -1,10 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using MigracaoTabelas.Target;
-
-using Seguros.Helpers;
-
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class IntegracaoSeniorConfiguration : IEntityTypeConfiguration<IntegracaoSenior>
@@ -56,12 +52,6 @@ public class IntegracaoSeniorConfiguration : IEntityTypeConfiguration<Integracao
             .HasComment("Valor monetário do lançamento a ser integrado")
             .IsRequired();
 
-        builder.Property(x => x.NumeroLancamento)
-            .HasColumnName("numero_lancamento")
-            .HasColumnType("int")
-            .HasComment("Número sequencial do lançamento no sistema de origem")
-            .IsRequired();
-
         builder.Property(x => x.Descricao)
             .HasColumnName("descricao")
             .HasMaxLength(255)
@@ -70,9 +60,9 @@ public class IntegracaoSeniorConfiguration : IEntityTypeConfiguration<Integracao
 
         builder.Property(x => x.TipoLancamentoContabil)
             .HasColumnName("tipo_lancamento_contabil")
-            .HasColumnType("enum('Seguro Prestamista Contratado','Comissão Seguro Prestamista Contratado','Cancelamento Seguro Prestamista Parcelado','Cancelamento Seguro Prestamista Parcelado Comissão','Cancelamento Seguro Prestamista À Vista Proporcional Comissão','Pagamento Seguro Prestamista','Recebimento Comissão Seguro Prestamista')")
-            .HasConversion(
-                v => v.AsString(),
+            .HasColumnType("enum('Seguro Prestamista Contratado', 'Comissão Seguro Prestamista Contratado', 'Cancelamento Seguro Prestamista Parcelado Comissão', 'Cancelamento Seguro Prestamista À Vista Proporcional Comissão', 'Pagamento Seguro Prestamista', 'Recebimento Comissão Seguro Prestamista', 'Recebimento Premio Seguro Prestamista Parcelado', 'Recebimento Comissão Seguro Prestamista Parcelado')")
+            .HasConversion(v =>
+                v.AsString(),
                 v => EnumHelper.FromString<TipoLancamentoContabilIntegracaoSenior>(v)
             )
             .HasComment("Tipo do lançamento contábil conforme enum tipo_lancamento")

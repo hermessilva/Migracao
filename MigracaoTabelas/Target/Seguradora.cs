@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 
 namespace MigracaoTabelas.Target;
 
@@ -73,7 +72,14 @@ public class Seguradora
             CreditoComissaoValorPago = string.Empty,
             DescricaoComissaoCreditoValorPago = string.Empty,
             DebitoComissaoValorPago = string.Empty,
-            DescricaoComissaoDebitoValorPago = string.Empty
+            DescricaoComissaoDebitoValorPago = string.Empty,
+            DebitoPremioParcela = string.Empty,
+            DescricaoDebitoPremioParcela = string.Empty,
+            CreditoPremioParcela = string.Empty,
+            DescricaoCreditoPremioParcela = string.Empty,
+            DebitoComissaoParcela = string.Empty,
+            DescricaoDebitoComissaoParcela = string.Empty,
+            CreditoComissaoParcela = string.Empty,
         });
 
         PropostasSeguradoras.Add(new PropostaSeguradora

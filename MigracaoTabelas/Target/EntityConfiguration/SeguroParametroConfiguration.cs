@@ -1,10 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using MigracaoTabelas.Target;
-
-using Seguros.Helpers;
-
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public sealed class SeguroParametroConfiguration : IEntityTypeConfiguration<SeguroParametro>
@@ -39,8 +35,26 @@ public sealed class SeguroParametroConfiguration : IEntityTypeConfiguration<Segu
 
         pBuilder.Property(pX => pX.Coeficiente)
             .HasColumnName("coeficiente")
-            .HasColumnType("decimal(5,4)")
+            .HasColumnType("decimal(8,7)")
             .HasComment("Coeficiente multiplicador utilizado para cálculo do prêmio e estornos")
+            .IsRequired();
+
+        pBuilder.Property(pX => pX.Iof)
+            .HasColumnName("iof")
+            .HasColumnType("decimal(5,4)")
+            .HasComment("Porcentual de IOF cobrado no seguro")
+            .IsRequired();
+
+        pBuilder.Property(pX => pX.PorcentagemComissaoCorretora)
+            .HasColumnName("porcentagem_comissao_corretora")
+            .HasColumnType("decimal(5,4)")
+            .HasComment("Percentual de comissão destinado à corretora (ex: 0.1500 = 15%)")
+            .IsRequired();
+
+        pBuilder.Property(pX => pX.PorcentagemComissaoCooperativa)
+            .HasColumnName("porcentagem_comissao_cooperativa")
+            .HasColumnType("decimal(5,4)")
+            .HasComment("Percentual de comissão destinado à cooperativa (ex: 0.0500 = 5%)")
             .IsRequired();
     }
 }

@@ -1,8 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using MigracaoTabelas.Target;
-
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class SeguradoraLimiteConfiguration : IEntityTypeConfiguration<SeguradoraLimite>
@@ -43,7 +41,7 @@ public class SeguradoraLimiteConfiguration : IEntityTypeConfiguration<Seguradora
 
         builder.Property(x => x.Coeficiente)
             .HasColumnName("coeficiente")
-            .HasColumnType("decimal(5,4)")
+            .HasColumnType("decimal(8,7)")
             .HasComment("Coeficiente multiplicador para cálculo do prêmio")
             .IsRequired();
 
