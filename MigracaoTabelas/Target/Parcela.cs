@@ -11,7 +11,7 @@ public class Parcela
     {
         if (source.SegCancelado.HasValue)
             Status = StatusParcela.Pago;
-        else if (!source.SegPgto.HasValue)
+        else
             Status = StatusParcela.Pendente;
 
         NumeroParcela = (ushort)source.SegParcela;

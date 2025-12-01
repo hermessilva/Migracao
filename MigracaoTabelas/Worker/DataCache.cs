@@ -65,19 +65,22 @@ namespace MigracaoTabelas.Worker
                 if (Agencias.ContainsKey(pCodigo))
                     return Agencias[pCodigo];
 
-                var agencia = pSContext.Agencia.Where(a => a.Codigo == pCodigo).FirstOrDefault();
-                if (agencia == null)
+                var agencias = pSContext.Agencia.ToList();
+                if (!agencias.Any())
                     throw new Exception($"Agência [{pCodigo}] não encontrada.");
-                var ag = new Agencia
+                var ags = agencias.DistinctBy(a => a.Codigo);
+                foreach (var agencia in ags)
                 {
-                    Codigo = pCodigo,
-                    Nome = agencia.Nome
-                };
-                _TContext.Agencia.Add(ag);
+                    var ag = new Agencia
+                    {
+                        Codigo = agencia.Codigo,
+                        Nome = agencia.Nome
+                    };
+                    _TContext.Agencia.Add(ag);
+                }
                 _TContext.SaveChanges();
-
-                Agencias.Add(pCodigo, ag);
-                return ag;
+                _TContext.Agencia.ToList().ForEach(a => Agencias.Add(a.Codigo, a));
+                return Agencias[pCodigo];
             }
         }
 
@@ -91,19 +94,27 @@ namespace MigracaoTabelas.Worker
                     return PontosAtendimento[(pAgenciaCodigo, pPontoCodigo)];
                 var agencia = GetAgencia(pSContext, pAgenciaCodigo);
 
-                var ponto = pSContext.PontoAtendimento.Where(p => p.Agencia == agencia.Codigo && p.Codigo == pPontoCodigo).OrderBy(p => p.Codigo).FirstOrDefault();
-                if (ponto == null)
+                var pontos = pSContext.PontoAtendimento.Where(p => p.Agencia == agencia.Codigo).OrderBy(p => p.Codigo).ToList();
+                if (!pontos.Any())
                     throw new Exception($"Ponto de Atendimento [{pPontoCodigo}] da Agência [{pAgenciaCodigo}] não encontrado.");
-                var pa = new PontoAtendimento
+                foreach (var ponto in pontos)
                 {
-                    AgenciaId = agencia.Id,
-                    Codigo = pPontoCodigo,
-                    Nome = pPontoCodigo + " - " + ponto.Nome
-                };
-                _TContext.PontoAtendimento.Add(pa);
+                    var pa = new PontoAtendimento
+                    {
+                        AgenciaId = agencia.Id,
+                        Codigo = ponto.Codigo,
+                        Nome = ponto.Codigo + " - " + ponto.Nome
+                    };
+                    if (!_TContext.PontoAtendimento.Any(p => p.AgenciaId == pa.AgenciaId && p.Codigo == pa.Codigo))
+                        _TContext.PontoAtendimento.Add(pa);
+                }
                 _TContext.SaveChanges();
-                PontosAtendimento.Add((pAgenciaCodigo, pPontoCodigo), pa);
-                return pa;
+                _TContext.PontoAtendimento.Include(p => p.Agencia).ToList().ForEach(p =>
+                {
+                    if (!PontosAtendimento.ContainsKey((p.Agencia.Codigo, p.Codigo)))
+                        PontosAtendimento.Add((p.Agencia.Codigo, p.Codigo), p);
+                });
+                return PontosAtendimento[(pAgenciaCodigo, pPontoCodigo)];
             }
         }
 
@@ -204,18 +215,76 @@ namespace MigracaoTabelas.Worker
                 var seguradoraSrc = pSContext.Seguradoras.Where(s => s.Codigo == pCodigo).FirstOrDefault();
                 if (seguradoraSrc == null)
                     throw new Exception($"Seguradora [{pCodigo}] não encontrada.");
-                var seguradoraTgt = new Seguradora
-                {
-                    Nome = seguradoraSrc.Nome,
-                    Cnpj = (seguradoraSrc.Codigo + seguradoraSrc.Cnpj).Substring(0, 14),
-                    RazaoSocial = seguradoraSrc.RazaoSocial,
-                    Status = StatusSeguradora.Ativo
-                };
-                _TContext.Seguradora.Add(seguradoraTgt);
+                var seguradora = CriarSeguradora(
+                    seguradoraSrc.Nome,
+                    StatusSeguradora.Ativo,
+                    (seguradoraSrc.Codigo + seguradoraSrc.Cnpj).Substring(0, 14), 120, 75, 0.1m, 0.1m, 0.1m, true);
+
+                _TContext.Seguradora.Add(seguradora);
                 _TContext.SaveChanges();
-                Seguradoras.Add(pCodigo, seguradoraTgt);
-                return seguradoraTgt;
+                Seguradoras.Add(pCodigo, seguradora);
+                return seguradora;
             }
+        }
+
+        private static Seguradora CriarSeguradora(string nome, StatusSeguradora status, string cnpj, ushort maxMesesContrato, ushort maxIdade, decimal coberturaMorte, decimal coberturaInvalidez, decimal coberturaPerdaRenda, bool periodicidade30Dias)
+        {
+            var seguradora = new Seguradora
+            {
+                Nome = nome,
+                Status = status,
+                Cnpj = cnpj,
+                RazaoSocial = nome
+            };
+
+            seguradora.CondicoesSeguradora.Add(new CondicaoSeguradora
+            {
+                MaxMesesContrato = maxMesesContrato,
+                MaxIdade = maxIdade,
+                PorcentagemCoberturaMorte = coberturaMorte,
+                PorcentagemCoberturaInvalidez = coberturaInvalidez,
+                PorcentagemCoberturaPerdaRenda = coberturaPerdaRenda,
+                Periodicidade30Dias = periodicidade30Dias
+            });
+
+            seguradora.ContabilizacoesSeguradoras.Add(new ContabilizacaoSeguradora
+            {
+                CreditoPremioContratacao = string.Empty,
+                DescricaoCreditoPremioContratacao = string.Empty,
+                DebitoPremioContratacao = string.Empty,
+                DescricaoDebitoPremioContratacao = string.Empty,
+                CreditoComissaoContratacao = string.Empty,
+                DescricaoCreditoComissaoContratacao = string.Empty,
+                DebitoComissaoContratacao = string.Empty,
+                DescricaoDebitoComissaoContratacao = string.Empty,
+                CreditoCancelamentoComissaoParcTot = string.Empty,
+                DescricaoCreditoCancelamentoComissaoParcTot = string.Empty,
+                DebitoCancelamentoComissaoParcTot = string.Empty,
+                DescricaoDebitoCancelamentoComissaoParcTot = string.Empty,
+                CreditoCancelamentoComissaoAVista = string.Empty,
+                DescricaoCreditoCancelamentoComissaoAVista = string.Empty,
+                DebitoCancelamentoComissaoAVista = string.Empty,
+                DescricaoDebitoCancelamentoComissaoAVista = string.Empty,
+                CreditoValorPago = string.Empty,
+                DescricaoCreditoValorPago = string.Empty,
+                DebitoValorPago = string.Empty,
+                DescricaoDebitoValorPago = string.Empty,
+                CreditoComissaoValorPago = string.Empty,
+                DescricaoComissaoCreditoValorPago = string.Empty,
+                DebitoComissaoValorPago = string.Empty,
+                DescricaoComissaoDebitoValorPago = string.Empty
+            });
+
+            seguradora.SeguradorasLimites.Add(new SeguradoraLimite
+            {
+                IdadeInicial = 18,
+                IdadeFinal = 90,
+                Coeficiente = 0.0005m,
+                ValorMaximo = 1000000m, // 1 Milhão
+                DescricaoRegra = "Regra Padrão Teste"
+            });
+
+            return seguradora;
         }
 
         public ulong GetAgenciaSeguradora(ulong pAgenciaId, ulong pSeguradoraId)
@@ -231,11 +300,23 @@ namespace MigracaoTabelas.Worker
                     AgenciaId = pAgenciaId,
                     SeguradoraId = pSeguradoraId,
                 };
+
+                var ags = new ApoliceGrupoSeguradora
+                {
+                    Apolice = "APO-001",
+                    Grupo = "GRP-001",
+                    SubGrupo = "SUB-001",
+                    TipoCapital = TipoCapitalApoliceGrupoSeguradora.Fixo,
+                    ModalidadeUnico = "Unico",
+                    ModalidadeAVista = 1.5m,
+                    ModalidadeParcelado = 10m,
+                };
+                ag.ApolicesGruposSeguradoras.Add(ags);
                 _TContext.AgenciaSeguradora.Add(ag);
                 _TContext.SaveChanges();
 
                 AgenciasSeguradoras.Add((pAgenciaId, pSeguradoraId), ag);
-                return ag.Id;
+                return ags.Id;
             }
         }
     }

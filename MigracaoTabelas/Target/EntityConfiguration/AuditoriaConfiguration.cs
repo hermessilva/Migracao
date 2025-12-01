@@ -46,7 +46,6 @@ public class AuditoriaConfiguration : IEntityTypeConfiguration<Auditoria>
 
         builder.Property(x => x.Antes)
             .HasColumnName("antes")
-            .HasMaxLength(255)
             .HasComment("Dados do registro antes da alteração em formato JSON ou serializado")
             .IsRequired();
 

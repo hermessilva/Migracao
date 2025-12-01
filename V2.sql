@@ -1,4 +1,3 @@
-START TRANSACTION;
 ALTER TABLE `apolice_grupo_seguradora` DROP CONSTRAINT `FK_apolice_grupo_seguradora_agencia_agencia_id`;
 
 ALTER TABLE `apolice_grupo_seguradora` DROP CONSTRAINT `FK_apolice_grupo_seguradora_seguradora_seguradora_id`;
@@ -336,9 +335,4 @@ ALTER TABLE `parametrizacao_resposta` ADD CONSTRAINT `FK_parametrizacao_resposta
 ALTER TABLE `seguro` ADD CONSTRAINT `FK_seguro_apolice_grupo_seguradora_apolice_grupo_seguradora_id` FOREIGN KEY (`apolice_grupo_seguradora_id`) REFERENCES `apolice_grupo_seguradora` (`id`);
 
 ALTER TABLE `seguro` ADD CONSTRAINT `FK_seguro_seguro_parametro_seguro_parametro_id` FOREIGN KEY (`seguro_parametro_id`) REFERENCES `seguro_parametro` (`id`);
-
-INSERT INTO `__EFMigrationsHistory` (`MigrationId`, `ProductVersion`)
-VALUES ('20251128132604_V2', '9.0.10');
-
-COMMIT;
 

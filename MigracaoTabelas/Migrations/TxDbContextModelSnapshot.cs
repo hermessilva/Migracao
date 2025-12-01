@@ -197,8 +197,7 @@ namespace MigracaoTabelas.Migrations
 
                     b.Property<string>("Antes")
                         .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)")
+                        .HasColumnType("longtext")
                         .HasColumnName("antes")
                         .HasComment("Dados do registro antes da alteração em formato JSON ou serializado");
 

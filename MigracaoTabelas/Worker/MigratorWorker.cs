@@ -91,7 +91,6 @@ namespace MigracaoTabelas.Worker
                 .GroupBy(p => (p.CcoConta, p.SegContrato))
                 .ToDictionary(g => g.Key, g => g.ToList());
 
-
             var totalPrestamistas = segprestamistas.Count;
             TotalContratos += segprestamistas.Count;
             var processados = 0;
@@ -117,7 +116,7 @@ namespace MigracaoTabelas.Worker
                     processados++;
 
                     parcnt += Migrate(parcelas, seguros, prestamista);
-                    if (seguros.Count > 10)
+                    if (seguros.Count > 100)
                     {
                         _TContext.AddRange(seguros);
                         _TContext.SaveChanges();
@@ -177,8 +176,16 @@ namespace MigracaoTabelas.Worker
 
             tgt.CooperadoAgenciaContaId = cooagct.Id;
             tgt.PontoAtendimentoId = GetPontoAtendimentoId(conta.PaCodigo);
+            tgt.ApoliceGrupoSeguradoraId = GetAgenciaSeguradoraId(pPrestamista, agenciaId);
+            tgt.CooperadoAgenciaContaId = cooagct.Id;
+
             //tgt.UsuarioId = 21;
 
+            var spar = new SeguroParametro();
+            spar.TipoCapital = TipoCapitalSeguro.Fixo;
+            spar.Periodicidade30Dias = true;
+            spar.Coeficiente = 0.0003M;
+            tgt.SeguroParametro = spar;
 
             foreach (var item in parcelasSrc)
             {
