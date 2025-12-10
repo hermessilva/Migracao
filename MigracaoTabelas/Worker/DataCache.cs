@@ -114,7 +114,8 @@ namespace MigracaoTabelas.Worker
                     if (!PontosAtendimento.ContainsKey((p.Agencia.Codigo, p.Codigo)))
                         PontosAtendimento.Add((p.Agencia.Codigo, p.Codigo), p);
                 });
-                return PontosAtendimento[(pAgenciaCodigo, pPontoCodigo)];
+                return null;
+                //PontosAtendimento[(pAgenciaCodigo, pPontoCodigo)];
             }
         }
 

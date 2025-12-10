@@ -57,6 +57,7 @@ namespace MigracaoTabelas.Worker
                         Console.WriteLine();
                         Log.Information($"Iniciando migração da Agencia [{ag.Nome}] Códiog [{ag.Codigo}] id[{ag.Id}]");
                         _SContext = sctx;
+                        //var pv = _DataCache.GetPontoAtendimento(_SContext, _SAgencia.Codigo, "0000");
                         MigraDados(sctx);
                     }
                 }
