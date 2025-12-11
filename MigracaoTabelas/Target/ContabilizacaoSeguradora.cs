@@ -39,7 +39,6 @@ public class ContabilizacaoSeguradora
     public string DescricaoDebitoComissaoParcela { get; set; }
 
     public string CreditoComissaoParcela { get; set; }
-
     public string DescricaoCreditoComissaoParcela { get; set; }
 
     public virtual Seguradora Seguradoras { get; set; }

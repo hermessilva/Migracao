@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MigracaoTabelas.Source
@@ -106,6 +106,12 @@ namespace MigracaoTabelas.Source
         /// </summary>
         [Column("SEG_VRCONTRATO", TypeName = "decimal(12,2)")]
         public decimal? SegVrContrato { get; set; } = 0.00m; // decimal NOT NULL (por ter DEFAULT) -> decimal
+
+        /// <summary>
+        /// Saldo Atualizado do Contrato
+        /// </summary>
+        [Column("Saldo", TypeName = "decimal(12,2)")]
+        public decimal Saldo { get; set; } 
 
         /// <summary>
         /// Valor Base Segurado

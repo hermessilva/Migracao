@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class GestaoDocumentoConfiguration : IEntityTypeConfiguration<GestaoDocumento>
+public class GestaoDocumentoConfiguration : BaseEntityConfiguration<GestaoDocumento>
 {
-    public void Configure(EntityTypeBuilder<GestaoDocumento> builder)
+    public override void Configure(EntityTypeBuilder<GestaoDocumento> builder)
     {
         builder.ToTable("gestao_documento", t => t.HasComment("Gestão de templates e campos de documentos por seguradora para geração automática"));
 
@@ -29,7 +29,7 @@ public class GestaoDocumentoConfiguration : IEntityTypeConfiguration<GestaoDocum
 
         builder.Property(x => x.Versao)
             .HasColumnName("versao")
-            .HasColumnType("smallint")
+            .HasColumnType(SmallInt())
             .HasComment("Número da versão do documento para controle de alterações")
             .IsRequired();
 
@@ -53,7 +53,7 @@ public class GestaoDocumentoConfiguration : IEntityTypeConfiguration<GestaoDocum
 
         builder.Property(x => x.Ordem)
             .HasColumnName("ordem")
-            .HasColumnType("int")
+            .HasColumnType(Int())
             .HasComment("Ordem de exibição do campo no documento")
             .HasDefaultValue(0)
             .IsRequired();
@@ -61,7 +61,7 @@ public class GestaoDocumentoConfiguration : IEntityTypeConfiguration<GestaoDocum
         builder.Property(x => x.CriadoEm)
             .HasColumnName("criado_em")
             .HasComment("Data e hora de criação do registro")
-            .HasDefaultValueSql("CURRENT_TIMESTAMP(6)");
+            .HasDefaultValueSql(CurrentTimestamp());
 
         // Relacionamentos
         builder.HasOne(x => x.Seguradoras)

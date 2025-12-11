@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public sealed class SeguroCancelamentoConfiguration : IEntityTypeConfiguration<SeguroCancelamento>
+public sealed class SeguroCancelamentoConfiguration : BaseEntityConfiguration<SeguroCancelamento>
 {
-    public void Configure(EntityTypeBuilder<SeguroCancelamento> pBuilder)
+    public override void Configure(EntityTypeBuilder<SeguroCancelamento> pBuilder)
     {
         pBuilder.ToTable("seguro_cancelamento", pT => pT.HasComment("Registro de cancelamento de seguro"));
 
@@ -23,19 +25,19 @@ public sealed class SeguroCancelamentoConfiguration : IEntityTypeConfiguration<S
 
         pBuilder.Property(pX => pX.Data)
             .HasColumnName("data")
-            .HasColumnType("date")
+            .HasColumnType(Date())
             .HasComment("Data do cancelamento")
             .IsRequired();
 
         pBuilder.Property(pX => pX.CriadoEm)
             .HasColumnName("criado_em")
-            .HasColumnType("datetime")
+            .HasColumnType(DateTime())
             .HasComment("Data/hora de criação do registro")
             .IsRequired();
 
-        pBuilder.Property(pX => pX.Motivo)
-            .HasColumnName("motivo")
-            .HasColumnType("enum('Expiração da Vigência do Seguro','Cancelado pelo Cooperado','Cancelado pela Cooperativa','Sinistro','Recusado pela Seguradora','Cancelamento por Prejuízo','Liquidação Antecipada','Cancelado por Renegociação','Cancelado por Aditivo')")
+        ConfigureEnum(pBuilder.Property(pX => pX.Motivo)
+            .HasColumnName("motivo"), "Aditivo", "Cancelamento por prejuízo", "Renegociaçao", "Sinistro",
+                           "Solicitado pela cooperativa", "Solicitado pelo cooperado", "Liquidação Antecipada")
             .HasConversion(
                 v => v.AsString(),
                 v => EnumHelper.FromString<MotivoSeguroCancelamento>(v))
@@ -44,19 +46,19 @@ public sealed class SeguroCancelamentoConfiguration : IEntityTypeConfiguration<S
 
         pBuilder.Property(pX => pX.ValorRestituir)
             .HasColumnName("valor_restituir")
-            .HasColumnType("decimal(10,2)")
+            .HasColumnType(Decimal(10, 2))
             .HasComment("Valor que foi restituido ao segurado")
             .IsRequired();
 
         pBuilder.Property(pX => pX.ValorComissao)
             .HasColumnName("valor_comissao")
-            .HasColumnType("decimal(10,2)")
+            .HasColumnType(Decimal(10, 2))
             .HasComment("Valor que foi laçando de abatimento de comissão")
             .IsRequired();
 
         pBuilder.Property(pX => pX.DiasUtilizados)
             .HasColumnName("dias_utilizados")
-            .HasColumnType("int")
+            .HasColumnType(Int())
             .HasComment("Quantidade de dias que foi utilizado o seguro")
             .IsRequired();
 

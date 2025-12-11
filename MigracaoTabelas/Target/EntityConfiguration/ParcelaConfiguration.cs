@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class ParcelaConfiguration : IEntityTypeConfiguration<Parcela>
+public class ParcelaConfiguration : BaseEntityConfiguration<Parcela>
 {
-    public void Configure(EntityTypeBuilder<Parcela> builder)
+    public override void Configure(EntityTypeBuilder<Parcela> builder)
     {
         builder.ToTable("parcela", t => t.HasComment("Parcelas financeiras de prêmio vinculadas a um contrato de seguro"));
 
@@ -21,9 +23,8 @@ public class ParcelaConfiguration : IEntityTypeConfiguration<Parcela>
             .HasComment("Chave estrangeira referenciando a tabela seguro")
             .IsRequired();
 
-        builder.Property(x => x.Status)
-            .HasColumnName("status")
-            .HasColumnType("enum('Em Aberto','Pago','Cancelada')")
+        ConfigureEnum(builder.Property(x => x.Status)
+            .HasColumnName("status"), "Em Aberto", "Pago", "Cancelada")
             .HasConversion(v =>
                 v.AsString(),
                 v => EnumHelper.FromString<StatusParcela>(v)
@@ -33,42 +34,42 @@ public class ParcelaConfiguration : IEntityTypeConfiguration<Parcela>
 
         builder.Property(x => x.NumeroParcela)
             .HasColumnName("numero_parcela")
-            .HasColumnType("smallint")
+            .HasColumnType(SmallInt())
             .HasComment("Número sequencial da parcela dentro do seguro (1, 2, 3...)")
             .IsRequired();
 
         builder.Property(x => x.ValorParcela)
             .HasColumnName("valor_parcela")
-            .HasColumnType("decimal(10,2)")
+            .HasColumnType(Decimal(10, 2))
             .HasComment("Valor nominal atual da parcela a ser cobrado")
             .IsRequired();
 
         builder.Property(x => x.ValorOriginal)
             .HasColumnName("valor_original")
-            .HasColumnType("decimal(10,2)")
+            .HasColumnType(Decimal(10, 2))
             .HasComment("Valor original da parcela calculado na contratação")
             .IsRequired();
 
         builder.Property(x => x.ValorPago)
             .HasColumnName("valor_pago")
-            .HasColumnType("decimal(10,2)")
+            .HasColumnType(Decimal(10, 2))
             .HasComment("Valor total efetivamente pago na parcela")
             .IsRequired();
 
         builder.Property(x => x.Vencimento)
             .HasColumnName("vencimento")
-            .HasColumnType("date")
+            .HasColumnType(Date())
             .HasComment("Data de vencimento da parcela")
             .IsRequired();
 
         builder.Property(x => x.Liquidacao)
             .HasColumnName("liquidacao")
-            .HasColumnType("datetime")
+            .HasColumnType(DateTime())
             .HasComment("Data e hora de liquidação/quitação da parcela");
 
         builder.Property(x => x.DataUltimoPagamento)
             .HasColumnName("data_ultimo_pagamento")
-            .HasColumnType("datetime")
+            .HasColumnType(DateTime())
             .HasComment("Data e hora do último pagamento parcial ou total registrado");
 
         // Relacionamentos

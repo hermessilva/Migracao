@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public sealed class ComissaoSeguradoraConfiguration : IEntityTypeConfiguration<ComissaoSeguradora>
+public sealed class ComissaoSeguradoraConfiguration : BaseEntityConfiguration<ComissaoSeguradora>
 {
-    public void Configure(EntityTypeBuilder<ComissaoSeguradora> pBuilder)
+    public override void Configure(EntityTypeBuilder<ComissaoSeguradora> pBuilder)
     {
         pBuilder.ToTable("comissao_seguradora", pT => pT.HasComment("Configurações de comissões por seguradora"));
 
@@ -23,13 +23,13 @@ public sealed class ComissaoSeguradoraConfiguration : IEntityTypeConfiguration<C
 
         pBuilder.Property(pX => pX.PorcentagemComissaoCorretora)
             .HasColumnName("porcentagem_comissao_corretora")
-            .HasColumnType("decimal(5,4)")
+            .HasColumnType(Decimal(5, 4))
             .HasComment("Percentual de comissão da corretora")
             .IsRequired();
 
         pBuilder.Property(pX => pX.PorcentagemComissaoCooperativa)
             .HasColumnName("porcentagem_comissao_cooperativa")
-            .HasColumnType("decimal(5,4)")
+            .HasColumnType(Decimal(5, 4))
             .HasComment("Percentual de comissão da cooperativa")
             .IsRequired();
 

@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 using Microsoft.EntityFrameworkCore;
 
 
@@ -92,7 +94,10 @@ namespace MigracaoTabelas.Source
             modelBuilder.Entity<SxEpSegPrestamista>(entity =>
             {
                 entity.HasNoKey();
-                entity.ToSqlQuery(@"select pm.* from ep_segprestamista pm join cc_conta c on c.cco_conta = pm.CCO_CONTA where pm.SEG_MODALIDADE = 4 and c.CCO_SITUACAO = 1");
+                entity.ToSqlQuery(@"select  pm.*, saldocontratoemprestimoaditivo (pm.cco_conta ,pm.seg_contrato ,'00000','2025-12-10' ) saldo
+                                    from ep_segprestamista pm join cc_conta c on c.cco_conta = pm.CCO_CONTA 
+                                    where pm.SEG_MODALIDADE = 4 and c.CCO_SITUACAO = 1 and pm.SEG_CANCTIPO = 0 and pm.SEG_FIM  >= '2025-12-10' and                                   
+                                    (select count(*) from ep_segparcela es where es.seg_contrato = pm.SEG_CONTRATO and es.cco_conta = pm.CCO_CONTA ) >1");
             });
 
             modelBuilder.Entity<SxEpSegParcela>(entity =>

@@ -1,13 +1,121 @@
 using System.ComponentModel;
 
+using MigracaoTabelas.Enums;
 using MigracaoTabelas.Source;
-using MigracaoTabelas.Target;
-
 
 namespace MigracaoTabelas.Target;
 
 public class Seguro
 {
+    private MotivoSeguro _Motivo;
+    public ulong Id { get; set; }
+    public ulong CooperadoAgenciaContaId { get; set; }
+    public ulong PontoAtendimentoId { get; set; }
+    public ulong ApoliceGrupoSeguradoraId { get; set; }
+    public ulong SeguroParametroId { get; set; }
+    public ulong? UsuarioId { get; set; }
+    public StatusSeguro Status { get; private set; }
+    public MotivoSeguro Motivo
+    {
+        get
+        {
+            return _Motivo;
+        }
+        set
+        {
+            _Motivo = value;
+            switch (_Motivo)
+            {
+                case MotivoSeguro.EmAnaliseNaSeguradora:
+                case MotivoSeguro.AguardandoFaturamento:
+                case MotivoSeguro.AguardandoDocumentacao:
+                    Status = StatusSeguro.Pendente;
+                    break;
+                case MotivoSeguro.PagamentoAVista:
+                case MotivoSeguro.PagamentoParcelado:
+                case MotivoSeguro.Inadimplente:
+                case MotivoSeguro.Regular:
+                    Status = StatusSeguro.Ativo;
+                    break;
+                case MotivoSeguro.RecusadoPelaSeguradora:
+                    Status = StatusSeguro.Recusado;
+                    break;
+                case MotivoSeguro.ExpiracaoVigenciaSeguro:
+                    Status = StatusSeguro.Expirado;
+                    break;
+                case MotivoSeguro.Aditivo:
+                case MotivoSeguro.CancelamentoPorPrejuizo:
+                case MotivoSeguro.Renegociacao:
+                case MotivoSeguro.Sinistro:
+                case MotivoSeguro.SolicitadoPelaCooperativa:
+                case MotivoSeguro.SolicitadoPeloCooperado:
+                case MotivoSeguro.LiquidacaoAntecipada:
+                    Status = StatusSeguro.Cancelado;
+                    break;
+
+                default:
+                    throw new Exception($"Não foi implementado equivalência para o motivo informado {_Motivo}.");
+            }
+        }
+    }
+
+    public string Contrato { get; set; }
+    public string NumeroContratoEmprestimo { get; set; }
+    public DateTime? InicioVigencia { get; set; }
+    public DateTime? FimVigencia { get; set; }
+    public int CodigoGrupo { get; set; }
+    public short QuantidadeParcelas { get; set; }
+    public DateTime? Vencimento { get; set; }
+    public decimal CapitalSegurado { get; set; }
+    public decimal PremioTotal { get; set; }
+    public TipoPagamentoSeguro TipoPagamento { get; set; }
+    public decimal EstornoProporcional { get; set; }
+    public decimal? ValorBase { get; set; }
+    public bool? DeclaracaoPessoalSaude { get; set; }
+    public decimal? ValorIof { get; set; }
+
+    public virtual CooperadoAgenciaConta CooperadosAgenciasContas { get; set; }
+    public virtual ApoliceGrupoSeguradora ApolicesGruposSeguradoras { get; set; }
+    public virtual PontoAtendimento PontosAtendimentos { get; set; }
+    public virtual SeguroParametro SeguroParametro { get; set; }
+    public virtual Usuario Usuarios { get; set; }
+    public virtual ICollection<Parcela> Parcelas { get; set; } = new List<Parcela>();
+    public virtual ICollection<SeguroCancelamento> SegurosCancelamentos { get; set; } = new List<SeguroCancelamento>();
+
+    public void AlterarMotivo(MotivoSeguro requestMotivo)
+    {
+        Motivo = requestMotivo;
+    }
+
+    public static bool PermiteAlteracaoManual(MotivoSeguro motivo)
+    {
+        return MotivoSeguro.EmAnaliseNaSeguradora == motivo ||
+               MotivoSeguro.AguardandoFaturamento == motivo ||
+               MotivoSeguro.RecusadoPelaSeguradora == motivo;
+    }
+    public static MotivoSeguro Convert(MotivoSeguroCancelamento motivoCancelamento)
+    {
+        switch (motivoCancelamento)
+        {
+            case MotivoSeguroCancelamento.Aditivo:
+                return MotivoSeguro.Aditivo;
+            case MotivoSeguroCancelamento.CancelamentoPorPrejuizo:
+                return MotivoSeguro.CancelamentoPorPrejuizo;
+            case MotivoSeguroCancelamento.Renegociacao:
+                return MotivoSeguro.Renegociacao;
+            case MotivoSeguroCancelamento.Sinistro:
+                return MotivoSeguro.Sinistro;
+            case MotivoSeguroCancelamento.SolicitadoPelaCooperativa:
+                return MotivoSeguro.SolicitadoPelaCooperativa;
+            case MotivoSeguroCancelamento.SolicitadoPeloCooperado:
+                return MotivoSeguro.SolicitadoPeloCooperado;
+            case MotivoSeguroCancelamento.LiquidacaoAntecipada:
+                return MotivoSeguro.LiquidacaoAntecipada;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(motivoCancelamento), $"MotivoSeguroCancelamento '{motivoCancelamento}' não pode ser convertido para MotivoSeguro.");
+        }
+    }
+
     public void Assign(SxEpSegPrestamista source)
     {
         // Campos de PK 'id' são Identity, não são mapeados diretamente da source.
@@ -15,30 +123,7 @@ public class Seguro
         // (SEG_CANCTIPO: Tipo de Cancelamento -> status: Identificador do status)
         // Regra aplicada: > 0 consideramos cancelado (3), senão aberto (1)
 
-        switch (source.SegCancTipo.Value)
-        {
-            case 1:
-                Status = StatusSeguro.CanceladoPeloCooperado;
-                break;
-            case 2:
-                Status = StatusSeguro.CanceladoPelaCooperativa;
-                break;
-            case 3:
-                Status = StatusSeguro.Sinistro;
-                break;
-            case 4:
-                Status = StatusSeguro.RecusadoPelaSeguradora;
-                break;
-            case 5:
-                Status = StatusSeguro.CanceladoPorAditivo;
-                break;
-            case 6:
-                Status = StatusSeguro.LiquidacaoAntecipada;
-                break;
-            default:
-                Status = StatusSeguro.Ativo;
-                break;
-        }
+        Motivo = MotivoSeguro.Regular;
 
         // Mapeamentos com correspondência direta
         Contrato = source.SegContrato ?? string.Empty;                         // (SEG_CONTRATO: Contrato -> contrato: Número do contrato do seguro)
@@ -53,77 +138,20 @@ public class Seguro
         Vencimento = source.SegFim;                                            // (SEG_FIM: Final do Contrato -> vencimento: Data de vencimento) [assumido]
 
         // Capital segurado: usar base segurada como principal, com fallback para valor do contrato
-        CapitalSegurado = (source.SegBase ?? source.SegVrContrato) ?? 0.00m;   // (SEG_BASE: Valor Base Segurado / SEG_VRCONTRATO: Valor do Contrato -> capital_segurado: Valor do capital segurado)
+        CapitalSegurado = source.Saldo;
 
         // Prêmio total e tipo de pagamento
         PremioTotal = source.SegPremio ?? 0.00m;                               // (SEG_PREMIO: Valor do Seguro -> premio_total: Valor do prêmio total do seguro)
-        switch (source.SegModalidade)
-        {
-            default:
-                TipoPagamento = TipoPagamentoSeguro.AVista; // (SEG_MODALIDADE: Modalidade -> tipo_pagamento: Identificador do tipo de pagamento)
-                break;
-        }
+        ValorBase = source.SegBase;                                               // (SEG_BASE: Valor Base Segurado -> valor_base: Valor base do seguro)
+        ValorIof = source.SegIof;                                                   // (SEG_IOF: Valor do IOF -> valor_iof: Valor do IOF do seguro)
 
-        // Campos que precisam de lógica de negócio para buscar FKs
 
-        // Sem correspondência direta no momento (deixar explícito para avaliação de negócio):
-        // this.CodigoGrupo = 0;
-        // this.EstornoProporcional = 0.00m;
+        TipoPagamento = TipoPagamentoSeguro.Parcelado;
 
-        // Campos da Source sem correspondência direta no Target (mantidos apenas para contexto de migração):
-        // source.SegNome;
-        // source.SegNasc;
-        // source.SegTipoConta;
-        // source.SegCancelamento;
-        // source.SegCancMotivo;
-        // source.SegIof;
-        // source.SegDps;
-        // source.SegEfetivacao;
-        // source.ConSeq;
-        // source.ControleUnimed;
-        // source.SqlDeleted;
-    }
-    public ulong Id { get; set; }
-    public ulong CooperadoAgenciaContaId { get; set; }
-    public ulong PontoAtendimentoId { get; set; }
-    public ulong ApoliceGrupoSeguradoraId { get; set; }
-    public ulong SeguroParametroId { get; set; }
-    public ulong? UsuarioId { get; set; }
-    public StatusSeguro Status { get; set; }
-    public string Contrato { get; set; }
-    public DateTime? InicioVigencia { get; set; }
-    public DateTime? FimVigencia { get; set; }
-    public int CodigoGrupo { get; set; }
-    public short QuantidadeParcelas { get; set; }
-    public DateTime? Vencimento { get; set; }
-    public decimal CapitalSegurado { get; set; }
-    public decimal PremioTotal { get; set; }
-    public TipoPagamentoSeguro TipoPagamento { get; set; }
-    public decimal EstornoProporcional { get; set; }
-    public decimal? ValorBase { get; set; }
-    public bool? Dps { get; set; }
-    public decimal? ValorIof { get; set; }
 
-    public virtual CooperadoAgenciaConta CooperadosAgenciasContas { get; set; }
-    public virtual ApoliceGrupoSeguradora ApolicesGruposSeguradoras { get; set; }
-    public virtual PontoAtendimento PontosAtendimentos { get; set; }
-    public virtual SeguroParametro SeguroParametro { get; set; }
-    public virtual Usuario Usuarios { get; set; }
-    public virtual ICollection<Parcela> Parcelas { get; set; } = new List<Parcela>();
-    public virtual ICollection<SeguroCancelamento> SegurosCancelamentos { get; set; } = new List<SeguroCancelamento>();
-
-    public void AlterarStatus(StatusSeguro requestStatus)
-    {
-        Status = requestStatus;
-    }
-
-    public static bool PermiteAlteracaoManual(StatusSeguro status)
-    {
-        return status == StatusSeguro.Ativo
-            || status == StatusSeguro.EmAnalisePelaSeguradora
-            || status == StatusSeguro.PendenteDeDocumentacao
-            || status == StatusSeguro.RecusadoPelaSeguradora
-            || status == StatusSeguro.Sinistro;
+        /*
+        EstornoProporcional =
+        */
     }
 }
 
@@ -131,10 +159,8 @@ public enum TipoPagamentoSeguro
 {
     [Description("À Vista")]
     AVista = 1,
-
     [Description("Parcelado")]
     Parcelado = 2,
-
     [Description("Único")]
     Unico = 3
 }
@@ -143,46 +169,61 @@ public enum TipoCapitalSeguro
 {
     [Description("Fixo")]
     Fixo = 1,
-
     [Description("Variável")]
     Variavel = 2
 }
 
 public enum StatusSeguro
 {
+    [Description("Não Permitido")]
+    NaoPermitido = 0,
+    [Description("Pendente")]
+    Pendente = 1,
     [Description("Ativo")]
-    Ativo = 1,
+    Ativo = 2,
+    [Description("Recusado")]
+    Recusado = 3,
+    [Description("Expirado")]
+    Expirado = 4,
+    [Description("Cancelado")]
+    Cancelado = 5,
+}
 
-    [Description("Em análise pela Seguradora")]
-    EmAnalisePelaSeguradora = 2,
-
-    [Description("Pendente de Documentação")]
-    PendenteDeDocumentacao = 3,
-
-    [Description("Expiração da Vigência do Seguro")]
-    ExpiracaoDaVigenciaDoSeguro = 4,
-
-    [Description("Cancelado pelo Cooperado")]
-    CanceladoPeloCooperado = 5,
-
-    [Description("Cancelado pela Cooperativa")]
-    CanceladoPelaCooperativa = 6,
-
-    [Description("Sinistro")]
-    Sinistro = 7,
-
-    [Description("Recusado pela Seguradora")]
+public enum MotivoSeguro
+{
+    [Description("Não Permitido")]
+    NaoPermitido = 0,
+    [Description("Em analise na seguradora")]
+    EmAnaliseNaSeguradora = 1,
+    [Description("Aguardando faturamento")]
+    AguardandoFaturamento = 2,
+    [Description("Aguardando documentação")]
+    AguardandoDocumentacao = 3,
+    [Description("Pagamento à vista")]
+    PagamentoAVista = 4,
+    [Description("Pagamento parcelado")]
+    PagamentoParcelado = 5,
+    [Description("Inadimplente")]
+    Inadimplente = 6,
+    [Description("Regular")]
+    Regular = 7,
+    [Description("Recusado pela seguradora")]
     RecusadoPelaSeguradora = 8,
+    [Description("Expiração da vigência do seguro")]
+    ExpiracaoVigenciaSeguro = 9,
 
-    [Description("Cancelamento por Prejuízo")]
-    CancelamentoPorPrejuizo = 9,
-
-    [Description("Liquidação Antecipada")]
-    LiquidacaoAntecipada = 10,
-
-    [Description("Cancelado por Renegociação")]
-    CanceladoPorRenegociacao = 11,
-
-    [Description("Cancelado por Aditivo")]
-    CanceladoPorAditivo = 12
+    [Description("Aditivo")]
+    Aditivo = 10,
+    [Description("Cancelamento por prejuízo")]
+    CancelamentoPorPrejuizo = 11,
+    [Description("Renegociação")]
+    Renegociacao = 12,
+    [Description("Sinistro")]
+    Sinistro = 13,
+    [Description("Solicitado pela cooperativa")]
+    SolicitadoPelaCooperativa = 14,
+    [Description("Solicitado pelo cooperado")]
+    SolicitadoPeloCooperado = 15,
+    [Description("Liquidação antecipada")]
+    LiquidacaoAntecipada = 16,
 }

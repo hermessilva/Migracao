@@ -36,6 +36,10 @@ namespace MigracaoTabelas.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Descricao")
+                        .IsUnique()
+                        .HasDatabaseName("ux_acao_descricao");
+
                     b.ToTable("acao", null, t =>
                         {
                             t.HasComment("Catálogo de ações que podem ser executadas nas telas");
@@ -190,24 +194,29 @@ namespace MigracaoTabelas.Migrations
                         .HasColumnName("id")
                         .HasComment("Identificador único do registro na tabela");
 
-                    b.Property<ulong>("AgenciaId")
+                    b.Property<ulong?>("AgenciaId")
                         .HasColumnType("bigint unsigned")
                         .HasColumnName("agencia_id")
                         .HasComment("Chave estrangeira referenciando a tabela agencia onde a ação foi realizada");
 
-                    b.Property<string>("Antes")
-                        .IsRequired()
-                        .HasColumnType("longtext")
-                        .HasColumnName("antes")
-                        .HasComment("Dados do registro antes da alteração em formato JSON ou serializado");
+                    b.Property<ulong?>("Chave")
+                        .HasColumnType("bigint unsigned")
+                        .HasColumnName("chave")
+                        .HasComment("Chave primária da tabela auditada");
 
-                    b.Property<DateTime?>("CriadoEm")
+                    b.Property<DateTime>("CriadoEm")
                         .HasColumnType("datetime")
                         .HasColumnName("criado_em")
                         .HasComment("Data e hora em que a ação foi registrada");
 
-                    b.Property<string>("Modulo")
+                    b.Property<string>("DadosAnteriores")
                         .IsRequired()
+                        .HasMaxLength(8000)
+                        .HasColumnType("varchar(8000)")
+                        .HasColumnName("dados_anteriores")
+                        .HasComment("Dados do registro antes da alteração em formato JSON ou serializado");
+
+                    b.Property<string>("Modulo")
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
                         .HasColumnName("modulo")
@@ -215,20 +224,29 @@ namespace MigracaoTabelas.Migrations
 
                     b.Property<string>("Operacao")
                         .IsRequired()
-                        .HasColumnType("enum('Insert','Delete','Update')")
+                        .HasColumnType("enum('Atualização','Deleção')")
                         .HasColumnName("operacao")
                         .HasComment("Tipo da operação realizada: Insert (inserção), Delete (exclusão) ou Update (atualização)");
 
-                    b.Property<ulong>("UsuarioId")
+                    b.Property<string>("Rota")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("rota")
+                        .HasComment("Rota onde a operação foi realizada");
+
+                    b.Property<string>("Tabela")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("tabela")
+                        .HasComment("Nome da tabela auditada");
+
+                    b.Property<ulong?>("UsuarioId")
                         .HasColumnType("bigint unsigned")
                         .HasColumnName("usuario_id")
                         .HasComment("Chave estrangeira referenciando a tabela usuario que realizou a ação");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AgenciaId");
-
-                    b.HasIndex("UsuarioId");
 
                     b.ToTable("auditoria", null, t =>
                         {
@@ -551,7 +569,11 @@ namespace MigracaoTabelas.Migrations
                         .HasComment("Descrição da conta contábil comissao de credito");
 
                     b.Property<string>("DescricaoCreditoComissaoParcela")
-                        .HasColumnType("longtext");
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("descricao_credito_comissao_parcela")
+                        .HasComment("Descrição da conta contábil credito comissao parcela");
 
                     b.Property<string>("DescricaoCreditoPremioContratacao")
                         .IsRequired()
@@ -714,11 +736,11 @@ namespace MigracaoTabelas.Migrations
                     b.HasIndex("AgenciaId");
 
                     b.HasIndex("ContaCorrente")
-                        .HasDatabaseName("cooperado_agencia_conta_index_7");
+                        .HasDatabaseName("idx_conta_corrente");
 
                     b.HasIndex("CooperadoId", "AgenciaId", "ContaCorrente")
                         .IsUnique()
-                        .HasDatabaseName("cooperado_agencia_conta_index_6");
+                        .HasDatabaseName("idx_cooperado_id_agencia_id_conta_corrente");
 
                     b.ToTable("cooperado_agencia_conta", null, t =>
                         {
@@ -847,7 +869,7 @@ namespace MigracaoTabelas.Migrations
 
                     b.Property<string>("TipoLancamentoContabil")
                         .IsRequired()
-                        .HasColumnType("enum('Seguro Prestamista Contratado', 'Comissão Seguro Prestamista Contratado', 'Cancelamento Seguro Prestamista Parcelado Comissão', 'Cancelamento Seguro Prestamista À Vista Proporcional Comissão', 'Pagamento Seguro Prestamista', 'Recebimento Comissão Seguro Prestamista', 'Recebimento Premio Seguro Prestamista Parcelado', 'Recebimento Comissão Seguro Prestamista Parcelado')")
+                        .HasColumnType("enum('Seguro Prestamista Contratado','Comissão Seguro Prestamista Contratado','Cancelamento Seguro Prestamista Parcelado Comissão','Cancelamento Seguro Prestamista À Vista Proporcional Comissão','Pagamento Seguro Prestamista','Recebimento Comissão Seguro Prestamista','Recebimento Premio Seguro Prestamista Parcelado','Recebimento Comissão Seguro Prestamista Parcelado')")
                         .HasColumnName("tipo_lancamento_contabil")
                         .HasComment("Tipo do lançamento contábil conforme enum tipo_lancamento");
 
@@ -1115,7 +1137,7 @@ namespace MigracaoTabelas.Migrations
 
                     b.HasIndex("AgenciaId", "Codigo")
                         .IsUnique()
-                        .HasDatabaseName("ponto_atendimento_index_0");
+                        .HasDatabaseName("idx_agencia_id_codigo");
 
                     b.ToTable("ponto_atendimento", null, t =>
                         {
@@ -1286,16 +1308,16 @@ namespace MigracaoTabelas.Migrations
                         .HasMaxLength(10)
                         .HasColumnType("varchar(10)")
                         .HasColumnName("contrato")
-                        .HasComment("Número do contrato de crédito vinculado ao seguro");
+                        .HasComment("Número do contrato de seguro");
 
                     b.Property<ulong>("CooperadoAgenciaContaId")
                         .HasColumnType("bigint unsigned")
                         .HasColumnName("cooperado_agencia_conta_id")
                         .HasComment("Chave estrangeira referenciando a tabela cooperado_agencia_conta");
 
-                    b.Property<bool?>("Dps")
+                    b.Property<bool?>("DeclaracaoPessoalSaude")
                         .HasColumnType("tinyint(1)")
-                        .HasColumnName("dps")
+                        .HasColumnName("declaracao_pessoal_saude")
                         .HasComment("Indica se foi exigida Declaração Pessoal de Saúde (true/false)");
 
                     b.Property<decimal>("EstornoProporcional")
@@ -1312,6 +1334,18 @@ namespace MigracaoTabelas.Migrations
                         .HasColumnType("date")
                         .HasColumnName("inicio_vigencia")
                         .HasComment("Data de início da vigência do seguro");
+
+                    b.Property<string>("Motivo")
+                        .IsRequired()
+                        .HasColumnType("enum('Em analise na seguradora','Aguardando faturamento','Aguardando documentação','Pagamento à vista','Pagamento parcelado','Inadimplente','Regular','Recusado pela seguradora','Expiração da vigência do seguro','Aditivo','Cancelamento por prejuízo','Renegociação','Sinistro','Solicitado pela cooperativa','Solicitado pelo cooperado','Liquidação antecipada')")
+                        .HasColumnName("motivo")
+                        .HasComment("Motivo do seguro");
+
+                    b.Property<string>("NumeroContratoEmprestimo")
+                        .HasMaxLength(20)
+                        .HasColumnType("varchar(20)")
+                        .HasColumnName("numero_contrato_emprestimo")
+                        .HasComment("Número do contrato de crédito do empréstimo");
 
                     b.Property<ulong>("PontoAtendimentoId")
                         .HasColumnType("bigint unsigned")
@@ -1335,7 +1369,7 @@ namespace MigracaoTabelas.Migrations
 
                     b.Property<string>("Status")
                         .IsRequired()
-                        .HasColumnType("enum('Em análise pela Seguradora','Pendente de Documentação','Ativo','Expiração da Vigência do Seguro','Cancelado pelo Cooperado','Cancelado pela Cooperativa','Sinistro','Recusado pela Seguradora','Cancelamento por Prejuízo','Liquidação Antecipada','Cancelado por Renegociação','Cancelado por Aditivo')")
+                        .HasColumnType("enum('Pendente','Ativo','Recusado','Expirado','Cancelado')")
                         .HasColumnName("status")
                         .HasComment("Status do seguro");
 
@@ -1375,7 +1409,7 @@ namespace MigracaoTabelas.Migrations
 
                     b.HasIndex("SeguroParametroId")
                         .IsUnique()
-                        .HasDatabaseName("seguro_index_8");
+                        .HasDatabaseName("idx_seguro_parametro_id");
 
                     b.HasIndex("UsuarioId");
 
@@ -1410,7 +1444,7 @@ namespace MigracaoTabelas.Migrations
 
                     b.Property<string>("Motivo")
                         .IsRequired()
-                        .HasColumnType("enum('Expiração da Vigência do Seguro','Cancelado pelo Cooperado','Cancelado pela Cooperativa','Sinistro','Recusado pela Seguradora','Cancelamento por Prejuízo','Liquidação Antecipada','Cancelado por Renegociação','Cancelado por Aditivo')")
+                        .HasColumnType("enum('Aditivo','Cancelamento por prejuízo','Renegociaçao','Sinistro','Solicitado pela cooperativa','Solicitado pelo cooperado','Liquidação Antecipada')")
                         .HasColumnName("motivo")
                         .HasComment("Motivo do cancelamento");
 
@@ -1452,11 +1486,6 @@ namespace MigracaoTabelas.Migrations
                         .HasColumnName("coeficiente")
                         .HasComment("Coeficiente multiplicador utilizado para cálculo do prêmio e estornos");
 
-                    b.Property<decimal>("Iof")
-                        .HasColumnType("decimal(5,4)")
-                        .HasColumnName("iof")
-                        .HasComment("Porcentual de IOF cobrado no seguro");
-
                     b.Property<bool>("Periodicidade30Dias")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("tinyint(1)")
@@ -1473,6 +1502,11 @@ namespace MigracaoTabelas.Migrations
                         .HasColumnType("decimal(5,4)")
                         .HasColumnName("porcentagem_comissao_corretora")
                         .HasComment("Percentual de comissão destinado à corretora (ex: 0.1500 = 15%)");
+
+                    b.Property<decimal>("PorcentualIof")
+                        .HasColumnType("decimal(5,4)")
+                        .HasColumnName("porcentual_iof")
+                        .HasComment("Porcentual de IOF cobrado no seguro");
 
                     b.Property<string>("TipoCapital")
                         .IsRequired()
@@ -1570,9 +1604,6 @@ namespace MigracaoTabelas.Migrations
                         .HasColumnName("perfil_id")
                         .HasComment("Chave estrangeira da tabela perfil");
 
-                    b.Property<ulong?>("TelaAcaoId")
-                        .HasColumnType("bigint unsigned");
-
                     b.Property<ulong>("TelaId")
                         .HasColumnType("bigint unsigned")
                         .HasColumnName("tela_id")
@@ -1588,8 +1619,6 @@ namespace MigracaoTabelas.Migrations
                     b.HasIndex("PerfilId")
                         .HasDatabaseName("tela_acao_perfil_index_6");
 
-                    b.HasIndex("TelaAcaoId");
-
                     b.HasIndex("TelaId")
                         .HasDatabaseName("tela_acao_perfil_index_4");
 
@@ -1603,11 +1632,6 @@ namespace MigracaoTabelas.Migrations
                         .HasColumnType("bigint unsigned")
                         .HasColumnName("id")
                         .HasComment("Identificador único do registro na tabela");
-
-                    b.Property<ulong>("AgenciaId")
-                        .HasColumnType("bigint unsigned")
-                        .HasColumnName("agencia_id")
-                        .HasComment("Chave estrangeira referenciando a tabela agencia");
 
                     b.Property<DateTime>("CriadoEm")
                         .ValueGeneratedOnAdd()
@@ -1655,8 +1679,6 @@ namespace MigracaoTabelas.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AgenciaId");
-
                     b.HasIndex("PerfilId");
 
                     b.HasIndex("PontoAtendimentoId");
@@ -1695,25 +1717,6 @@ namespace MigracaoTabelas.Migrations
                         .IsRequired();
 
                     b.Navigation("AgenciasSeguradoras");
-                });
-
-            modelBuilder.Entity("MigracaoTabelas.Target.Auditoria", b =>
-                {
-                    b.HasOne("MigracaoTabelas.Target.Agencia", "Agencias")
-                        .WithMany("Auditorias")
-                        .HasForeignKey("AgenciaId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.HasOne("MigracaoTabelas.Target.Usuario", "Usuarios")
-                        .WithMany()
-                        .HasForeignKey("UsuarioId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Agencias");
-
-                    b.Navigation("Usuarios");
                 });
 
             modelBuilder.Entity("MigracaoTabelas.Target.ComissaoSeguradora", b =>
@@ -1961,10 +1964,6 @@ namespace MigracaoTabelas.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("MigracaoTabelas.Target.TelaAcao", null)
-                        .WithMany("TelasAcoesPerfis")
-                        .HasForeignKey("TelaAcaoId");
-
                     b.HasOne("MigracaoTabelas.Target.Tela", "Telas")
                         .WithMany("TelasAcoesPerfis")
                         .HasForeignKey("TelaId")
@@ -1980,12 +1979,6 @@ namespace MigracaoTabelas.Migrations
 
             modelBuilder.Entity("MigracaoTabelas.Target.Usuario", b =>
                 {
-                    b.HasOne("MigracaoTabelas.Target.Agencia", "Agencias")
-                        .WithMany("Usuarios")
-                        .HasForeignKey("AgenciaId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
                     b.HasOne("MigracaoTabelas.Target.Perfil", "Perfils")
                         .WithMany("Usuarios")
                         .HasForeignKey("PerfilId")
@@ -1996,8 +1989,6 @@ namespace MigracaoTabelas.Migrations
                         .HasForeignKey("PontoAtendimentoId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.Navigation("Agencias");
 
                     b.Navigation("Perfils");
 
@@ -2015,8 +2006,6 @@ namespace MigracaoTabelas.Migrations
                 {
                     b.Navigation("AgenciasSeguradoras");
 
-                    b.Navigation("Auditorias");
-
                     b.Navigation("CooperadosAgenciasContas");
 
                     b.Navigation("IntegracoesSeniores");
@@ -2024,8 +2013,6 @@ namespace MigracaoTabelas.Migrations
                     b.Navigation("LancamentosEfetivar");
 
                     b.Navigation("PontosAtendimentos");
-
-                    b.Navigation("Usuarios");
                 });
 
             modelBuilder.Entity("MigracaoTabelas.Target.AgenciaSeguradora", b =>
@@ -2104,11 +2091,6 @@ namespace MigracaoTabelas.Migrations
                 {
                     b.Navigation("TelasAcoes");
 
-                    b.Navigation("TelasAcoesPerfis");
-                });
-
-            modelBuilder.Entity("MigracaoTabelas.Target.TelaAcao", b =>
-                {
                     b.Navigation("TelasAcoesPerfis");
                 });
 #pragma warning restore 612, 618

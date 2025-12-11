@@ -1,23 +1,26 @@
+using System.ComponentModel;
+
 namespace MigracaoTabelas.Target;
 
 
 public class Auditoria
 {
     public ulong Id { get; set; }
-    public ulong UsuarioId { get; set; }
-    public ulong AgenciaId { get; set; }
+    public ulong? Chave { get; set; }
+    public ulong? UsuarioId { get; set; }
+    public ulong? AgenciaId { get; set; }
     public string Modulo { get; set; }
+    public string Rota { get; set; }
+    public string Tabela { get; set; }
     public OperacaoAuditoria Operacao { get; set; }
-    public string Antes { get; set; }
-    public DateTime? CriadoEm { get; set; }
-
-    public virtual Usuario Usuarios { get; set; }
-    public virtual Agencia Agencias { get; set; }
+    public string DadosAnteriores { get; set; }
+    public DateTime CriadoEm { get; set; }
 }
 
 public enum OperacaoAuditoria
 {
-    Insert,
-    Delete,
-    Update
+    [Description("Atualização")]
+    Update = 1,
+    [Description("Deleção")]
+    Delete = 2
 }

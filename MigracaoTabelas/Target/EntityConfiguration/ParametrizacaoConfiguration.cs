@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class ParametrizacaoConfiguration : IEntityTypeConfiguration<Parametrizacao>
+public class ParametrizacaoConfiguration : BaseEntityConfiguration<Parametrizacao>
 {
-    public void Configure(EntityTypeBuilder<Parametrizacao> builder)
+    public override void Configure(EntityTypeBuilder<Parametrizacao> builder)
     {
         builder.ToTable("parametrizacao", t => t.HasComment("Parametrizações de campos para preechimento"));
 

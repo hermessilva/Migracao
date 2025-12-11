@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class LancamentoEfetivarConfiguration : IEntityTypeConfiguration<LancamentoEfetivar>
+public class LancamentoEfetivarConfiguration : BaseEntityConfiguration<LancamentoEfetivar>
 {
-    public void Configure(EntityTypeBuilder<LancamentoEfetivar> builder)
+    public override void Configure(EntityTypeBuilder<LancamentoEfetivar> builder)
     {
         builder.ToTable("lancamento_efetivar", t => t.HasComment("Fila de lançamentos financeiros pendentes de efetivação nas contas dos cooperados"));
 
@@ -34,7 +34,7 @@ public class LancamentoEfetivarConfiguration : IEntityTypeConfiguration<Lancamen
 
         builder.Property(x => x.DataMovimentacao)
             .HasColumnName("data_movimentacao")
-            .HasColumnType("datetime")
+            .HasColumnType(DateTime())
             .HasComment("Data e hora da movimentação financeira no sistema de origem");
 
         builder.Property(x => x.Descricao)
@@ -45,13 +45,13 @@ public class LancamentoEfetivarConfiguration : IEntityTypeConfiguration<Lancamen
 
         builder.Property(x => x.Valor)
             .HasColumnName("valor")
-            .HasColumnType("decimal(10,2)")
+            .HasColumnType(Decimal(10, 2))
             .HasComment("Valor monetário do lançamento a ser efetivado")
             .IsRequired();
 
         builder.Property(x => x.DataLancamento)
             .HasColumnName("data_lancamento")
-            .HasColumnType("date")
+            .HasColumnType(Date())
             .HasComment("Data programada para efetivação do lançamento no sistema");
 
         // Relacionamentos

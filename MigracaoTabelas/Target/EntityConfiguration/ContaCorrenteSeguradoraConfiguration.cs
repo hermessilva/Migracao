@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class ContaCorrenteSeguradoraConfiguration : IEntityTypeConfiguration<ContaCorrenteSeguradora>
+public class ContaCorrenteSeguradoraConfiguration : BaseEntityConfiguration<ContaCorrenteSeguradora>
 {
-    public void Configure(EntityTypeBuilder<ContaCorrenteSeguradora> builder)
+    public override void Configure(EntityTypeBuilder<ContaCorrenteSeguradora> builder)
     {
         builder.ToTable("conta_corrente_seguradora", t => t.HasComment("Junção entre parâmetros de seguradora e contas correntes"));
 

@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class TelaConfiguration : IEntityTypeConfiguration<Tela>
+public class TelaConfiguration : BaseEntityConfiguration<Tela>
 {
-    public void Configure(EntityTypeBuilder<Tela> builder)
+    public override void Configure(EntityTypeBuilder<Tela> builder)
     {
         builder.ToTable("tela", t => t.HasComment("Catálogo de telas (módulos/páginas) disponíveis no sistema"));
 

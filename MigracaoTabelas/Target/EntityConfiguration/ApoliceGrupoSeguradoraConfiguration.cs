@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class ApoliceGrupoSeguradoraConfiguration : IEntityTypeConfiguration<ApoliceGrupoSeguradora>
+public class ApoliceGrupoSeguradoraConfiguration : BaseEntityConfiguration<ApoliceGrupoSeguradora>
 {
-    public void Configure(EntityTypeBuilder<ApoliceGrupoSeguradora> builder)
+    public override void Configure(EntityTypeBuilder<ApoliceGrupoSeguradora> builder)
     {
         builder.ToTable("apolice_grupo_seguradora", t => t.HasComment("Configurações de apólices e grupos por vínculo agência-seguradora"));
 
@@ -36,10 +38,12 @@ public class ApoliceGrupoSeguradoraConfiguration : IEntityTypeConfiguration<Apol
             .HasMaxLength(255)
             .HasComment("Código do subgrupo dentro do grupo da apólice");
 
-        builder.Property(x => x.TipoCapital)
-            .HasColumnName("tipo_capital")
-            .HasColumnType("enum('Fixo','Variável')")
-            .HasConversion<string>()
+        ConfigureEnum(builder.Property(x => x.TipoCapital)
+            .HasColumnName("tipo_capital"), "Fixo", "Variável")
+            .HasConversion(
+                v => v.AsString(),
+                v => EnumHelper.FromString<TipoCapitalApoliceGrupoSeguradora>(v)
+            )
             .HasComment("Tipo de capital segurado: Fixo (valor constante) ou Variável (acompanha saldo devedor)")
             .IsRequired();
 
@@ -50,12 +54,12 @@ public class ApoliceGrupoSeguradoraConfiguration : IEntityTypeConfiguration<Apol
 
         builder.Property(x => x.ModalidadeAVista)
             .HasColumnName("modalidade_avista")
-            .HasColumnType("decimal(10,2)")
+            .HasColumnType(Decimal(10, 2))
             .HasComment("Valor ou taxa para modalidade de pagamento à vista");
 
         builder.Property(x => x.ModalidadeParcelado)
             .HasColumnName("modalidade_parcelado")
-            .HasColumnType("decimal(10,2)")
+            .HasColumnType(Decimal(10, 2))
             .HasComment("Valor ou taxa para modalidade de pagamento parcelado");
 
         // Relacionamentos

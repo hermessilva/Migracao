@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class AuditoriaConfiguration : IEntityTypeConfiguration<Auditoria>
+public class AuditoriaConfiguration : BaseEntityConfiguration<Auditoria>
 {
-    public void Configure(EntityTypeBuilder<Auditoria> builder)
+    public override void Configure(EntityTypeBuilder<Auditoria> builder)
     {
         builder.ToTable("auditoria", t => t.HasComment("Tabela de auditoria para rastreamento de todas as operações realizadas no sistema"));
 
@@ -19,47 +21,54 @@ public class AuditoriaConfiguration : IEntityTypeConfiguration<Auditoria>
         builder.Property(x => x.UsuarioId)
             .HasColumnName("usuario_id")
             .HasComment("Chave estrangeira referenciando a tabela usuario que realizou a ação")
-            .IsRequired();
+            .IsRequired(false);
 
         builder.Property(x => x.AgenciaId)
             .HasColumnName("agencia_id")
             .HasComment("Chave estrangeira referenciando a tabela agencia onde a ação foi realizada")
+            .IsRequired(false);
+
+        builder.Property(x => x.Chave)
+            .HasColumnName("chave")
+            .HasComment("Chave primária da tabela auditada")
+            .IsRequired(false);
+
+        builder.Property(x => x.Tabela)
+            .HasColumnName("tabela")
+            .HasMaxLength(255)
+            .HasComment("Nome da tabela auditada")
             .IsRequired();
 
         builder.Property(x => x.Modulo)
             .HasColumnName("modulo")
             .HasMaxLength(255)
             .HasComment("Nome do módulo ou área do sistema onde a operação foi realizada")
-            .IsRequired();
+            .IsRequired(false);
 
-        builder.Property(x => x.Operacao)
-            .HasColumnName("operacao")
-            .HasColumnType("enum('Insert','Delete','Update')")
+        builder.Property(x => x.Rota)
+            .HasColumnName("rota")
+            .HasMaxLength(255)
+            .HasComment("Rota onde a operação foi realizada")
+            .IsRequired(false);
+
+        ConfigureEnum(builder.Property(x => x.Operacao)
+            .HasColumnName("operacao"), "Atualização", "Deleção")
             .HasConversion(
-                v => v.ToString(),
-                v => Enum.Parse<OperacaoAuditoria>(v)
+                v => v.AsString(),
+                v => EnumHelper.FromString<OperacaoAuditoria>(v)
             )
             .HasComment("Tipo da operação realizada: Insert (inserção), Delete (exclusão) ou Update (atualização)")
             .IsRequired();
 
-        builder.Property(x => x.Antes)
-            .HasColumnName("antes")
+        builder.Property(x => x.DadosAnteriores)
+            .HasColumnName("dados_anteriores")
+            .HasMaxLength(8000)
             .HasComment("Dados do registro antes da alteração em formato JSON ou serializado")
             .IsRequired();
 
         builder.Property(x => x.CriadoEm)
             .HasColumnName("criado_em")
             .HasComment("Data e hora em que a ação foi registrada")
-            .HasColumnType("datetime");
-
-        builder.HasOne(x => x.Usuarios)
-            .WithMany()
-            .HasForeignKey(x => x.UsuarioId)
-            .OnDelete(DeleteBehavior.NoAction);
-
-        builder.HasOne(x => x.Agencias)
-            .WithMany(a => a.Auditorias)
-            .HasForeignKey(x => x.AgenciaId)
-            .OnDelete(DeleteBehavior.NoAction);
+            .HasColumnType(DateTime());
     }
 }

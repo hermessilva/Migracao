@@ -51,11 +51,12 @@ namespace MigracaoTabelas.Worker
                 {
                     _SAgencia = sagencia;
                     SxDbContext.Schema = sagencia.TABLE_SCHEMA;
+                    Log.Information($"[{sagencia.TABLE_SCHEMA}]");
                     using (var sctx = _Scope.ServiceProvider.GetRequiredService<SxDbContext>())
                     {
                         ag = _DataCache.GetAgencia(sctx, sagencia.Codigo);
-                        Console.WriteLine();
                         Log.Information($"Iniciando migração da Agencia [{ag.Nome}] Códiog [{ag.Codigo}] id[{ag.Id}]");
+                        Console.WriteLine();
                         _SContext = sctx;
                         //var pv = _DataCache.GetPontoAtendimento(_SContext, _SAgencia.Codigo, "0000");
                         MigraDados(sctx);
@@ -115,7 +116,6 @@ namespace MigracaoTabelas.Worker
                 try
                 {
                     processados++;
-
                     parcnt += Migrate(parcelas, seguros, prestamista);
                     if (seguros.Count > 0)
                     {
@@ -190,7 +190,7 @@ namespace MigracaoTabelas.Worker
             spar.TipoCapital = TipoCapitalSeguro.Fixo;
             spar.Periodicidade30Dias = true;
             spar.Coeficiente = 0.0003M;
-            spar.Iof = 0.0038M;
+            spar.PorcentualIof = 0.0038M;
             spar.PorcentagemComissaoCorretora = comissao?.PorcentagemComissaoCorretora ?? 0.15M;
             spar.PorcentagemComissaoCooperativa = comissao?.PorcentagemComissaoCooperativa ?? 0.05M;
             tgt.SeguroParametro = spar;

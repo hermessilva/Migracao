@@ -66,14 +66,14 @@ public class Parcela
         if (Status != StatusParcela.Pendente && Status != StatusParcela.Cancelada)
             throw new ApplicationException(
                 $"Não é permitido pagamento manual para parcela com status diferente de 'Pendente' ou 'Cancelado. Parcela.Status = {Status}");
-        if (Status == StatusParcela.Cancelada)
+        if (Status == StatusParcela.Cancelada) //TODO: Existem casos em que parcela cancelada pode ser paga?
         {
-            var canceladaPagavel =
-                Seguros.Status == StatusSeguro.ExpiracaoDaVigenciaDoSeguro ||
-                Seguros.SegurosCancelamentos.FirstOrDefault(sc => sc.SeguroId == SeguroId)?.Motivo ==
-                 MotivoSeguroCancelamento.CanceladoPelaCooperativa;//TODO: Mudar para enum Solicitado Agencia
-            if (!canceladaPagavel)
-                throw new ApplicationException($"Não é permitido pagamento manual para parcelas canceladas com motivo {Seguros.SegurosCancelamentos.Where(sc => sc.SeguroId == SeguroId).FirstOrDefault().Motivo}");
+            //var canceladaPagavel =
+            //    (Seguros.Status == StatusSeguro.ExpiracaoDaVigenciaDoSeguro) ||
+            //    (Seguros.SegurosCancelamentos.FirstOrDefault(sc => sc.SeguroId == SeguroId)?.Motivo ==
+            //     MotivoSeguroCancelamento.CanceladoPelaCooperativa);
+            //if (!canceladaPagavel)
+            throw new ApplicationException($"Não é permitido pagamento manual para parcelas canceladas com motivo {Seguros.SegurosCancelamentos.Where(sc => sc.SeguroId == SeguroId).FirstOrDefault().Motivo}");
         }
     }
 }

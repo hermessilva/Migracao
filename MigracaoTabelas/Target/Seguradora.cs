@@ -80,6 +80,7 @@ public class Seguradora
             DebitoComissaoParcela = string.Empty,
             DescricaoDebitoComissaoParcela = string.Empty,
             CreditoComissaoParcela = string.Empty,
+            DescricaoCreditoComissaoParcela = string.Empty
         });
 
         PropostasSeguradoras.Add(new PropostaSeguradora

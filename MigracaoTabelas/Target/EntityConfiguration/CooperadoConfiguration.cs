@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class CooperadoConfiguration : IEntityTypeConfiguration<Cooperado>
+public class CooperadoConfiguration : BaseEntityConfiguration<Cooperado>
 {
-    public void Configure(EntityTypeBuilder<Cooperado> builder)
+    public override void Configure(EntityTypeBuilder<Cooperado> builder)
     {
         builder.ToTable("cooperado", t => t.HasComment("Cadastro de cooperados (clientes) da cooperativa que podem contratar seguros"));
 
@@ -22,9 +24,8 @@ public class CooperadoConfiguration : IEntityTypeConfiguration<Cooperado>
             .HasComment("Documento de identificação do cooperado (CPF com 11 dígitos ou CNPJ com 14 dígitos, sem formatação)")
             .IsRequired();
 
-        builder.Property(x => x.Tipo)
-            .HasColumnName("tipo")
-            .HasColumnType("enum('Física','Jurídica')")
+        ConfigureEnum(builder.Property(x => x.Tipo)
+            .HasColumnName("tipo"), "Física", "Jurídica")
             .HasConversion(
                 v => v.AsString(),
                 v => EnumHelper.FromString<TipoPessoaCooperado>(v)

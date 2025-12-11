@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class AcaoConfiguration : IEntityTypeConfiguration<Acao>
+public class AcaoConfiguration : BaseEntityConfiguration<Acao>
 {
-    public void Configure(EntityTypeBuilder<Acao> builder)
+    public override void Configure(EntityTypeBuilder<Acao> builder)
     {
         builder.ToTable("acao", t => t.HasComment("Catálogo de ações que podem ser executadas nas telas"));
 
@@ -21,5 +21,10 @@ public class AcaoConfiguration : IEntityTypeConfiguration<Acao>
             .HasMaxLength(255)
             .IsRequired()
             .HasComment("Descrição da ação (ex.: Visualizar, Editar, Excluir)");
+
+        builder.HasIndex(x => x.Descricao)
+            .IsUnique()
+            .HasDatabaseName("ux_acao_descricao");
+
     }
 }

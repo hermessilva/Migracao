@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class AgenciaConfiguration : IEntityTypeConfiguration<Agencia>
+public class AgenciaConfiguration : BaseEntityConfiguration<Agencia>
 {
-    public void Configure(EntityTypeBuilder<Agencia> builder)
+    public override void Configure(EntityTypeBuilder<Agencia> builder)
     {
         builder.ToTable("agencia", t => t.HasComment("Armazena informações cadastrais das agências da cooperativa"));
 
@@ -18,7 +18,7 @@ public class AgenciaConfiguration : IEntityTypeConfiguration<Agencia>
 
         builder.Property(x => x.Codigo)
             .HasColumnName("codigo")
-            .HasColumnType("char(4)")
+            .HasColumnType(Char(4))
             .HasComment("Código único da agência no formato de 4 caracteres")
             .IsRequired();
 
@@ -30,7 +30,7 @@ public class AgenciaConfiguration : IEntityTypeConfiguration<Agencia>
 
         builder.Property(x => x.CriadoEm)
             .HasColumnName("criado_em")
-            .HasDefaultValueSql("CURRENT_TIMESTAMP(6)")
+            .HasDefaultValueSql(CurrentTimestamp())
             .HasComment("Data e hora de criação do registro")
             .IsRequired();
 

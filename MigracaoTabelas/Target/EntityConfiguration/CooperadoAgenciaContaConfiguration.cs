@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class CooperadoAgenciaContaConfiguration : IEntityTypeConfiguration<CooperadoAgenciaConta>
+public class CooperadoAgenciaContaConfiguration : BaseEntityConfiguration<CooperadoAgenciaConta>
 {
-    public void Configure(EntityTypeBuilder<CooperadoAgenciaConta> builder)
+    public override void Configure(EntityTypeBuilder<CooperadoAgenciaConta> builder)
     {
         builder.ToTable("cooperado_agencia_conta", t => t.HasComment("Junção entre cooperados, agencias e contas"));
 
@@ -28,7 +28,7 @@ public class CooperadoAgenciaContaConfiguration : IEntityTypeConfiguration<Coope
 
         builder.Property(x => x.ContaCorrente)
             .HasColumnName("conta_corrente")
-            .HasColumnType("char(9)")
+            .HasColumnType(Char(9))
             .HasComment("Código da conta corrente")
             .IsRequired();
 
@@ -46,9 +46,9 @@ public class CooperadoAgenciaContaConfiguration : IEntityTypeConfiguration<Coope
         // Índices
         builder.HasIndex(x => new { x.CooperadoId, x.AgenciaId, x.ContaCorrente })
             .IsUnique()
-            .HasDatabaseName("cooperado_agencia_conta_index_6");
+            .HasDatabaseName("idx_cooperado_id_agencia_id_conta_corrente");
 
         builder.HasIndex(x => x.ContaCorrente)
-            .HasDatabaseName("cooperado_agencia_conta_index_7");
+            .HasDatabaseName("idx_conta_corrente");
     }
 }

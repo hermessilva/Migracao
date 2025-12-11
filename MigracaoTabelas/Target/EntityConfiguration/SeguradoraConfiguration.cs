@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class SeguradoraConfiguration : IEntityTypeConfiguration<Seguradora>
+public class SeguradoraConfiguration : BaseEntityConfiguration<Seguradora>
 {
-    public void Configure(EntityTypeBuilder<Seguradora> builder)
+    public override void Configure(EntityTypeBuilder<Seguradora> builder)
     {
         builder.ToTable("seguradora", t => t.HasComment("Armazena os dados cadastrais das seguradoras parceiras"));
 
@@ -24,7 +26,7 @@ public class SeguradoraConfiguration : IEntityTypeConfiguration<Seguradora>
 
         builder.Property(x => x.Cnpj)
             .HasColumnName("cnpj")
-            .HasColumnType("char(14)")
+            .HasColumnType(Char(14))
             .HasComment("CNPJ da seguradora sem formatação (apenas números)")
             .IsRequired();
 
@@ -34,9 +36,8 @@ public class SeguradoraConfiguration : IEntityTypeConfiguration<Seguradora>
             .HasComment("Razão social completa da seguradora")
             .IsRequired();
 
-        builder.Property(x => x.Status)
-            .HasColumnName("status")
-            .HasColumnType("enum('Ativo','Inativo')")
+        ConfigureEnum(builder.Property(x => x.Status)
+            .HasColumnName("status"), "Ativo", "Inativo")
             .HasConversion(
                 v => v.AsString(),
                 v => EnumHelper.FromString<StatusSeguradora>(v))

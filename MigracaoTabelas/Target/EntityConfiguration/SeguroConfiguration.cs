@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class SeguroConfiguration : IEntityTypeConfiguration<Seguro>
+public class SeguroConfiguration : BaseEntityConfiguration<Seguro>
 {
-    public void Configure(EntityTypeBuilder<Seguro> builder)
+    public override void Configure(EntityTypeBuilder<Seguro> builder)
     {
         builder.ToTable("seguro", t => t.HasComment("Contratos de seguros e seus metadados financeiros e relacionamentos"));
 
@@ -39,9 +41,8 @@ public class SeguroConfiguration : IEntityTypeConfiguration<Seguro>
             .HasColumnName("usuario_id")
             .HasComment("Chave estrangeira referenciando a tabela usuario responsável pela contratação");
 
-        builder.Property(x => x.Status)
-            .HasColumnName("status")
-            .HasColumnType("enum('Em análise pela Seguradora','Pendente de Documentação','Ativo','Expiração da Vigência do Seguro','Cancelado pelo Cooperado','Cancelado pela Cooperativa','Sinistro','Recusado pela Seguradora','Cancelamento por Prejuízo','Liquidação Antecipada','Cancelado por Renegociação','Cancelado por Aditivo')")
+        ConfigureEnum(builder.Property(x => x.Status)
+            .HasColumnName("status"), "Pendente", "Ativo", "Recusado", "Expirado", "Cancelado")
             .HasConversion(
                 v => v.AsString(),
                 v => EnumHelper.FromString<StatusSeguro>(v)
@@ -49,54 +50,65 @@ public class SeguroConfiguration : IEntityTypeConfiguration<Seguro>
             .HasComment("Status do seguro")
             .IsRequired();
 
+        ConfigureEnum(builder.Property(x => x.Motivo)
+            .HasColumnName("motivo"), "Em analise na seguradora", "Aguardando faturamento", "Aguardando documentação", "Pagamento à vista",
+                                      "Pagamento parcelado", "Inadimplente", "Regular", "Recusado pela seguradora",
+                                      "Expiração da vigência do seguro", "Aditivo", "Cancelamento por prejuízo", "Renegociação",
+                                      "Sinistro", "Solicitado pela cooperativa", "Solicitado pelo cooperado", "Liquidação antecipada")
+            .HasConversion(
+                v => v.AsString(),
+                v => EnumHelper.FromString<MotivoSeguro>(v)
+            )
+            .HasComment("Motivo do seguro")
+            .IsRequired();
+
         builder.Property(x => x.Contrato)
             .HasColumnName("contrato")
             .HasMaxLength(10)
-            .HasComment("Número do contrato de crédito vinculado ao seguro")
+            .HasComment("Número do contrato de seguro")
             .IsRequired();
 
         builder.Property(x => x.InicioVigencia)
             .HasColumnName("inicio_vigencia")
-            .HasColumnType("date")
+            .HasColumnType(Date())
             .HasComment("Data de início da vigência do seguro");
 
         builder.Property(x => x.FimVigencia)
             .HasColumnName("fim_vigencia")
-            .HasColumnType("date")
+            .HasColumnType(Date())
             .HasComment("Data de término da vigência do seguro");
 
         builder.Property(x => x.CodigoGrupo)
             .HasColumnName("codigo_grupo")
-            .HasColumnType("int")
+            .HasColumnType(Int())
             .HasComment("Código identificador do grupo/produto do seguro")
             .IsRequired();
 
         builder.Property(x => x.QuantidadeParcelas)
             .HasColumnName("quantidade_parcelas")
-            .HasColumnType("smallint")
+            .HasColumnType(SmallInt())
             .HasComment("Quantidade total de parcelas do seguro")
             .IsRequired();
 
         builder.Property(x => x.Vencimento)
             .HasColumnName("vencimento")
-            .HasColumnType("date")
+            .HasColumnType(Date())
             .HasComment("Data de vencimento base do contrato ou da próxima parcela");
 
         builder.Property(x => x.CapitalSegurado)
             .HasColumnName("capital_segurado")
-            .HasColumnType("decimal(10,2)")
+            .HasColumnType(Decimal(10, 2))
             .HasComment("Valor total do capital segurado (valor coberto em caso de sinistro)")
             .IsRequired();
 
         builder.Property(x => x.PremioTotal)
             .HasColumnName("premio_total")
-            .HasColumnType("decimal(10,2)")
+            .HasColumnType(Decimal(10, 2))
             .HasComment("Valor total do prêmio do seguro a ser pago")
             .IsRequired();
 
-        builder.Property(x => x.TipoPagamento)
-            .HasColumnName("tipo_pagamento")
-            .HasColumnType("enum('À Vista','Parcelado','Único')")
+        ConfigureEnum(builder.Property(x => x.TipoPagamento)
+            .HasColumnName("tipo_pagamento"), "À Vista", "Parcelado", "Único")
             .HasConversion(
                 v => v.AsString(),
                 v => EnumHelper.FromString<TipoPagamentoSeguro>(v)
@@ -106,24 +118,29 @@ public class SeguroConfiguration : IEntityTypeConfiguration<Seguro>
 
         builder.Property(x => x.EstornoProporcional)
             .HasColumnName("estorno_proporcional")
-            .HasColumnType("decimal(10,2)")
+            .HasColumnType(Decimal(10, 2))
             .HasComment("Valor de estorno proporcional em caso de cancelamento")
             .IsRequired();
 
         builder.Property(x => x.ValorBase)
             .HasColumnName("valor_base")
-            .HasColumnType("decimal(10,2)")
+            .HasColumnType(Decimal(10, 2))
             .HasComment("Valor base utilizado para cálculo do seguro (saldo devedor ou valor financiado)");
 
-        builder.Property(x => x.Dps)
-            .HasColumnName("dps")
-            .HasColumnType("tinyint(1)")
+        builder.Property(x => x.DeclaracaoPessoalSaude)
+            .HasColumnName("declaracao_pessoal_saude")
+            .HasColumnType(TinyIntBoolean())
             .HasComment("Indica se foi exigida Declaração Pessoal de Saúde (true/false)");
 
         builder.Property(x => x.ValorIof)
             .HasColumnName("valor_iof")
-            .HasColumnType("decimal(10,2)")
+            .HasColumnType(Decimal(10, 2))
             .HasComment("Valor do IOF (Imposto sobre Operações Financeiras) incidente sobre o prêmio");
+
+        builder.Property(x => x.NumeroContratoEmprestimo)
+            .HasColumnName("numero_contrato_emprestimo")
+            .HasMaxLength(20)
+            .HasComment("Número do contrato de crédito do empréstimo");
 
         // Relacionamentos
         builder.HasOne(x => x.CooperadosAgenciasContas)
@@ -154,7 +171,7 @@ public class SeguroConfiguration : IEntityTypeConfiguration<Seguro>
         // Índices
         builder.HasIndex(x => x.SeguroParametroId)
             .IsUnique()
-            .HasDatabaseName("seguro_index_8");
+            .HasDatabaseName("idx_seguro_parametro_id");
 
     }
 }

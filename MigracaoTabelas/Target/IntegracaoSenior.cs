@@ -1,5 +1,7 @@
 using System.ComponentModel;
 
+
+
 namespace MigracaoTabelas.Target;
 
 public class IntegracaoSenior
@@ -54,8 +56,10 @@ public class IntegracaoSenior
 
 public enum StatusEnvioIntegracaoSenior
 {
-    Enviado,
-    Falha
+    [Description("Enviado")]
+    Enviado = 0,
+    [Description("Falha")]
+    Falha = 1
 }
 
 public enum TipoLancamentoContabilIntegracaoSenior

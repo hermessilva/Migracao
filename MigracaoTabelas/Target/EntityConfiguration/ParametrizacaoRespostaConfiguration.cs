@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class ParametrizacaoRespostaConfiguration : IEntityTypeConfiguration<ParametrizacaoResposta>
+public class ParametrizacaoRespostaConfiguration : BaseEntityConfiguration<ParametrizacaoResposta>
 {
-    public void Configure(EntityTypeBuilder<ParametrizacaoResposta> builder)
+    public override void Configure(EntityTypeBuilder<ParametrizacaoResposta> builder)
     {
         builder.ToTable("parametrizacao_resposta", t => t.HasComment("Opções de resposta disponíveis para cada campo de parametrização"));
 

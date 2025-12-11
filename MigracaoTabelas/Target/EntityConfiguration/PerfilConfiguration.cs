@@ -2,9 +2,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
-public class PerfilConfiguration : IEntityTypeConfiguration<Perfil>
+public class PerfilConfiguration : BaseEntityConfiguration<Perfil>
 {
-    public void Configure(EntityTypeBuilder<Perfil> builder)
+    public override void Configure(EntityTypeBuilder<Perfil> builder)
     {
         builder.ToTable("perfil");
 

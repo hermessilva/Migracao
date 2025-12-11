@@ -1,11 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class IntegracaoSeniorConfiguration : IEntityTypeConfiguration<IntegracaoSenior>
+public class IntegracaoSeniorConfiguration : BaseEntityConfiguration<IntegracaoSenior>
 {
-    public void Configure(EntityTypeBuilder<IntegracaoSenior> builder)
+    public override void Configure(EntityTypeBuilder<IntegracaoSenior> builder)
     {
         builder.ToTable("integracao_senior", t => t.HasComment("Fila de controle de integrações contábeis com o sistema Sênior (ERP)"));
 
@@ -23,32 +25,34 @@ public class IntegracaoSeniorConfiguration : IEntityTypeConfiguration<Integracao
 
         builder.Property(x => x.ContaContabilCredito)
             .HasColumnName("conta_contabil_credito")
-            .HasColumnType("varchar(255)")
+            .HasColumnType(VarChar(255))
             .HasComment("Código da conta contábil de crédito para o lançamento")
             .IsRequired();
 
         builder.Property(x => x.ContaContabilDebito)
             .HasColumnName("conta_contabil_debito")
-            .HasColumnType("varchar(255)")
+            .HasColumnType(VarChar(255))
             .HasComment("Código da conta contábil de débito para o lançamento")
             .IsRequired();
 
-        builder.Property(x => x.Status)
-            .HasColumnName("status")
-            .HasColumnType("enum('Enviado','Falha')")
-            .HasConversion<string>()
+        ConfigureEnum(builder.Property(x => x.Status)
+            .HasColumnName("status"), "Enviado", "Falha")
+            .HasConversion(
+                v => v.AsString(),
+                v => EnumHelper.FromString<StatusEnvioIntegracaoSenior>(v)
+            )
             .HasComment("Status da integração: Enviado (sucesso) ou Falha (erro no envio)")
             .IsRequired();
 
         builder.Property(x => x.DataMovimentacao)
             .HasColumnName("data_movimentacao")
-            .HasColumnType("datetime")
+            .HasColumnType(DateTime())
             .HasComment("Data e hora da movimentação a ser integrada")
             .IsRequired();
 
         builder.Property(x => x.Valor)
             .HasColumnName("valor")
-            .HasColumnType("decimal(10,2)")
+            .HasColumnType(Decimal(10, 2))
             .HasComment("Valor monetário do lançamento a ser integrado")
             .IsRequired();
 
@@ -58,9 +62,11 @@ public class IntegracaoSeniorConfiguration : IEntityTypeConfiguration<Integracao
             .HasComment("Descrição detalhada do lançamento para identificação")
             .IsRequired();
 
-        builder.Property(x => x.TipoLancamentoContabil)
-            .HasColumnName("tipo_lancamento_contabil")
-            .HasColumnType("enum('Seguro Prestamista Contratado', 'Comissão Seguro Prestamista Contratado', 'Cancelamento Seguro Prestamista Parcelado Comissão', 'Cancelamento Seguro Prestamista À Vista Proporcional Comissão', 'Pagamento Seguro Prestamista', 'Recebimento Comissão Seguro Prestamista', 'Recebimento Premio Seguro Prestamista Parcelado', 'Recebimento Comissão Seguro Prestamista Parcelado')")
+        ConfigureEnum(builder.Property(x => x.TipoLancamentoContabil)
+            .HasColumnName("tipo_lancamento_contabil"), "Seguro Prestamista Contratado", "Comissão Seguro Prestamista Contratado",
+                                                       "Cancelamento Seguro Prestamista Parcelado Comissão", "Cancelamento Seguro Prestamista À Vista Proporcional Comissão",
+                                                       "Pagamento Seguro Prestamista", "Recebimento Comissão Seguro Prestamista",
+                                                       "Recebimento Premio Seguro Prestamista Parcelado", "Recebimento Comissão Seguro Prestamista Parcelado")
             .HasConversion(v =>
                 v.AsString(),
                 v => EnumHelper.FromString<TipoLancamentoContabilIntegracaoSenior>(v)
@@ -70,7 +76,7 @@ public class IntegracaoSeniorConfiguration : IEntityTypeConfiguration<Integracao
 
         builder.Property(x => x.CodigoPa)
             .HasColumnName("codigo_pa")
-            .HasColumnType("char(3)")
+            .HasColumnType(Char(3))
             .HasComment("Código do ponto de atendimento de origem do lançamento")
             .IsRequired();
 

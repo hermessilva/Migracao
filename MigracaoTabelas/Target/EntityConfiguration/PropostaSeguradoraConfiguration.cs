@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class PropostaSeguradoraConfiguration : IEntityTypeConfiguration<PropostaSeguradora>
+public class PropostaSeguradoraConfiguration : BaseEntityConfiguration<PropostaSeguradora>
 {
-    public void Configure(EntityTypeBuilder<PropostaSeguradora> builder)
+    public override void Configure(EntityTypeBuilder<PropostaSeguradora> builder)
     {
         builder.ToTable("proposta_seguradora", t => t.HasComment("Controle de numeração sequencial de propostas por seguradora"));
 

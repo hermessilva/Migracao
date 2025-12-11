@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class AgenciaSeguradoraConfiguration : IEntityTypeConfiguration<AgenciaSeguradora>
+public class AgenciaSeguradoraConfiguration : BaseEntityConfiguration<AgenciaSeguradora>
 {
-    public void Configure(EntityTypeBuilder<AgenciaSeguradora> builder)
+    public override void Configure(EntityTypeBuilder<AgenciaSeguradora> builder)
     {
         builder.ToTable("agencia_seguradora", t => t.HasComment("Tabela de vínculo que relaciona agências com seguradoras autorizadas e define prioridade"));
 
@@ -28,7 +28,7 @@ public class AgenciaSeguradoraConfiguration : IEntityTypeConfiguration<AgenciaSe
 
         builder.Property(x => x.Ordem)
             .HasColumnName("ordem")
-            .HasColumnType("tinyint")
+            .HasColumnType(TinyInt())
             .HasComment("Ordem de prioridade da seguradora dentro da agência (menor = maior prioridade)")
             .IsRequired();
 

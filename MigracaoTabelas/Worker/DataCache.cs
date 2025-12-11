@@ -37,7 +37,7 @@ namespace MigracaoTabelas.Worker
         {
             _TContext.Seguradora.AsNoTracking().ToList().ForEach(a =>
             {
-                Seguradoras.Add(a.Id.ToString("0000"), a);
+                Seguradoras.Add(a.Cnpj, a);
             });
             _TContext.Agencia.AsNoTracking().ToList().ForEach(a =>
             {
@@ -114,8 +114,7 @@ namespace MigracaoTabelas.Worker
                     if (!PontosAtendimento.ContainsKey((p.Agencia.Codigo, p.Codigo)))
                         PontosAtendimento.Add((p.Agencia.Codigo, p.Codigo), p);
                 });
-                return null;
-                //PontosAtendimento[(pAgenciaCodigo, pPontoCodigo)];
+                return PontosAtendimento[(pAgenciaCodigo, pPontoCodigo)];
             }
         }
 
@@ -211,16 +210,17 @@ namespace MigracaoTabelas.Worker
             ArgumentNullException.ThrowIfNull(pCodigo, nameof(pCodigo));
             lock (_ToLock)
             {
-                if (Seguradoras.ContainsKey(pCodigo))
-                    return Seguradoras[pCodigo];
-                var seguradoraSrc = pSContext.Seguradoras.Where(s => s.Codigo == pCodigo).FirstOrDefault();
+                var cnpj = (pCodigo.PadRight(14, '0')).Substring(0, 14);
+                if (Seguradoras.ContainsKey(cnpj))
+                    return Seguradoras[cnpj];
+                var seguradoraSrc = pSContext.Seguradoras.Where(s => s.Codigo == cnpj).FirstOrDefault();
                 if (seguradoraSrc == null)
-                    throw new Exception($"Seguradora [{pCodigo}] não encontrada.");
+                    throw new Exception($"Seguradora [{cnpj}] não encontrada.");
                 var seguradora = CriarSeguradora(seguradoraSrc);
 
                 _TContext.Seguradora.Add(seguradora);
                 _TContext.SaveChanges();
-                Seguradoras.Add(pCodigo, seguradora);
+                Seguradoras.Add(cnpj, seguradora);
                 return seguradora;
             }
         }
@@ -253,7 +253,7 @@ namespace MigracaoTabelas.Worker
                 PorcentagemCoberturaMorte = 0.1m,
                 PorcentagemCoberturaInvalidez = 0.1m,
                 PorcentagemCoberturaPerdaRenda = 0.1m,
-                Periodicidade30Dias = true
+                Periodicidade30Dias = src.Codigo != "0005"
             });
 
             // ContabilizacaoSeguradora - utiliza as contas contábeis da fonte
@@ -299,7 +299,7 @@ namespace MigracaoTabelas.Worker
                 DescricaoDebitoPremioParcela = "Conta Contábil de Débito - Prêmio Parcela",
                 CreditoPremioParcela = string.Empty,
                 DescricaoCreditoPremioParcela = "Conta Contábil de Crédito - Prêmio Parcela",
-                DebitoComissaoParcela =  string.Empty,
+                DebitoComissaoParcela = string.Empty,
                 DescricaoDebitoComissaoParcela = "Conta Contábil de Débito - Comissão Parcela",
                 CreditoComissaoParcela = string.Empty,
                 DescricaoCreditoComissaoParcela = "Conta Contábil de Crédito - Comissão Parcela"

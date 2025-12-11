@@ -103,7 +103,16 @@ public static class EnumHelper
             => Map.TryGetValue(key, out valueEnum);
 
         public static string GetDescription(TEnum valueEnum)
-            => DescriptionMap[valueEnum];
+        {
+            try
+            {
+                return DescriptionMap[valueEnum];
+            }
+            catch (KeyNotFoundException)
+            {
+                throw new ArgumentException($"Valor inválido: {valueEnum}", nameof(valueEnum));
+            }
+        }
 
         public static IReadOnlyList<string> GetAllDescriptions()
             => Descriptions;

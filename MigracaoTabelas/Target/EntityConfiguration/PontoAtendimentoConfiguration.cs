@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class PontoAtendimentoConfiguration : IEntityTypeConfiguration<PontoAtendimento>
+public class PontoAtendimentoConfiguration : BaseEntityConfiguration<PontoAtendimento>
 {
-    public void Configure(EntityTypeBuilder<PontoAtendimento> builder)
+    public override void Configure(EntityTypeBuilder<PontoAtendimento> builder)
     {
         builder.ToTable("ponto_atendimento", t => t.HasComment("Armazena informações dos pontos de atendimento (PAs) vinculados a cada agência"));
 
@@ -23,7 +23,7 @@ public class PontoAtendimentoConfiguration : IEntityTypeConfiguration<PontoAtend
 
         builder.Property(x => x.Codigo)
             .HasColumnName("codigo")
-            .HasColumnType("char(3)")
+            .HasColumnType(Char(3))
             .HasComment("Código do ponto de atendimento no formato de 3 caracteres, único dentro de uma agência")
             .IsRequired();
 
@@ -35,7 +35,7 @@ public class PontoAtendimentoConfiguration : IEntityTypeConfiguration<PontoAtend
 
         builder.Property(x => x.CriadoEm)
             .HasColumnName("criado_em")
-            .HasDefaultValueSql("CURRENT_TIMESTAMP(6)")
+            .HasDefaultValueSql(CurrentTimestamp())
             .HasComment("Data e hora de criação do registro");
 
         // Relacionamentos
@@ -50,6 +50,6 @@ public class PontoAtendimentoConfiguration : IEntityTypeConfiguration<PontoAtend
 
         builder.HasIndex(x => new { x.AgenciaId, x.Codigo })
             .IsUnique()
-            .HasDatabaseName("ponto_atendimento_index_0");
+            .HasDatabaseName("idx_agencia_id_codigo");
     }
 }

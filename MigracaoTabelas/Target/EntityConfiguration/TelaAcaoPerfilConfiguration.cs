@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class TelaAcaoPerfilConfiguration : IEntityTypeConfiguration<TelaAcaoPerfil>
+public class TelaAcaoPerfilConfiguration : BaseEntityConfiguration<TelaAcaoPerfil>
 {
-    public void Configure(EntityTypeBuilder<TelaAcaoPerfil> builder)
+    public override void Configure(EntityTypeBuilder<TelaAcaoPerfil> builder)
     {
         builder.ToTable("tela_acao_perfil");
 

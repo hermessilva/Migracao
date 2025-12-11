@@ -1,10 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class ContabilizacaoSeguradoraConfiguration : IEntityTypeConfiguration<ContabilizacaoSeguradora>
+public class ContabilizacaoSeguradoraConfiguration : BaseEntityConfiguration<ContabilizacaoSeguradora>
 {
-    public void Configure(EntityTypeBuilder<ContabilizacaoSeguradora> builder)
+    public override void Configure(EntityTypeBuilder<ContabilizacaoSeguradora> builder)
     {
         builder.ToTable("contabilizacao_seguradora");
 
@@ -175,7 +176,7 @@ public class ContabilizacaoSeguradoraConfiguration : IEntityTypeConfiguration<Co
             .HasMaxLength(255)
             .HasComment("Descrição da conta contábil debito premio parcela")
             .IsRequired();
-        
+
         builder.Property(x => x.CreditoPremioParcela)
             .HasColumnName("credito_premio_parcela")
             .HasMaxLength(50)
@@ -211,6 +212,7 @@ public class ContabilizacaoSeguradoraConfiguration : IEntityTypeConfiguration<Co
             .HasMaxLength(255)
             .HasComment("Descrição da conta contábil credito comissao parcela")
             .IsRequired();
+
 
         // Relacionamentos
         builder.HasOne(x => x.Seguradoras)
