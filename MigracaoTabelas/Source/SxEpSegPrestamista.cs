@@ -111,7 +111,7 @@ namespace MigracaoTabelas.Source
         /// Saldo Atualizado do Contrato
         /// </summary>
         [Column("Saldo", TypeName = "decimal(12,2)")]
-        public decimal Saldo { get; set; } 
+        public decimal Saldo { get; set; }
 
         /// <summary>
         /// Valor Base Segurado
@@ -171,6 +171,9 @@ namespace MigracaoTabelas.Source
         [Required]
         [StringLength(1)]
         public string SqlDeleted { get; set; } = "F"; // enum NOT NULL -> string
+
+        public int TipoPagamento { get; set; }
+        public UInt16 ContratoSequencia { get; set; }
 
     }
 }

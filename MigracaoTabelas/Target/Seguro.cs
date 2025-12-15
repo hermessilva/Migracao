@@ -14,6 +14,7 @@ public class Seguro
     public ulong ApoliceGrupoSeguradoraId { get; set; }
     public ulong SeguroParametroId { get; set; }
     public ulong? UsuarioId { get; set; }
+    public string ContratoSequencia { get; set; }
     public StatusSeguro Status { get; private set; }
     public MotivoSeguro Motivo
     {
@@ -118,40 +119,18 @@ public class Seguro
 
     public void Assign(SxEpSegPrestamista source)
     {
-        // Campos de PK 'id' são Identity, não são mapeados diretamente da source.
-
-        // (SEG_CANCTIPO: Tipo de Cancelamento -> status: Identificador do status)
-        // Regra aplicada: > 0 consideramos cancelado (3), senão aberto (1)
-
         Motivo = MotivoSeguro.Regular;
-
-        // Mapeamentos com correspondência direta
-        Contrato = source.SegContrato ?? string.Empty;                         // (SEG_CONTRATO: Contrato -> contrato: Número do contrato do seguro)
-        InicioVigencia = source.SegInicio;                                     // (SEG_INICIO: Início do Contrato -> inicio_vigencia: Início de vigência do seguro)
-        FimVigencia = source.SegFim;                                           // (SEG_FIM: Final do Contrato -> fim_vigencia: Fim de vigência do seguro)
-
-        // Quantidade de parcelas: preferir valor informado (SegMeses); fallback para quantidade de parcelas de navegação
-        QuantidadeParcelas = (short)(source.SegMeses ?? 0);                             // (SEG_MESES: Nº de Meses do Seguro -> quantidade_parcelas: Quantidade total de parcelas)
-
-
-        // Vencimento: manter como fim de vigência, até haver regra específica
-        Vencimento = source.SegFim;                                            // (SEG_FIM: Final do Contrato -> vencimento: Data de vencimento) [assumido]
-
-        // Capital segurado: usar base segurada como principal, com fallback para valor do contrato
-        CapitalSegurado = source.Saldo;
-
-        // Prêmio total e tipo de pagamento
-        PremioTotal = source.SegPremio ?? 0.00m;                               // (SEG_PREMIO: Valor do Seguro -> premio_total: Valor do prêmio total do seguro)
-        ValorBase = source.SegBase;                                               // (SEG_BASE: Valor Base Segurado -> valor_base: Valor base do seguro)
-        ValorIof = source.SegIof;                                                   // (SEG_IOF: Valor do IOF -> valor_iof: Valor do IOF do seguro)
-
-
-        TipoPagamento = TipoPagamentoSeguro.Parcelado;
-
-
-        /*
-        EstornoProporcional =
-        */
+        Contrato = source.SegContrato ?? string.Empty;
+        InicioVigencia = source.SegInicio;
+        FimVigencia = source.SegFim;
+        QuantidadeParcelas = (short)(source.SegMeses ?? 0);
+        Vencimento = source.SegFim;
+        CapitalSegurado = source.Saldo == 0 ? source.SegBase ?? 0 : source.Saldo;
+        PremioTotal = source.SegPremio ?? 0.00m;
+        ValorBase = source.SegBase;
+        ValorIof = source.SegIof;
+        ContratoSequencia = source.ContratoSequencia.ToString("00");
+        TipoPagamento = source.TipoPagamento == 1 ? TipoPagamentoSeguro.Parcelado : TipoPagamentoSeguro.AVista;
     }
 }
 

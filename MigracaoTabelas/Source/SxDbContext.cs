@@ -94,8 +94,10 @@ namespace MigracaoTabelas.Source
             modelBuilder.Entity<SxEpSegPrestamista>(entity =>
             {
                 entity.HasNoKey();
-                entity.ToSqlQuery(@"select  pm.*, saldocontratoemprestimoaditivo (pm.cco_conta ,pm.seg_contrato ,'00000','2025-12-10' ) saldo
-                                    from ep_segprestamista pm join cc_conta c on c.cco_conta = pm.CCO_CONTA 
+                entity.ToSqlQuery(@"select ec.CON_DEBSEGURO TipoPagamento,ec.CON_SEQ ContratoSequencia, pm.*, saldocontratoemprestimoaditivo (pm.cco_conta ,pm.seg_contrato ,'00000','2025-12-10' ) saldo
+                                    from ep_segprestamista pm 
+                                    join cc_conta c on c.cco_conta = pm.CCO_CONTA
+                                    join ep_contrato ec on ec.CCO_CONTA = pm.CCO_CONTA and ec.CON_NDOC = pm.SEG_CONTRATO 
                                     where pm.SEG_MODALIDADE = 4 and c.CCO_SITUACAO = 1 and pm.SEG_CANCTIPO = 0 and pm.SEG_FIM  >= '2025-12-10' and                                   
                                     (select count(*) from ep_segparcela es where es.seg_contrato = pm.SEG_CONTRATO and es.cco_conta = pm.CCO_CONTA ) >1");
             });

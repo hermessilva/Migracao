@@ -8,6 +8,8 @@ using MigracaoTabelas.Target;
 
 using Serilog;
 
+using static System.Net.Mime.MediaTypeNames;
+
 
 namespace MigracaoTabelas.Worker
 {
@@ -54,6 +56,16 @@ namespace MigracaoTabelas.Worker
                     Log.Information($"[{sagencia.TABLE_SCHEMA}]");
                     using (var sctx = _Scope.ServiceProvider.GetRequiredService<SxDbContext>())
                     {
+                        if (sagencia.Codigo == "0012")
+                        {
+                            Log.Warning($"Agencia não contem fuction saldocontratoemprestimoaditivo");
+                            continue;
+                        }
+                        if (sagencia.Codigo == "0023")
+                        {
+                            Log.Warning($"Agencia Com banco sob lock");
+                            continue;
+                        }
                         ag = _DataCache.GetAgencia(sctx, sagencia.Codigo);
                         Log.Information($"Iniciando migração da Agencia [{ag.Nome}] Códiog [{ag.Codigo}] id[{ag.Id}]");
                         Console.WriteLine();
@@ -75,6 +87,8 @@ namespace MigracaoTabelas.Worker
         private void MigraDados(SxDbContext sctx)
         {
             _AgenciaPA = null;
+            GetPontoAtendimentoId("000");
+
             var segprestamistas = sctx.EpSegPrestamista.AsNoTracking().ToList();
             if (segprestamistas.Count == 0)
             {
@@ -180,19 +194,22 @@ namespace MigracaoTabelas.Worker
             tgt.ApoliceGrupoSeguradoraId = GetAgenciaSeguradoraId(pPrestamista, agenciaId);
             tgt.CooperadoAgenciaContaId = cooagct.Id;
 
-            //tgt.UsuarioId = 21;
+            tgt.UsuarioId = 18;
 
             // Obtém a seguradora para buscar as comissões
             var seguradora = _DataCache.GetSeguradora(_SContext, pPrestamista.PstCodigo);
             var comissao = seguradora.ComissoesSeguradoras.FirstOrDefault();
 
             var spar = new SeguroParametro();
-            spar.TipoCapital = TipoCapitalSeguro.Fixo;
+            if (seguradora.Nome!.Contains("FIXO"))
+                spar.TipoCapital = TipoCapitalSeguro.Fixo;
+            else
+                spar.TipoCapital = TipoCapitalSeguro.Variavel;
             spar.Periodicidade30Dias = true;
-            spar.Coeficiente = 0.0003M;
+            spar.Coeficiente = 0.0005945M;
             spar.PorcentualIof = 0.0038M;
-            spar.PorcentagemComissaoCorretora = comissao?.PorcentagemComissaoCorretora ?? 0.15M;
-            spar.PorcentagemComissaoCooperativa = comissao?.PorcentagemComissaoCooperativa ?? 0.05M;
+            spar.PorcentagemComissaoCorretora = comissao?.PorcentagemComissaoCorretora ?? 0.45M;
+            spar.PorcentagemComissaoCooperativa = comissao?.PorcentagemComissaoCooperativa ?? 0.20M;
             tgt.SeguroParametro = spar;
 
             foreach (var item in parcelasSrc)

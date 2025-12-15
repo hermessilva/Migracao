@@ -142,6 +142,12 @@ public class SeguroConfiguration : BaseEntityConfiguration<Seguro>
             .HasMaxLength(20)
             .HasComment("Número do contrato de crédito do empréstimo");
 
+        builder.Property(x => x.ContratoSequencia)
+            .HasColumnName("contrato_sequencia")
+            .HasMaxLength(2)
+            .HasDefaultValue("00")
+            .HasComment("Numero sequêncial do contrato");
+
         // Relacionamentos
         builder.HasOne(x => x.CooperadosAgenciasContas)
             .WithMany(x => x.Seguros)
