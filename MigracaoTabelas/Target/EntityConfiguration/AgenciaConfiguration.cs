@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using MigracaoTabelas.Target;
+
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class AgenciaConfiguration : BaseEntityConfiguration<Agencia>

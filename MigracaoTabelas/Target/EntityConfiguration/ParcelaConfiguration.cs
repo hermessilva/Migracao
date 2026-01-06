@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using Seguros.Helpers;
 
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
@@ -23,13 +24,16 @@ public class ParcelaConfiguration : BaseEntityConfiguration<Parcela>
             .HasComment("Chave estrangeira referenciando a tabela seguro")
             .IsRequired();
 
-        ConfigureEnum(builder.Property(x => x.Status)
-            .HasColumnName("status"), "Em Aberto", "Pago", "Cancelada")
-            .HasConversion(v =>
-                v.AsString(),
-                v => EnumHelper.FromString<StatusParcela>(v)
+        ConfigureEnum(
+                builder.Property(x => x.Status)
+                    .HasColumnName("status")
+                    .HasConversion(v =>
+                        v.AsString(),
+                        v => EnumHelper.FromString<StatusParcela>(v)
+                    )
+                    .HasComment("Status atual da parcela conforme enum status_seguro"),
+                "Pendente", "Em Aberto", "Pago", "Cancelada"
             )
-            .HasComment("Status atual da parcela conforme enum status_seguro")
             .IsRequired();
 
         builder.Property(x => x.NumeroParcela)
@@ -71,6 +75,18 @@ public class ParcelaConfiguration : BaseEntityConfiguration<Parcela>
             .HasColumnName("data_ultimo_pagamento")
             .HasColumnType(DateTime())
             .HasComment("Data e hora do último pagamento parcial ou total registrado");
+
+        builder.Property(x => x.ComissaoCorretora)
+            .HasColumnName("comissao_corretora")
+            .HasColumnType(Decimal(10, 2))
+            .HasComment("Valor da comissão do corretor sobre a parcela")
+            .IsRequired();
+
+        builder.Property(x => x.ComissaoCooperativa)
+            .HasColumnName("comissao_cooperativa")
+            .HasColumnType(Decimal(10, 2))
+            .HasComment("Valor da comissão da cooperativa sobre a parcela")
+            .IsRequired();
 
         // Relacionamentos
         builder.HasOne(x => x.Seguros)

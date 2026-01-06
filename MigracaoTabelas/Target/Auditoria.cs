@@ -19,8 +19,14 @@ public class Auditoria
 
 public enum OperacaoAuditoria
 {
+    [Description("Inserção")]
+    Insert = 1,
     [Description("Atualização")]
-    Update = 1,
+    Update = 2,
     [Description("Deleção")]
-    Delete = 2
+    Delete = 3,
+    [Description("Login")]
+    Login = 4,
+    [Description("Refresh Token")]
+    RefreshToken = 5
 }

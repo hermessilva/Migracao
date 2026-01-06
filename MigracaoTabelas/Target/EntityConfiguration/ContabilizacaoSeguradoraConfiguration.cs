@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using MigracaoTabelas.Target;
+
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class ContabilizacaoSeguradoraConfiguration : BaseEntityConfiguration<ContabilizacaoSeguradora>
@@ -206,7 +209,6 @@ public class ContabilizacaoSeguradoraConfiguration : BaseEntityConfiguration<Con
             .HasMaxLength(50)
             .HasComment("Código da conta contábil credito comissao parcela")
             .IsRequired();
-
         builder.Property(x => x.DescricaoCreditoComissaoParcela)
             .HasColumnName("descricao_credito_comissao_parcela")
             .HasMaxLength(255)

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
 public class TelaAcaoPerfilConfiguration : BaseEntityConfiguration<TelaAcaoPerfil>

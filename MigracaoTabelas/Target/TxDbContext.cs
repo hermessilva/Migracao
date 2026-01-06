@@ -38,7 +38,6 @@ namespace MigracaoTabelas.Target
         public DbSet<SeguroCancelamento> SeguroCancelamento { get; set; }
         public DbSet<Parcela> Parcela { get; set; }
         public DbSet<Parametrizacao> Parametrizacao { get; set; }
-        public DbSet<ParametrizacaoResposta> ParametrizacaoResposta { get; set; }
         public DbSet<LancamentoEfetivar> LancamentoEfetivar { get; set; }
         public DbSet<IntegracaoSenior> IntegracaoSenior { get; set; }
         public DbSet<ComissaoSeguradora> ComissaoSeguradora { get; set; }

@@ -94,12 +94,14 @@ namespace MigracaoTabelas.Source
             modelBuilder.Entity<SxEpSegPrestamista>(entity =>
             {
                 entity.HasNoKey();
-                entity.ToSqlQuery(@"select ec.CON_DEBSEGURO TipoPagamento,ec.CON_SEQ ContratoSequencia, pm.*, saldocontratoemprestimoaditivo (pm.cco_conta ,pm.seg_contrato ,'00000','2025-12-10' ) saldo
+                entity.ToSqlQuery(@"select ec.con_debseguro tipopagamento,ec.con_seq contratosequencia, pm.*, saldocontratoemprestimoaditivo (pm.cco_conta ,pm.seg_contrato ,'00000','2025-12-10' ) saldo
                                     from ep_segprestamista pm 
-                                    join cc_conta c on c.cco_conta = pm.CCO_CONTA
-                                    join ep_contrato ec on ec.CCO_CONTA = pm.CCO_CONTA and ec.CON_NDOC = pm.SEG_CONTRATO 
-                                    where pm.SEG_MODALIDADE = 4 and c.CCO_SITUACAO = 1 and pm.SEG_CANCTIPO = 0 and pm.SEG_FIM  >= '2025-12-10' and                                   
-                                    (select count(*) from ep_segparcela es where es.seg_contrato = pm.SEG_CONTRATO and es.cco_conta = pm.CCO_CONTA ) >1");
+                                    join cc_conta c on c.cco_conta = pm.cco_conta
+                                    join ep_contrato ec on ec.cco_conta = pm.cco_conta and ec.con_ndoc = pm.seg_contrato 
+									join ep_parcela as p on p.con_ndoc = ec.con_ndoc and p.cco_conta = c.cco_conta   
+                                    where pm.seg_modalidade = 4 and c.cco_situacao = 1 and pm.seg_canctipo = 0 and pm.seg_fim  >= '2025-12-10' and
+                                    ec.con_pgto is null and p.emp_creli is null and p.emp_pgto is null and
+                                    (select count(*) from ep_segparcela es where es.seg_contrato = pm.seg_contrato and es.cco_conta = pm.cco_conta ) > 1");
             });
 
             modelBuilder.Entity<SxEpSegParcela>(entity =>

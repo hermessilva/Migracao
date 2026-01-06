@@ -1,7 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using MigracaoTabelas.Target;
+
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
+
 public class PerfilConfiguration : BaseEntityConfiguration<Perfil>
 {
     public override void Configure(EntityTypeBuilder<Perfil> builder)

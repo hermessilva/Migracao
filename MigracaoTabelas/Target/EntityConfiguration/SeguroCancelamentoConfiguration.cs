@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using MigracaoTabelas.Target;
+
+using Seguros.Helpers;
 
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
@@ -40,7 +43,8 @@ public sealed class SeguroCancelamentoConfiguration : BaseEntityConfiguration<Se
                            "Solicitado pela cooperativa", "Solicitado pelo cooperado", "Liquidação Antecipada")
             .HasConversion(
                 v => v.AsString(),
-                v => EnumHelper.FromString<MotivoSeguroCancelamento>(v))
+                v => EnumHelper.FromString<MotivoSeguroCancelamento>(v)
+            )
             .HasComment("Motivo do cancelamento")
             .IsRequired();
 

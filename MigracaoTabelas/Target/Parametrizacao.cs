@@ -2,12 +2,24 @@ namespace MigracaoTabelas.Target;
 
 public class Parametrizacao
 {
+
+
+
     public ulong Id { get; set; }
     public string Descricao { get; set; }
-    public virtual ICollection<ParametrizacaoResposta> ParametrizacoesRespostas { get; set; } = new List<ParametrizacaoResposta>();
+    public string Identificador { get; set; }
+    public string Valor { get; private set; }
+    public string Tipo { get; private set; }
 
-    public void AtualizarResposta(TimeSpan? atualizacao)
+    public void AtualizarValor(TimeSpan? valor)
     {
-        ParametrizacoesRespostas.FirstOrDefault().Resposta = atualizacao?.ToString();
+        Valor = valor?.ToString();
+        Tipo = "TimeSpan";
+    }
+
+    public void AtualizarValor(decimal? valor)
+    {
+        Valor = valor?.ToString();
+        Tipo = "Decimal";
     }
 }

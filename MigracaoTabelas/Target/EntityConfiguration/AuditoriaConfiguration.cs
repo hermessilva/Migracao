@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using Seguros.Helpers;
 
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
@@ -52,7 +53,7 @@ public class AuditoriaConfiguration : BaseEntityConfiguration<Auditoria>
             .IsRequired(false);
 
         ConfigureEnum(builder.Property(x => x.Operacao)
-            .HasColumnName("operacao"), "Atualização", "Deleção")
+            .HasColumnName("operacao"), "Inserção", "Atualização", "Deleção", "Login", "Refresh Token")
             .HasConversion(
                 v => v.AsString(),
                 v => EnumHelper.FromString<OperacaoAuditoria>(v)

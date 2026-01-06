@@ -1,31 +1,33 @@
 using System.ComponentModel;
 
-using MigracaoTabelas.Enums;
 using MigracaoTabelas.Source;
+
 
 namespace MigracaoTabelas.Target;
 
 public class Seguro
 {
-    private MotivoSeguro _Motivo;
+    private MotivoSeguro _motivo;
     public ulong Id { get; set; }
     public ulong CooperadoAgenciaContaId { get; set; }
     public ulong PontoAtendimentoId { get; set; }
     public ulong ApoliceGrupoSeguradoraId { get; set; }
     public ulong SeguroParametroId { get; set; }
     public ulong? UsuarioId { get; set; }
-    public string ContratoSequencia { get; set; }
+    public string ContratoSequencia { get; set; } = "00";
     public StatusSeguro Status { get; private set; }
     public MotivoSeguro Motivo
     {
         get
         {
-            return _Motivo;
+            return _motivo;
         }
         set
         {
-            _Motivo = value;
-            switch (_Motivo)
+            var statusAnterior = Status;
+            _motivo = value;
+            
+            switch (_motivo)
             {
                 case MotivoSeguro.EmAnaliseNaSeguradora:
                 case MotivoSeguro.AguardandoFaturamento:
@@ -36,7 +38,12 @@ public class Seguro
                 case MotivoSeguro.PagamentoParcelado:
                 case MotivoSeguro.Inadimplente:
                 case MotivoSeguro.Regular:
-                    Status = StatusSeguro.Ativo;
+                    // Se o status anterior era Cancelado, mantém Cancelado
+                    // Isso permite atualizar o motivo sem alterar o status
+                    if (statusAnterior != StatusSeguro.Cancelado)
+                    {
+                        Status = StatusSeguro.Ativo;
+                    }
                     break;
                 case MotivoSeguro.RecusadoPelaSeguradora:
                     Status = StatusSeguro.Recusado;
@@ -55,7 +62,7 @@ public class Seguro
                     break;
 
                 default:
-                    throw new Exception($"Não foi implementado equivalência para o motivo informado {_Motivo}.");
+                    throw new Exception($"Não foi implementado equivalência para o motivo informado {_motivo}.");
             }
         }
     }
@@ -82,11 +89,6 @@ public class Seguro
     public virtual Usuario Usuarios { get; set; }
     public virtual ICollection<Parcela> Parcelas { get; set; } = new List<Parcela>();
     public virtual ICollection<SeguroCancelamento> SegurosCancelamentos { get; set; } = new List<SeguroCancelamento>();
-
-    public void AlterarMotivo(MotivoSeguro requestMotivo)
-    {
-        Motivo = requestMotivo;
-    }
 
     public static bool PermiteAlteracaoManual(MotivoSeguro motivo)
     {
@@ -116,7 +118,7 @@ public class Seguro
                 throw new ArgumentOutOfRangeException(nameof(motivoCancelamento), $"MotivoSeguroCancelamento '{motivoCancelamento}' não pode ser convertido para MotivoSeguro.");
         }
     }
-
+    
     public void Assign(SxEpSegPrestamista source)
     {
         Motivo = MotivoSeguro.Regular;

@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-
+using Seguros.Helpers;
 
 namespace MigracaoTabelas.Target;
 
@@ -16,6 +16,7 @@ public class IntegracaoSenior
     public DateTime DataMovimentacao { get; private set; }
     public decimal Valor { get; private set; }
     public string Descricao { get; private set; }
+    public string NumeroLancamento { get; private set; }
     public virtual Agencia Agencia { get; private set; }
 
     protected IntegracaoSenior() { }
@@ -50,7 +51,7 @@ public class IntegracaoSenior
             return;
         }
         Status = StatusEnvioIntegracaoSenior.Falha;
-        Descricao = $"{tipoLancamentoContabil.AsString()} falhou ao enviar: {mensagemErroSenior}";
+        Descricao = $"{tipoLancamentoContabil.AsString()} falhou ao enviar. Motivo: {mensagemErroSenior}";
     }
 }
 

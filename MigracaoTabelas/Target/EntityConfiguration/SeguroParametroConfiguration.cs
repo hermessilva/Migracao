@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using Seguros.Helpers;
 
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
@@ -57,5 +58,43 @@ public sealed class SeguroParametroConfiguration : BaseEntityConfiguration<Segur
             .HasColumnType(Decimal(5, 4))
             .HasComment("Percentual de comissão destinado à cooperativa (ex: 0.0500 = 5%)")
             .IsRequired();
+
+        // Coberturas - Morte
+        pBuilder.Property(pX => pX.PorcentagemCoberturaMorte)
+            .HasColumnName("porcentagem_cobertura_morte")
+            .HasColumnType(Decimal(5, 4))
+            .HasDefaultValue(0m)
+            .HasComment("Percentual de cobertura por morte (ex: 1.0000 = 100%)");
+
+        pBuilder.Property(pX => pX.CapitalMorte)
+            .HasColumnName("capital_morte")
+            .HasColumnType(Decimal(18, 2))
+            .HasDefaultValue(0m)
+            .HasComment("Valor do capital segurado por morte");
+
+        pBuilder.Property(pX => pX.PremioMorte)
+            .HasColumnName("premio_morte")
+            .HasColumnType(Decimal(18, 2))
+            .HasDefaultValue(0m)
+            .HasComment("Valor do prêmio referente à cobertura por morte");
+
+        // Coberturas - Invalidez
+        pBuilder.Property(pX => pX.PorcentagemCoberturaInvalidez)
+            .HasColumnName("porcentagem_cobertura_invalidez")
+            .HasColumnType(Decimal(5, 4))
+            .HasDefaultValue(0m)
+            .HasComment("Percentual de cobertura por invalidez permanente total por acidente - IPTA (ex: 1.0000 = 100%)");
+
+        pBuilder.Property(pX => pX.CapitalInvalidez)
+            .HasColumnName("capital_invalidez")
+            .HasColumnType(Decimal(18, 2))
+            .HasDefaultValue(0m)
+            .HasComment("Valor do capital segurado por invalidez permanente total por acidente - IPTA");
+
+        pBuilder.Property(pX => pX.PremioInvalidez)
+            .HasColumnName("premio_invalidez")
+            .HasColumnType(Decimal(18, 2))
+            .HasDefaultValue(0m)
+            .HasComment("Valor do prêmio referente à cobertura por invalidez - IPTA");
     }
 }

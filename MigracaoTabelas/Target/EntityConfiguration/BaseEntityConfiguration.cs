@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
+
 public abstract class BaseEntityConfiguration
 {  /// <summary>
    /// Provider de banco de dados atual. Pode ser configurado via variável de ambiente ou configuração.
@@ -161,6 +162,21 @@ public abstract class BaseEntityConfiguration<TEntity> : BaseEntityConfiguration
             DatabaseProvider.MySql => $"varchar({length})",
             DatabaseProvider.Sqlite => "TEXT",
             _ => $"varchar({length})"
+        };
+    }
+
+    /// <summary>
+    /// Retorna o tipo de coluna para MEDIUMBLOB (dados binários até 16MB).
+    /// MySQL: mediumblob | SQLite: BLOB
+    /// </summary>
+    /// <returns>String do tipo de coluna apropriado para o provider</returns>
+    protected string MediumBlob()
+    {
+        return CurrentProvider switch
+        {
+            DatabaseProvider.MySql => "mediumblob",
+            DatabaseProvider.Sqlite => "BLOB",
+            _ => "mediumblob"
         };
     }
 

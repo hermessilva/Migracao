@@ -1,13 +1,16 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using Seguros.Helpers;
+
+
 namespace MigracaoTabelas.Target.EntityConfiguration;
 
-public class GestaoDocumentoConfiguration : BaseEntityConfiguration<GestaoDocumento>
+public sealed class GestaoDocumentoConfiguration : BaseEntityConfiguration<GestaoDocumento>
 {
     public override void Configure(EntityTypeBuilder<GestaoDocumento> builder)
     {
-        builder.ToTable("gestao_documento", t => t.HasComment("Gestão de templates e campos de documentos por seguradora para geração automática"));
+        builder.ToTable("gestao_documento", t => t.HasComment("Armazena os documentos de gestão por seguradora"));
 
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id)
@@ -21,41 +24,38 @@ public class GestaoDocumentoConfiguration : BaseEntityConfiguration<GestaoDocume
             .HasComment("Chave estrangeira referenciando a tabela seguradora")
             .IsRequired();
 
-        builder.Property(x => x.NomeDocumento)
-            .HasColumnName("nome_documento")
-            .HasMaxLength(255)
-            .HasComment("Nome ou título do documento a ser gerado")
+        ConfigureEnum(builder.Property(x => x.Tipo)
+            .HasColumnName("tipo"), "Termo de Adesão", "DPS")
+            .HasConversion(
+                v => v.AsString(),
+                v => EnumHelper.FromString<TipoGestaoDocumento>(v))
+            .HasComment("Tipo do documento/modelo")
             .IsRequired();
 
-        builder.Property(x => x.Versao)
-            .HasColumnName("versao")
-            .HasColumnType(SmallInt())
-            .HasComment("Número da versão do documento para controle de alterações")
+        builder.Property(x => x.Validade)
+            .HasColumnName("validade")
+            .HasColumnType(Date())
+            .HasComment("Data inicial de validade")
             .IsRequired();
 
-        builder.Property(x => x.Label)
-            .HasColumnName("label")
-            .HasMaxLength(255)
-            .HasComment("Rótulo amigável do campo para exibição ao usuário")
+        ConfigureEnum(builder.Property(x => x.Status)
+            .HasColumnName("status"), "Ativo", "Inativo")
+            .HasConversion(
+                v => v.AsString(),
+                v => EnumHelper.FromString<StatusGestaoDocumento>(v))
+            .HasComment("Indica se um documento está disponível para uso")
             .IsRequired();
 
-        builder.Property(x => x.Campo)
-            .HasColumnName("campo")
-            .HasMaxLength(255)
-            .HasComment("Identificador técnico do campo no documento")
+        builder.Property(x => x.Modelo)
+            .HasColumnName("modelo")
+            .HasColumnType(MediumBlob())
+            .HasComment("Modelo que será usado para gerar o documento")
             .IsRequired();
 
-        builder.Property(x => x.Valor)
-            .HasColumnName("valor")
-            .HasMaxLength(255)
-            .HasComment("Valor padrão ou resposta configurada para o campo")
-            .IsRequired();
-
-        builder.Property(x => x.Ordem)
-            .HasColumnName("ordem")
-            .HasColumnType(Int())
-            .HasComment("Ordem de exibição do campo no documento")
-            .HasDefaultValue(0)
+        builder.Property(x => x.Extensao)
+            .HasColumnName("extensao")
+            .HasMaxLength(15)
+            .HasComment("Extensão do documento")
             .IsRequired();
 
         builder.Property(x => x.CriadoEm)
@@ -63,8 +63,7 @@ public class GestaoDocumentoConfiguration : BaseEntityConfiguration<GestaoDocume
             .HasComment("Data e hora de criação do registro")
             .HasDefaultValueSql(CurrentTimestamp());
 
-        // Relacionamentos
-        builder.HasOne(x => x.Seguradoras)
+        builder.HasOne(x => x.Seguradora)
             .WithMany(x => x.GestoesDocumentos)
             .HasForeignKey(x => x.SeguradoraId)
             .OnDelete(DeleteBehavior.NoAction);

@@ -6,7 +6,7 @@ namespace MigracaoTabelas.Target
     {
         public ulong Id { get; set; }
         public ulong SeguroId { get; set; }
-        public DateOnly Data { get; set; }
+        public DateTime Data { get; set; }
         public DateTime CriadoEm { get; set; }
         public MotivoSeguroCancelamento Motivo { get; set; }
         public decimal ValorRestituir { get; set; }

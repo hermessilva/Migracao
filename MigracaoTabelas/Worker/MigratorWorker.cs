@@ -201,10 +201,10 @@ namespace MigracaoTabelas.Worker
             var comissao = seguradora.ComissoesSeguradoras.FirstOrDefault();
 
             var spar = new SeguroParametro();
-            if (seguradora.Nome!.Contains("FIXO"))
-                spar.TipoCapital = TipoCapitalSeguro.Fixo;
-            else
+            if (seguradora.Nome!.Contains("VARIAVEL"))
                 spar.TipoCapital = TipoCapitalSeguro.Variavel;
+            else
+                spar.TipoCapital = TipoCapitalSeguro.Fixo;
             spar.Periodicidade30Dias = true;
             spar.Coeficiente = 0.0005945M;
             spar.PorcentualIof = 0.0038M;

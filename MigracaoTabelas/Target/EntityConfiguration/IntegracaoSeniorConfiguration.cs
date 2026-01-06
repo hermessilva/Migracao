@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using MigracaoTabelas.Target;
+
+using Seguros.Helpers;
 
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
@@ -79,6 +82,11 @@ public class IntegracaoSeniorConfiguration : BaseEntityConfiguration<IntegracaoS
             .HasColumnType(Char(3))
             .HasComment("Código do ponto de atendimento de origem do lançamento")
             .IsRequired();
+
+        builder.Property(x => x.NumeroLancamento)
+            .HasColumnName("numero_lancamento")
+            .HasMaxLength(50)
+            .HasComment("Número do lançamento (ID do lançamento de origem)");
 
         // Relacionamentos
         builder.HasOne(x => x.Agencia)

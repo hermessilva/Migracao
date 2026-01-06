@@ -1,4 +1,4 @@
-namespace MigracaoTabelas;
+namespace Seguros.Helpers;
 
 
 public static class StringHelper
