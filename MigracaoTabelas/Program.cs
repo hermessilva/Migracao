@@ -3,6 +3,7 @@ using jsreport.Binary;
 
 using Microsoft.AspNetCore.Mvc;
 
+using MigracaoTabelas.DEVDB;
 using MigracaoTabelas.Source;
 using MigracaoTabelas.Target;
 using MigracaoTabelas.Worker;
@@ -36,7 +37,9 @@ namespace MigracaoTabelas
                 builder.Services.AddTransient<SxDbContext>();
                 builder.Services.AddDbContext<SxDbContext>();
                 builder.Services.AddScoped<TxDbContext>();
-                builder.Services.AddDbContext<TxDbContext>();
+                builder.Services.AddDbContext<TxDbContext>();           
+                builder.Services.AddScoped<DEVDBContext>();
+                builder.Services.AddDbContext<DEVDBContext>();
                 var app = builder.Build();
                 var thds = Environment.ProcessorCount;
 
