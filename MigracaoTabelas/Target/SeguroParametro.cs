@@ -4,7 +4,7 @@ namespace MigracaoTabelas.Target;
 public class SeguroParametro
 {
     public ulong Id { get; set; }
-    public TipoCapitalSeguro TipoCapital { get; set; }
+    public TipoCapitalApolice TipoCapital { get; set; } = TipoCapitalApolice.Fixo;
     public bool Periodicidade30Dias { get; set; }
     public decimal Coeficiente { get; set; }
     public decimal PorcentualIof { get; set; }
@@ -39,9 +39,9 @@ public class SeguroParametro
     {
         return new SeguroParametro
         {
-            TipoCapital = apoliceGrupo.TipoCapital == TipoCapitalApoliceGrupoSeguradora.Fixo
-                ? TipoCapitalSeguro.Fixo
-                : TipoCapitalSeguro.Variavel,
+            TipoCapital = apoliceGrupo.TipoCapital == TipoCapitalApolice.Fixo
+                ? TipoCapitalApolice.Fixo
+                : TipoCapitalApolice.Variavel,
             Periodicidade30Dias = periodicidade30Dias,
             Coeficiente = coeficiente,
             PorcentualIof = porcentualIof,

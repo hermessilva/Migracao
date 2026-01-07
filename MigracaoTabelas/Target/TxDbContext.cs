@@ -43,7 +43,6 @@ namespace MigracaoTabelas.Target
         public DbSet<ComissaoSeguradora> ComissaoSeguradora { get; set; }
         public DbSet<ContaCorrenteSeguradora> ContaCorrenteSeguradora { get; set; }
         public DbSet<PropostaSeguradora> PropostaSeguradora { get; set; }
-        public DbSet<AgenciaSeguradora> AgenciaSeguradora { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

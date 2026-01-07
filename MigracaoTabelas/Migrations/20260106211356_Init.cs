@@ -7,7 +7,7 @@ using MySql.EntityFrameworkCore.Metadata;
 namespace MigracaoTabelas.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -59,7 +59,7 @@ namespace MigracaoTabelas.Migrations
                     modulo = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Nome do módulo ou área do sistema onde a operação foi realizada"),
                     rota = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Rota onde a operação foi realizada"),
                     tabela = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Nome da tabela auditada"),
-                    operacao = table.Column<string>(type: "enum('Atualização','Deleção')", nullable: false, comment: "Tipo da operação realizada: Insert (inserção), Delete (exclusão) ou Update (atualização)"),
+                    operacao = table.Column<string>(type: "enum('Inserção','Atualização','Deleção','Login','Refresh Token')", nullable: false, comment: "Tipo da operação realizada: Insert (inserção), Delete (exclusão) ou Update (atualização)"),
                     dados_anteriores = table.Column<string>(type: "varchar(8000)", maxLength: 8000, nullable: false, comment: "Dados do registro antes da alteração em formato JSON ou serializado"),
                     criado_em = table.Column<DateTime>(type: "datetime", nullable: false, comment: "Data e hora em que a ação foi registrada")
                 },
@@ -90,18 +90,45 @@ namespace MigracaoTabelas.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "evento_outbox",
+                columns: table => new
+                {
+                    id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador do registro na tabela")
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    chave_idempotente = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false, comment: "Chave de idempotência para evitar processamento duplicado."),
+                    tipo = table.Column<string>(type: "enum('Processar débito da parcela','Processar lançamento contábil da parcela')", nullable: false, comment: "Tipo do evento de negócio."),
+                    chave_negocio = table.Column<string>(type: "varchar(200)", maxLength: 200, nullable: false, comment: "Chave de negócio associada como forma de identificação do evento."),
+                    payload = table.Column<string>(type: "varchar(3000)", maxLength: 3000, nullable: false, comment: "Payload do evento (JSON serializado). Armazerna informações do evento."),
+                    status = table.Column<string>(type: "enum('Pendente','Processando','Sucesso','Falha')", nullable: false, comment: "Status do evento na fila Outbox"),
+                    tentativas = table.Column<sbyte>(type: "tinyint", nullable: false, comment: "Número de tentativas de processamento."),
+                    ultima_atualizacao = table.Column<string>(type: "varchar(500)", maxLength: 500, nullable: true, comment: "Mensagem do último erro ocorrido."),
+                    identificador_externo = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, comment: "Identificador externo associado ao evento."),
+                    criado_em = table.Column<DateTime>(type: "datetime", nullable: false, comment: "Data e hora de criação do evento."),
+                    processado_em = table.Column<DateTime>(type: "datetime", nullable: true, comment: "Data e hora de processamento do evento.")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_evento_outbox", x => x.id);
+                },
+                comment: "Tabela de eventos para padrão Outbox que armazena um fila de processamento de forma geral.")
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "parametrizacao",
                 columns: table => new
                 {
                     id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador do registro na tabela")
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    descricao = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição do item")
+                    descricao = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição do item"),
+                    identificador = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Nome do parâmetro que será usando no código"),
+                    valor = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Valor atribuido ao parametro"),
+                    tipo = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Tipo de dados do campo valor")
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_parametrizacao", x => x.id);
                 },
-                comment: "Parametrizações de campos para preechimento")
+                comment: "Catálogo de campos de parametrização do sistema para configurações dinâmicas")
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -148,7 +175,13 @@ namespace MigracaoTabelas.Migrations
                     coeficiente = table.Column<decimal>(type: "decimal(8,7)", nullable: false, comment: "Coeficiente multiplicador utilizado para cálculo do prêmio e estornos"),
                     porcentual_iof = table.Column<decimal>(type: "decimal(5,4)", nullable: false, comment: "Porcentual de IOF cobrado no seguro"),
                     porcentagem_comissao_corretora = table.Column<decimal>(type: "decimal(5,4)", nullable: false, comment: "Percentual de comissão destinado à corretora (ex: 0.1500 = 15%)"),
-                    porcentagem_comissao_cooperativa = table.Column<decimal>(type: "decimal(5,4)", nullable: false, comment: "Percentual de comissão destinado à cooperativa (ex: 0.0500 = 5%)")
+                    porcentagem_comissao_cooperativa = table.Column<decimal>(type: "decimal(5,4)", nullable: false, comment: "Percentual de comissão destinado à cooperativa (ex: 0.0500 = 5%)"),
+                    porcentagem_cobertura_morte = table.Column<decimal>(type: "decimal(5,4)", nullable: false, defaultValue: 0m, comment: "Percentual de cobertura por morte (ex: 1.0000 = 100%)"),
+                    capital_morte = table.Column<decimal>(type: "decimal(18,2)", nullable: false, defaultValue: 0m, comment: "Valor do capital segurado por morte"),
+                    premio_morte = table.Column<decimal>(type: "decimal(18,2)", nullable: false, defaultValue: 0m, comment: "Valor do prêmio referente à cobertura por morte"),
+                    porcentagem_cobertura_invalidez = table.Column<decimal>(type: "decimal(5,4)", nullable: false, defaultValue: 0m, comment: "Percentual de cobertura por invalidez permanente total por acidente - IPTA (ex: 1.0000 = 100%)"),
+                    capital_invalidez = table.Column<decimal>(type: "decimal(18,2)", nullable: false, defaultValue: 0m, comment: "Valor do capital segurado por invalidez permanente total por acidente - IPTA"),
+                    premio_invalidez = table.Column<decimal>(type: "decimal(18,2)", nullable: false, defaultValue: 0m, comment: "Valor do prêmio referente à cobertura por invalidez - IPTA")
                 },
                 constraints: table =>
                 {
@@ -187,7 +220,8 @@ namespace MigracaoTabelas.Migrations
                     conta_contabil_credito = table.Column<string>(type: "varchar(255)", nullable: false, comment: "Código da conta contábil de crédito para o lançamento"),
                     data_movimentacao = table.Column<DateTime>(type: "datetime", nullable: false, comment: "Data e hora da movimentação a ser integrada"),
                     valor = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor monetário do lançamento a ser integrado"),
-                    descricao = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição detalhada do lançamento para identificação")
+                    descricao = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição detalhada do lançamento para identificação"),
+                    numero_lancamento = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, comment: "Número do lançamento (ID do lançamento de origem)")
                 },
                 constraints: table =>
                 {
@@ -283,51 +317,37 @@ namespace MigracaoTabelas.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "parametrizacao_resposta",
-                columns: table => new
-                {
-                    id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador único do registro na tabela")
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    parametrizacao_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira referenciando a tabela parametrizacao"),
-                    resposta = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Valor de resposta ou opção disponível para o campo de parametrização")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_parametrizacao_resposta", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_parametrizacao_resposta_parametrizacao_parametrizacao_id",
-                        column: x => x.parametrizacao_id,
-                        principalTable: "parametrizacao",
-                        principalColumn: "id");
-                },
-                comment: "Opções de resposta disponíveis para cada campo de parametrização")
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
-                name: "agencia_seguradora",
+                name: "apolice_grupo_seguradora",
                 columns: table => new
                 {
                     id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador único do registro na tabela")
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     agencia_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira referenciando a tabela agencia"),
                     seguradora_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira referenciando a tabela seguradora"),
-                    ordem = table.Column<sbyte>(type: "tinyint", nullable: false, comment: "Ordem de prioridade da seguradora dentro da agência (menor = maior prioridade)")
+                    ordem = table.Column<int>(type: "int", nullable: false, comment: "Ordem de prioridade da seguradora dentro da agência (menor = maior prioridade)"),
+                    apolice = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Número ou código da apólice contratada"),
+                    grupo = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Código do grupo dentro da apólice"),
+                    subgrupo = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Código do subgrupo dentro do grupo da apólice"),
+                    tipo_capital = table.Column<string>(type: "enum('Fixo','Variável')", nullable: false, comment: "Tipo de capital segurado: Fixo (valor constante) ou Variável (acompanha saldo devedor)"),
+                    modalidade_unico = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, comment: "Identificador ou código da modalidade de pagamento único"),
+                    modalidade_avista = table.Column<decimal>(type: "decimal(10,2)", nullable: true, comment: "Valor ou taxa para modalidade de pagamento à vista"),
+                    modalidade_parcelado = table.Column<decimal>(type: "decimal(10,2)", nullable: true, comment: "Valor ou taxa para modalidade de pagamento parcelado")
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_agencia_seguradora", x => x.id);
+                    table.PrimaryKey("PK_apolice_grupo_seguradora", x => x.id);
                     table.ForeignKey(
-                        name: "FK_agencia_seguradora_agencia_agencia_id",
+                        name: "FK_apolice_grupo_seguradora_agencia_agencia_id",
                         column: x => x.agencia_id,
                         principalTable: "agencia",
                         principalColumn: "id");
                     table.ForeignKey(
-                        name: "FK_agencia_seguradora_seguradora_seguradora_id",
+                        name: "FK_apolice_grupo_seguradora_seguradora_seguradora_id",
                         column: x => x.seguradora_id,
                         principalTable: "seguradora",
                         principalColumn: "id");
                 },
-                comment: "Tabela de vínculo que relaciona agências com seguradoras autorizadas e define prioridade")
+                comment: "Configurações de apólices e grupos por vínculo agência-seguradora")
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -462,12 +482,11 @@ namespace MigracaoTabelas.Migrations
                     id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador único do registro na tabela")
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     seguradora_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira referenciando a tabela seguradora"),
-                    nome_documento = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Nome ou título do documento a ser gerado"),
-                    versao = table.Column<short>(type: "smallint", nullable: false, comment: "Número da versão do documento para controle de alterações"),
-                    label = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Rótulo amigável do campo para exibição ao usuário"),
-                    campo = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Identificador técnico do campo no documento"),
-                    valor = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Valor padrão ou resposta configurada para o campo"),
-                    ordem = table.Column<int>(type: "int", nullable: false, defaultValue: 0, comment: "Ordem de exibição do campo no documento"),
+                    tipo = table.Column<string>(type: "enum('Termo de Adesão','DPS')", nullable: false, comment: "Tipo do documento/modelo"),
+                    validade = table.Column<DateTime>(type: "date", nullable: false, comment: "Data inicial de validade"),
+                    status = table.Column<string>(type: "enum('Ativo','Inativo')", nullable: false, comment: "Indica se um documento está disponível para uso"),
+                    modelo = table.Column<byte[]>(type: "mediumblob", nullable: false, comment: "Modelo que será usado para gerar o documento"),
+                    extensao = table.Column<string>(type: "varchar(15)", maxLength: 15, nullable: false, comment: "Extensão do documento"),
                     criado_em = table.Column<DateTime>(type: "datetime(6)", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP(6)", comment: "Data e hora de criação do registro")
                 },
                 constraints: table =>
@@ -479,7 +498,7 @@ namespace MigracaoTabelas.Migrations
                         principalTable: "seguradora",
                         principalColumn: "id");
                 },
-                comment: "Gestão de templates e campos de documentos por seguradora para geração automática")
+                comment: "Armazena os documentos de gestão por seguradora")
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -622,33 +641,6 @@ namespace MigracaoTabelas.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "apolice_grupo_seguradora",
-                columns: table => new
-                {
-                    id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador único do registro na tabela")
-                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
-                    agencia_seguradora_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira referenciando a tabela agencia_seguradora"),
-                    apolice = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Número ou código da apólice contratada"),
-                    grupo = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Código do grupo dentro da apólice"),
-                    subgrupo = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Código do subgrupo dentro do grupo da apólice"),
-                    tipo_capital = table.Column<string>(type: "enum('Fixo','Variável')", nullable: false, comment: "Tipo de capital segurado: Fixo (valor constante) ou Variável (acompanha saldo devedor)"),
-                    modalidade_unico = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, comment: "Identificador ou código da modalidade de pagamento único"),
-                    modalidade_avista = table.Column<decimal>(type: "decimal(10,2)", nullable: true, comment: "Valor ou taxa para modalidade de pagamento à vista"),
-                    modalidade_parcelado = table.Column<decimal>(type: "decimal(10,2)", nullable: true, comment: "Valor ou taxa para modalidade de pagamento parcelado")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_apolice_grupo_seguradora", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_apolice_grupo_seguradora_agencia_seguradora_agencia_segurado~",
-                        column: x => x.agencia_seguradora_id,
-                        principalTable: "agencia_seguradora",
-                        principalColumn: "id");
-                },
-                comment: "Configurações de apólices e grupos por vínculo agência-seguradora")
-                .Annotation("MySQL:Charset", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "seguro",
                 columns: table => new
                 {
@@ -659,6 +651,7 @@ namespace MigracaoTabelas.Migrations
                     apolice_grupo_seguradora_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira referenciando a tabela apolice_grupo_seguradora indicando a apolice contratada"),
                     seguro_parametro_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira referenciando a tabela seguro_parametro com os parâmetros de cálculo"),
                     usuario_id = table.Column<ulong>(type: "bigint unsigned", nullable: true, comment: "Chave estrangeira referenciando a tabela usuario responsável pela contratação"),
+                    contrato_sequencia = table.Column<string>(type: "varchar(2)", maxLength: 2, nullable: true, defaultValue: "00", comment: "Numero sequêncial do contrato"),
                     status = table.Column<string>(type: "enum('Pendente','Ativo','Recusado','Expirado','Cancelado')", nullable: false, comment: "Status do seguro"),
                     motivo = table.Column<string>(type: "enum('Em analise na seguradora','Aguardando faturamento','Aguardando documentação','Pagamento à vista','Pagamento parcelado','Inadimplente','Regular','Recusado pela seguradora','Expiração da vigência do seguro','Aditivo','Cancelamento por prejuízo','Renegociação','Sinistro','Solicitado pela cooperativa','Solicitado pelo cooperado','Liquidação antecipada')", nullable: false, comment: "Motivo do seguro"),
                     contrato = table.Column<string>(type: "varchar(10)", maxLength: 10, nullable: false, comment: "Número do contrato de seguro"),
@@ -715,14 +708,16 @@ namespace MigracaoTabelas.Migrations
                     id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador único do registro na tabela")
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     seguro_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira referenciando a tabela seguro"),
-                    status = table.Column<string>(type: "enum('Em Aberto','Pago','Cancelada')", nullable: false, comment: "Status atual da parcela conforme enum status_seguro"),
+                    status = table.Column<string>(type: "enum('Pendente','Em Aberto','Pago','Cancelada')", nullable: false, comment: "Status atual da parcela conforme enum status_seguro"),
                     numero_parcela = table.Column<short>(type: "smallint", nullable: false, comment: "Número sequencial da parcela dentro do seguro (1, 2, 3...)"),
                     valor_parcela = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor nominal atual da parcela a ser cobrado"),
                     valor_original = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor original da parcela calculado na contratação"),
                     valor_pago = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor total efetivamente pago na parcela"),
                     vencimento = table.Column<DateTime>(type: "date", nullable: false, comment: "Data de vencimento da parcela"),
                     liquidacao = table.Column<DateTime>(type: "datetime", nullable: true, comment: "Data e hora de liquidação/quitação da parcela"),
-                    data_ultimo_pagamento = table.Column<DateTime>(type: "datetime", nullable: true, comment: "Data e hora do último pagamento parcial ou total registrado")
+                    data_ultimo_pagamento = table.Column<DateTime>(type: "datetime", nullable: true, comment: "Data e hora do último pagamento parcial ou total registrado"),
+                    comissao_corretora = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor da comissão do corretor sobre a parcela"),
+                    comissao_cooperativa = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor da comissão da cooperativa sobre a parcela")
                 },
                 constraints: table =>
                 {
@@ -743,7 +738,7 @@ namespace MigracaoTabelas.Migrations
                     id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador do registro na tabela")
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     seguro_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela seguro"),
-                    data = table.Column<DateOnly>(type: "date", nullable: false, comment: "Data do cancelamento"),
+                    data = table.Column<DateTime>(type: "date", nullable: false, comment: "Data do cancelamento"),
                     criado_em = table.Column<DateTime>(type: "datetime", nullable: false, comment: "Data/hora de criação do registro"),
                     motivo = table.Column<string>(type: "enum('Aditivo','Cancelamento por prejuízo','Renegociaçao','Sinistro','Solicitado pela cooperativa','Solicitado pelo cooperado','Liquidação Antecipada')", nullable: false, comment: "Motivo do cancelamento"),
                     valor_restituir = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor que foi restituido ao segurado"),
@@ -781,19 +776,19 @@ namespace MigracaoTabelas.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_agencia_seguradora_agencia_id",
-                table: "agencia_seguradora",
-                column: "agencia_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_agencia_seguradora_seguradora_id",
-                table: "agencia_seguradora",
+                name: "IX_apolice_grupo_seguradora_seguradora_id",
+                table: "apolice_grupo_seguradora",
                 column: "seguradora_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_apolice_grupo_seguradora_agencia_seguradora_id",
+                name: "IX_ApoliceGrupoSeguradora_Agencia_Seguradora_TipoCapital",
                 table: "apolice_grupo_seguradora",
-                column: "agencia_seguradora_id");
+                columns: new[] { "agencia_id", "seguradora_id", "tipo_capital" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ApoliceGrupoSeguradora_Ordem",
+                table: "apolice_grupo_seguradora",
+                column: "ordem");
 
             migrationBuilder.CreateIndex(
                 name: "comissao_seguradora_index_5",
@@ -836,6 +831,12 @@ namespace MigracaoTabelas.Migrations
                 column: "agencia_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_evento_outbox_chave_idempotente",
+                table: "evento_outbox",
+                column: "chave_idempotente",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_gestao_documento_seguradora_id",
                 table: "gestao_documento",
                 column: "seguradora_id");
@@ -854,11 +855,6 @@ namespace MigracaoTabelas.Migrations
                 name: "IX_lancamento_efetivar_cooperado_id",
                 table: "lancamento_efetivar",
                 column: "cooperado_id");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_parametrizacao_resposta_parametrizacao_id",
-                table: "parametrizacao_resposta",
-                column: "parametrizacao_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_parcela_seguro_id",
@@ -997,6 +993,9 @@ namespace MigracaoTabelas.Migrations
                 name: "contabilizacao_seguradora");
 
             migrationBuilder.DropTable(
+                name: "evento_outbox");
+
+            migrationBuilder.DropTable(
                 name: "gestao_documento");
 
             migrationBuilder.DropTable(
@@ -1006,7 +1005,7 @@ namespace MigracaoTabelas.Migrations
                 name: "lancamento_efetivar");
 
             migrationBuilder.DropTable(
-                name: "parametrizacao_resposta");
+                name: "parametrizacao");
 
             migrationBuilder.DropTable(
                 name: "parcela");
@@ -1025,9 +1024,6 @@ namespace MigracaoTabelas.Migrations
 
             migrationBuilder.DropTable(
                 name: "tela_acao_perfil");
-
-            migrationBuilder.DropTable(
-                name: "parametrizacao");
 
             migrationBuilder.DropTable(
                 name: "seguro");
@@ -1051,7 +1047,7 @@ namespace MigracaoTabelas.Migrations
                 name: "usuario");
 
             migrationBuilder.DropTable(
-                name: "agencia_seguradora");
+                name: "seguradora");
 
             migrationBuilder.DropTable(
                 name: "cooperado");
@@ -1061,9 +1057,6 @@ namespace MigracaoTabelas.Migrations
 
             migrationBuilder.DropTable(
                 name: "ponto_atendimento");
-
-            migrationBuilder.DropTable(
-                name: "seguradora");
 
             migrationBuilder.DropTable(
                 name: "agencia");

@@ -118,7 +118,7 @@ public class Seguro
                 throw new ArgumentOutOfRangeException(nameof(motivoCancelamento), $"MotivoSeguroCancelamento '{motivoCancelamento}' não pode ser convertido para MotivoSeguro.");
         }
     }
-    
+  
     public void Assign(SxEpSegPrestamista source)
     {
         Motivo = MotivoSeguro.Regular;
@@ -127,7 +127,7 @@ public class Seguro
         FimVigencia = source.SegFim;
         QuantidadeParcelas = (short)(source.SegMeses ?? 0);
         Vencimento = source.SegFim;
-        CapitalSegurado = source.Saldo == 0 ? source.SegBase ?? 0 : source.Saldo;
+        CapitalSegurado = source.SegBase ?? 0.00m;
         PremioTotal = source.SegPremio ?? 0.00m;
         ValorBase = source.SegBase;
         ValorIof = source.SegIof;
@@ -146,13 +146,6 @@ public enum TipoPagamentoSeguro
     Unico = 3
 }
 
-public enum TipoCapitalSeguro
-{
-    [Description("Fixo")]
-    Fixo = 1,
-    [Description("Variável")]
-    Variavel = 2
-}
 
 public enum StatusSeguro
 {

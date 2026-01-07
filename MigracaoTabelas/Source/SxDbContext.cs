@@ -94,7 +94,7 @@ namespace MigracaoTabelas.Source
             modelBuilder.Entity<SxEpSegPrestamista>(entity =>
             {
                 entity.HasNoKey();
-                entity.ToSqlQuery(@"select ec.con_debseguro tipopagamento,ec.con_seq contratosequencia, pm.*, saldocontratoemprestimoaditivo (pm.cco_conta ,pm.seg_contrato ,'00000','2025-12-10' ) saldo
+                entity.ToSqlQuery(@"select ec.con_debseguro tipopagamento,ec.con_seq contratosequencia, pm.*
                                     from ep_segprestamista pm 
                                     join cc_conta c on c.cco_conta = pm.cco_conta
                                     join ep_contrato ec on ec.cco_conta = pm.cco_conta and ec.con_ndoc = pm.seg_contrato 
@@ -168,6 +168,7 @@ namespace MigracaoTabelas.Source
             {
                 var str = Utils.Read("SOURCE_DB", "");
                 str = str.Replace("unico", Schema);
+                Console.WriteLine(str);
                 pBuilder.UseMySQL(str);
             }
 #if DEBUG

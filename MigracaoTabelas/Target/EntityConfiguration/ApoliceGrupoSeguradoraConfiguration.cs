@@ -21,9 +21,21 @@ public class ApoliceGrupoSeguradoraConfiguration : BaseEntityConfiguration<Apoli
             .HasComment("Identificador único do registro na tabela")
             .IsRequired();
 
-        builder.Property(x => x.AgenciaSeguradoraId)
-            .HasColumnName("agencia_seguradora_id")
-            .HasComment("Chave estrangeira referenciando a tabela agencia_seguradora")
+        // Campos migrados de AgenciaSeguradora
+        builder.Property(x => x.AgenciaId)
+            .HasColumnName("agencia_id")
+            .HasComment("Chave estrangeira referenciando a tabela agencia")
+            .IsRequired();
+
+        builder.Property(x => x.SeguradoraId)
+            .HasColumnName("seguradora_id")
+            .HasComment("Chave estrangeira referenciando a tabela seguradora")
+            .IsRequired();
+
+        builder.Property(x => x.Ordem)
+            .HasColumnName("ordem")
+            .HasColumnType(Int())
+            .HasComment("Ordem de prioridade da seguradora dentro da agência (menor = maior prioridade)")
             .IsRequired();
 
         builder.Property(x => x.Apolice)
@@ -45,7 +57,7 @@ public class ApoliceGrupoSeguradoraConfiguration : BaseEntityConfiguration<Apoli
             .HasColumnName("tipo_capital"), "Fixo", "Variável")
             .HasConversion(
                 v => v.AsString(),
-                v => EnumHelper.FromString<TipoCapitalApoliceGrupoSeguradora>(v)
+                v => EnumHelper.FromString<TipoCapitalApolice>(v)
             )
             .HasComment("Tipo de capital segurado: Fixo (valor constante) ou Variável (acompanha saldo devedor)")
             .IsRequired();
@@ -66,9 +78,21 @@ public class ApoliceGrupoSeguradoraConfiguration : BaseEntityConfiguration<Apoli
             .HasComment("Valor ou taxa para modalidade de pagamento parcelado");
 
         // Relacionamentos
-        builder.HasOne(x => x.AgenciasSeguradoras)
+        builder.HasOne(x => x.Agencia)
             .WithMany(x => x.ApolicesGruposSeguradoras)
-            .HasForeignKey(x => x.AgenciaSeguradoraId)
+            .HasForeignKey(x => x.AgenciaId)
             .OnDelete(DeleteBehavior.NoAction);
+
+        builder.HasOne(x => x.Seguradora)
+            .WithMany(x => x.ApolicesGruposSeguradoras)
+            .HasForeignKey(x => x.SeguradoraId)
+            .OnDelete(DeleteBehavior.NoAction);
+
+        // Índices
+        builder.HasIndex(x => new { x.AgenciaId, x.SeguradoraId, x.TipoCapital })
+            .HasDatabaseName("IX_ApoliceGrupoSeguradora_Agencia_Seguradora_TipoCapital");
+
+        builder.HasIndex(x => x.Ordem)
+            .HasDatabaseName("IX_ApoliceGrupoSeguradora_Ordem");
     }
 }

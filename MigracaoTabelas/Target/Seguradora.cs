@@ -33,7 +33,7 @@ public class Seguradora
     public virtual ICollection<PropostaSeguradora> PropostasSeguradoras { get; set; } = new List<PropostaSeguradora>();
     public virtual ICollection<ComissaoSeguradora> ComissoesSeguradoras { get; set; } = new List<ComissaoSeguradora>();
     public virtual ICollection<SeguradoraLimite> SeguradorasLimites { get; set; } = new List<SeguradoraLimite>();
-    public virtual ICollection<AgenciaSeguradora> AgenciasSeguradoras { get; set; } = new List<AgenciaSeguradora>();
+    public virtual ICollection<ApoliceGrupoSeguradora> ApolicesGruposSeguradoras { get; set; } = new List<ApoliceGrupoSeguradora>();
 
     private void InitializeDefaults()
     {

@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 using MigracaoTabelas.Source;
 
-
 namespace MigracaoTabelas.Target;
 
 public class Parcela
@@ -58,7 +57,7 @@ public class Parcela
         }
 
     }
-                                  
+
 }
 
 public enum StatusParcela

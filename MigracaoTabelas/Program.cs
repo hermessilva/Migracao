@@ -18,7 +18,7 @@ namespace MigracaoTabelas
     {
         static void Main(string[] args)
         {
-            TesteReport();
+            //TesteReport();
             Log.Logger = new LoggerConfiguration()
                .ReadFrom.Configuration(new ConfigurationBuilder()
                .AddJsonFile("appsettings.json")

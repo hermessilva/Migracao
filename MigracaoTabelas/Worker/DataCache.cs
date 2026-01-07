@@ -11,7 +11,7 @@ namespace MigracaoTabelas.Worker
         private Dictionary<(string, string), PontoAtendimento> PontosAtendimento = new Dictionary<(string, string), PontoAtendimento>();
         private Dictionary<string, Cooperado> Cooperados = new Dictionary<string, Cooperado>();
         private Dictionary<string, Seguradora> Seguradoras = new Dictionary<string, Seguradora>();
-        private Dictionary<(ulong, ulong), AgenciaSeguradora> AgenciasSeguradoras = new Dictionary<(ulong, ulong), AgenciaSeguradora>();
+        private Dictionary<(ulong, ulong), ApoliceGrupoSeguradora> ApolicesGruposSeguradoras = new Dictionary<(ulong, ulong), ApoliceGrupoSeguradora>();
 
         private Object _ToLock = new Object();
 
@@ -51,9 +51,9 @@ namespace MigracaoTabelas.Worker
             {
                 Cooperados.Add(c.NumeroDocumento, c);
             });
-            _TContext.AgenciaSeguradora.AsNoTracking().ToList().ForEach(a =>
+            _TContext.ApoliceGrupoSeguradora.AsNoTracking().ToList().ForEach(a =>
             {
-                AgenciasSeguradoras.Add((a.AgenciaId, a.SeguradoraId), a);
+                ApolicesGruposSeguradoras.Add((a.AgenciaId, a.SeguradoraId), a);
             });
         }
 
@@ -213,7 +213,7 @@ namespace MigracaoTabelas.Worker
                 var cnpj = (pCodigo.PadRight(14, '0')).Substring(0, 14);
                 if (Seguradoras.ContainsKey(cnpj))
                     return Seguradoras[cnpj];
-                var seguradoraSrc = pSContext.Seguradoras.Where(s => s.Codigo == cnpj).FirstOrDefault();
+                var seguradoraSrc = pSContext.Seguradoras.Where(s => s.Codigo == pCodigo).FirstOrDefault();
                 if (seguradoraSrc == null)
                     throw new Exception($"Seguradora [{cnpj}] não encontrada.");
                 var seguradora = CriarSeguradora(seguradoraSrc);
@@ -497,30 +497,25 @@ namespace MigracaoTabelas.Worker
             ArgumentOutOfRangeException.ThrowIfZero(pAgenciaId, nameof(pAgenciaId));
             lock (_ToLock)
             {
-                if (AgenciasSeguradoras.ContainsKey((pAgenciaId, pSeguradoraId)))
-                    return AgenciasSeguradoras[(pAgenciaId, pSeguradoraId)].Id;
-
-                var ag = new AgenciaSeguradora
-                {
-                    AgenciaId = pAgenciaId,
-                    SeguradoraId = pSeguradoraId,
-                };
+                if (ApolicesGruposSeguradoras.ContainsKey((pAgenciaId, pSeguradoraId)))
+                    return ApolicesGruposSeguradoras[(pAgenciaId, pSeguradoraId)].Id;
 
                 var ags = new ApoliceGrupoSeguradora
                 {
                     Apolice = "APO-001",
                     Grupo = "GRP-001",
                     SubGrupo = "SUB-001",
-                    TipoCapital = TipoCapitalApoliceGrupoSeguradora.Fixo,
+                    TipoCapital = TipoCapitalApolice.Fixo,
                     ModalidadeUnico = "Unico",
                     ModalidadeAVista = 1.5m,
                     ModalidadeParcelado = 10m,
+                    AgenciaId = pAgenciaId,
+                    SeguradoraId = pSeguradoraId,
                 };
-                ag.ApolicesGruposSeguradoras.Add(ags);
-                _TContext.AgenciaSeguradora.Add(ag);
+                _TContext.ApoliceGrupoSeguradora.Add(ags);
                 _TContext.SaveChanges();
 
-                AgenciasSeguradoras.Add((pAgenciaId, pSeguradoraId), ag);
+                ApolicesGruposSeguradoras.Add((pAgenciaId, pSeguradoraId), ags);
                 return ags.Id;
             }
         }

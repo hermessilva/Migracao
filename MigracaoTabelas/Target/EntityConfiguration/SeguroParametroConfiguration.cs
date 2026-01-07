@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using MigracaoTabelas.Target;
+
 using Seguros.Helpers;
 
 
@@ -24,7 +26,7 @@ public sealed class SeguroParametroConfiguration : BaseEntityConfiguration<Segur
             .HasColumnName("tipo_capital"), "Fixo", "Variável")
             .HasConversion(
                 pV => pV.AsString(),
-                pV => EnumHelper.FromString<TipoCapitalSeguro>(pV))
+                pV => EnumHelper.FromString<TipoCapitalApolice>(pV))
             .HasComment("Tipo de capital segurado: Fixo (valor constante) ou Variável (acompanha saldo devedor)")
             .IsRequired();
 

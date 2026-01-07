@@ -108,12 +108,6 @@ namespace MigracaoTabelas.Source
         public decimal? SegVrContrato { get; set; } = 0.00m; // decimal NOT NULL (por ter DEFAULT) -> decimal
 
         /// <summary>
-        /// Saldo Atualizado do Contrato
-        /// </summary>
-        [Column("Saldo", TypeName = "decimal(12,2)")]
-        public decimal Saldo { get; set; }
-
-        /// <summary>
         /// Valor Base Segurado
         /// </summary>
         [Column("SEG_BASE", TypeName = "decimal(12,2)")]

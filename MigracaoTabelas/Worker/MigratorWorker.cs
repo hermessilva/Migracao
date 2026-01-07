@@ -43,10 +43,10 @@ namespace MigracaoTabelas.Worker
             SxDbContext.Schema = "unico";
             using var srcctx = _Scope.ServiceProvider.GetRequiredService<SxDbContext>();
             databsess = srcctx.Database.SqlQueryRaw<DataBaseSess>("SELECT CONCAT('agencia_', CAST(AG_CODIGO AS CHAR(8))) TABLE_SCHEMA,AG_CODIGO Codigo FROM unico.cd_agencia WHERE AG_ATIVA = 1").ToList();
-            IDbContextTransaction tx = null;
+            //IDbContextTransaction tx = null;
             try
             {
-                tx = _TContext.Database.BeginTransaction();
+                //tx = _TContext.Database.BeginTransaction();
                 Agencia ag = null;
                 databsess.ForEach(d => Log.Information("Aência encontra para migração [" + d.TABLE_SCHEMA + "]"));
                 foreach (var sagencia in databsess)
@@ -56,30 +56,32 @@ namespace MigracaoTabelas.Worker
                     Log.Information($"[{sagencia.TABLE_SCHEMA}]");
                     using (var sctx = _Scope.ServiceProvider.GetRequiredService<SxDbContext>())
                     {
-                        if (sagencia.Codigo == "0012")
-                        {
-                            Log.Warning($"Agencia não contem fuction saldocontratoemprestimoaditivo");
-                            continue;
-                        }
-                        if (sagencia.Codigo == "0023")
-                        {
-                            Log.Warning($"Agencia Com banco sob lock");
-                            continue;
-                        }
+                        //if (sagencia.Codigo == "0012")
+                        //{
+                        //    Log.Warning($"Agencia não contem fuction saldocontratoemprestimoaditivo");
+                        //    continue;
+                        //}
+                        //if (sagencia.Codigo == "0023")
+                        //{
+                        //    Log.Warning($"Agencia Com banco sob lock");
+                        //    continue;
+                        //}
                         ag = _DataCache.GetAgencia(sctx, sagencia.Codigo);
+                        _DataCache.GetPontoAtendimento(sctx, sagencia.Codigo, "000");
+
                         Log.Information($"Iniciando migração da Agencia [{ag.Nome}] Códiog [{ag.Codigo}] id[{ag.Id}]");
                         Console.WriteLine();
                         _SContext = sctx;
-                        //var pv = _DataCache.GetPontoAtendimento(_SContext, _SAgencia.Codigo, "0000");
                         MigraDados(sctx);
+                        sctx.Dispose();
                     }
                 }
-                tx.Commit();
+                //tx.Commit();
                 Log.Information($"Migração da Agencia [{ag.Nome}] Código [{ag.Codigo}] id[{ag.Id}] concluída com sucesso!");
             }
             catch (Exception ex)
             {
-                tx.Rollback();
+                //tx.Rollback();
                 Log.Fatal(ex, "Erro durante a migração [REVISE CUIDADOSAMENTO E LOG]: " + ex.Message);
             }
         }
@@ -131,7 +133,7 @@ namespace MigracaoTabelas.Worker
                 {
                     processados++;
                     parcnt += Migrate(parcelas, seguros, prestamista);
-                    if (seguros.Count > 0)
+                    if (seguros.Count > 100)
                     {
                         _TContext.AddRange(seguros);
                         _TContext.SaveChanges();
@@ -194,7 +196,7 @@ namespace MigracaoTabelas.Worker
             tgt.ApoliceGrupoSeguradoraId = GetAgenciaSeguradoraId(pPrestamista, agenciaId);
             tgt.CooperadoAgenciaContaId = cooagct.Id;
 
-            tgt.UsuarioId = 18;
+            //tgt.UsuarioId = 18;
 
             // Obtém a seguradora para buscar as comissões
             var seguradora = _DataCache.GetSeguradora(_SContext, pPrestamista.PstCodigo);
@@ -202,11 +204,16 @@ namespace MigracaoTabelas.Worker
 
             var spar = new SeguroParametro();
             if (seguradora.Nome!.Contains("VARIAVEL"))
-                spar.TipoCapital = TipoCapitalSeguro.Variavel;
+            {
+                spar.TipoCapital = TipoCapitalApolice.Variavel;
+                spar.Coeficiente = 0.0003511M;
+            }
             else
-                spar.TipoCapital = TipoCapitalSeguro.Fixo;
+            {
+                spar.TipoCapital = TipoCapitalApolice.Fixo;
+                spar.Coeficiente = 0.0005945M;
+            }
             spar.Periodicidade30Dias = true;
-            spar.Coeficiente = 0.0005945M;
             spar.PorcentualIof = 0.0038M;
             spar.PorcentagemComissaoCorretora = comissao?.PorcentagemComissaoCorretora ?? 0.45M;
             spar.PorcentagemComissaoCooperativa = comissao?.PorcentagemComissaoCooperativa ?? 0.20M;
