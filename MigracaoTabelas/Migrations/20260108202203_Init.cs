@@ -485,7 +485,7 @@ namespace MigracaoTabelas.Migrations
                     tipo = table.Column<string>(type: "enum('Termo de Adesão','DPS')", nullable: false, comment: "Tipo do documento/modelo"),
                     validade = table.Column<DateTime>(type: "date", nullable: false, comment: "Data inicial de validade"),
                     status = table.Column<string>(type: "enum('Ativo','Inativo')", nullable: false, comment: "Indica se um documento está disponível para uso"),
-                    modelo = table.Column<byte[]>(type: "mediumblob", nullable: false, comment: "Modelo que será usado para gerar o documento"),
+                    modelo = table.Column<string>(type: "mediumtext", nullable: false, comment: "Modelo que será usado para gerar o documento"),
                     extensao = table.Column<string>(type: "varchar(15)", maxLength: 15, nullable: false, comment: "Extensão do documento"),
                     criado_em = table.Column<DateTime>(type: "datetime(6)", nullable: true, defaultValueSql: "CURRENT_TIMESTAMP(6)", comment: "Data e hora de criação do registro")
                 },

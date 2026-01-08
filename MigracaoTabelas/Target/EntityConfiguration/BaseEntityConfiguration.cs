@@ -180,6 +180,21 @@ public abstract class BaseEntityConfiguration<TEntity> : BaseEntityConfiguration
         };
     }
 
+    /// <summary>
+    /// Retorna o tipo de coluna para MEDIUMTEXT (texto até 16MB).
+    /// MySQL: mediumtext | SQLite: TEXT
+    /// </summary>
+    /// <returns>String do tipo de coluna apropriado para o provider</returns>
+    protected string MediumText()
+    {
+        return CurrentProvider switch
+        {
+            DatabaseProvider.MySql => "mediumtext",
+            DatabaseProvider.Sqlite => "TEXT",
+            _ => "mediumtext"
+        };
+    }
+
     #endregion
 
     #region Tipos ENUM

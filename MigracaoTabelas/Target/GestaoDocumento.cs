@@ -9,7 +9,7 @@ public sealed class GestaoDocumento
     public TipoGestaoDocumento Tipo { get; set; }
     public DateTime Validade { get; set; }
     public StatusGestaoDocumento Status { get; set; }
-    public byte[] Modelo { get; set; }
+    public string Modelo { get; set; }
     public string Extensao { get; set; }
     public DateTime? CriadoEm { get; set; }
 

@@ -1,13 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-
-using MigracaoTabelas.Target;
-
 using Seguros.Helpers;
 
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
-
 public sealed class GestaoDocumentoConfiguration : BaseEntityConfiguration<GestaoDocumento>
 {
     public override void Configure(EntityTypeBuilder<GestaoDocumento> builder)
@@ -50,7 +46,7 @@ public sealed class GestaoDocumentoConfiguration : BaseEntityConfiguration<Gesta
 
         builder.Property(x => x.Modelo)
             .HasColumnName("modelo")
-            .HasColumnType(MediumBlob())
+            .HasColumnType(MediumText())
             .HasComment("Modelo que será usado para gerar o documento")
             .IsRequired();
 

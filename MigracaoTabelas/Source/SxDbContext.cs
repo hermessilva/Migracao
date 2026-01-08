@@ -168,7 +168,6 @@ namespace MigracaoTabelas.Source
             {
                 var str = Utils.Read("SOURCE_DB", "");
                 str = str.Replace("unico", Schema);
-                Console.WriteLine(str);
                 pBuilder.UseMySQL(str);
             }
 #if DEBUG

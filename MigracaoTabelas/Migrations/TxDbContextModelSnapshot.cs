@@ -830,9 +830,9 @@ namespace MigracaoTabelas.Migrations
                         .HasColumnName("extensao")
                         .HasComment("Extensão do documento");
 
-                    b.Property<byte[]>("Modelo")
+                    b.Property<string>("Modelo")
                         .IsRequired()
-                        .HasColumnType("mediumblob")
+                        .HasColumnType("mediumtext")
                         .HasColumnName("modelo")
                         .HasComment("Modelo que será usado para gerar o documento");
 
