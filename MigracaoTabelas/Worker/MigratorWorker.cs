@@ -3,6 +3,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
+using MigracaoTabelas.Enums;
 using MigracaoTabelas.Source;
 using MigracaoTabelas.Target;
 
@@ -203,16 +204,13 @@ namespace MigracaoTabelas.Worker
             var comissao = seguradora.ComissoesSeguradoras.FirstOrDefault();
 
             var spar = new SeguroParametro();
-            if (seguradora.Nome!.Contains("VARIAVEL"))
-            {
-                spar.TipoCapital = TipoCapitalApolice.Variavel;
+            spar.TipoCapital = pPrestamista.TipoSaldo == 1 ? TipoCapitalApolice.Fixo : TipoCapitalApolice.Variavel;
+
+            if (spar.TipoCapital == TipoCapitalApolice.Variavel)
                 spar.Coeficiente = 0.0003511M;
-            }
             else
-            {
-                spar.TipoCapital = TipoCapitalApolice.Fixo;
                 spar.Coeficiente = 0.0005945M;
-            }
+
             spar.Periodicidade30Dias = true;
             spar.PorcentualIof = 0.0038M;
             spar.PorcentagemComissaoCorretora = comissao?.PorcentagemComissaoCorretora ?? 0.45M;

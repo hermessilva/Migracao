@@ -32,7 +32,7 @@ namespace MigracaoTabelas
                 builder.Services.AddTransient<SxDbContext>();
                 builder.Services.AddDbContext<SxDbContext>();
                 builder.Services.AddScoped<TxDbContext>();
-                builder.Services.AddDbContext<TxDbContext>();           
+                builder.Services.AddDbContext<TxDbContext>();                                                                                          
                 var app = builder.Build();
                 var thds = Environment.ProcessorCount;
 

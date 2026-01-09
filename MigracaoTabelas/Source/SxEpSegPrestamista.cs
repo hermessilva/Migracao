@@ -166,7 +166,11 @@ namespace MigracaoTabelas.Source
         [StringLength(1)]
         public string SqlDeleted { get; set; } = "F"; // enum NOT NULL -> string
 
-        public int TipoPagamento { get; set; }
+        [Column("Tipo_Seguro")]
+        public int TipoPagamentoSeguro { get; set; }
+
+        [Column("tipo_saldo")]
+        public int TipoSaldo { get; set; }
         public UInt16 ContratoSequencia { get; set; }
 
     }

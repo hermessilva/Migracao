@@ -26,7 +26,7 @@ public class Seguro
         {
             var statusAnterior = Status;
             _motivo = value;
-            
+
             switch (_motivo)
             {
                 case MotivoSeguro.EmAnaliseNaSeguradora:
@@ -118,7 +118,7 @@ public class Seguro
                 throw new ArgumentOutOfRangeException(nameof(motivoCancelamento), $"MotivoSeguroCancelamento '{motivoCancelamento}' não pode ser convertido para MotivoSeguro.");
         }
     }
-  
+
     public void Assign(SxEpSegPrestamista source)
     {
         Motivo = MotivoSeguro.Regular;
@@ -132,7 +132,7 @@ public class Seguro
         ValorBase = source.SegBase;
         ValorIof = source.SegIof;
         ContratoSequencia = source.ContratoSequencia.ToString("00");
-        TipoPagamento = source.TipoPagamento == 1 ? TipoPagamentoSeguro.Parcelado : TipoPagamentoSeguro.AVista;
+        TipoPagamento = source.TipoPagamentoSeguro == 1 ? TipoPagamentoSeguro.AVista : TipoPagamentoSeguro.Parcelado;
     }
 }
 

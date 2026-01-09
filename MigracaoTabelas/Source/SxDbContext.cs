@@ -94,14 +94,54 @@ namespace MigracaoTabelas.Source
             modelBuilder.Entity<SxEpSegPrestamista>(entity =>
             {
                 entity.HasNoKey();
-                entity.ToSqlQuery(@"select ec.con_debseguro tipopagamento,ec.con_seq contratosequencia, pm.*
-                                    from ep_segprestamista pm 
-                                    join cc_conta c on c.cco_conta = pm.cco_conta
-                                    join ep_contrato ec on ec.cco_conta = pm.cco_conta and ec.con_ndoc = pm.seg_contrato 
-									join ep_parcela as p on p.con_ndoc = ec.con_ndoc and p.cco_conta = c.cco_conta   
-                                    where pm.seg_modalidade = 4 and c.cco_situacao = 1 and pm.seg_canctipo = 0 and pm.seg_fim  >= '2025-12-10' and
-                                    ec.con_pgto is null and p.emp_creli is null and p.emp_pgto is null and
-                                    (select count(*) from ep_segparcela es where es.seg_contrato = pm.seg_contrato and es.cco_conta = pm.cco_conta ) > 1");
+                entity.ToSqlQuery(@"
+WITH ResumoFinanceiro AS (
+    -- Busca na tabela específica de seguros (ep_segparcela)
+    SELECT 
+        cco_conta, seg_contrato AS contrato, con_seq,
+        SUM(seg_valor) AS total_seg,
+        COUNT(seg_parcela) AS qtd_seg,
+        'MODULO_SEGURO' AS fonte
+    FROM ep_segparcela
+    GROUP BY 1, 2, 3    
+    UNION ALL    
+    -- Busca na tabela geral de parcelas (ep_parcela)
+    -- Apenas se não houver dados na ep_segparcela para evitar duplicidade
+    SELECT 
+        cco_conta, con_ndoc AS contrato, con_seq,
+        SUM(emp_vlrseg) AS total_seg,
+        COUNT(CASE WHEN emp_vlrseg > 0 THEN emp_parcela END) AS qtd_seg,
+        'TABELA_PARCELAS' AS fonte
+    FROM ep_parcela
+    WHERE emp_vlrseg > 0
+    GROUP BY 1, 2, 3
+)
+SELECT 
+    CASE 
+        WHEN C.CON_DEBSEGURO = 2 OR C.CON_PARCELAS = 1 THEN 1 -- 'SEGURO À VISTA'
+        WHEN (SELECT COUNT(*) FROM ResumoFinanceiro RF WHERE RF.contrato = S.SEG_CONTRATO AND RF.total_seg > 0) > 1 THEN 2 -- 'SEGURO PARCELADO'
+        ELSE 3 -- 'SEGURO À VISTA (LANÇAMENTO ÚNICO)'
+    END AS tipo_seguro,
+    CASE 
+        WHEN C.MOD_CALCULO IN (2, 3) THEN 1 -- 'SALDO VARIÁVEL (PRICE/SAC)'
+        ELSE 2 -- 'SALDO FIXO'
+    END AS tipo_saldo,
+    C.CON_PARCELAS AS parc_emprestimo,    
+    COALESCE(MAX(CASE WHEN fonte = 'MODULO_SEGURO' THEN total_seg END), 
+             MAX(CASE WHEN fonte = 'TABELA_PARCELAS' THEN total_seg END), 0) AS Soma_Das_Parcelas,    
+    COALESCE(MAX(CASE WHEN fonte = 'MODULO_SEGURO' THEN qtd_seg END), 
+             MAX(CASE WHEN fonte = 'TABELA_PARCELAS' THEN qtd_seg END), 0) AS Qtd_Parcelas_Seguro,
+    C.con_seq contratosequencia,
+    S.*
+FROM ep_segprestamista S
+INNER JOIN ep_contrato C ON S.SEG_CONTRATO = C.CON_NDOC AND S.CON_SEQ = C.CON_SEQ
+join cc_conta cc on cc.cco_conta = S.cco_conta
+LEFT JOIN ResumoFinanceiro RF ON S.SEG_CONTRATO = RF.contrato AND S.CON_SEQ = RF.con_seq
+WHERE 
+	S.seg_modalidade = 4 and cc.cco_situacao = 1 and S.seg_canctipo = 0 and S.seg_fim  >= '2025-12-10' and C.con_pgto is null and  
+	S.sql_deleted = 'F' AND S.SEG_FIM > '2026-01-01'
+GROUP BY S.SEG_CONTRATO, S.CON_SEQ, S.SEG_PREMIO, C.CON_DEBSEGURO, C.CON_PARCELAS, C.MOD_CALCULO, S.SEG_FIM;
+");
             });
 
             modelBuilder.Entity<SxEpSegParcela>(entity =>
