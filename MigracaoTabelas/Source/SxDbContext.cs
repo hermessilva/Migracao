@@ -83,10 +83,6 @@ namespace MigracaoTabelas.Source
                     CONTA_CONTABIL_DEBITO AS ContaContabilDebito,
                     CONTA_CONTABIL_CREDITO_COMISSAO AS ContaContabilCreditoComissao,
                     CONTA_CONTABIL_DEBITO_COMISSAO AS ContaContabilDebitoComissao,
-                    CONTA_CONTABIL_CREDITO_4966 AS ContaContabilCredito4966,
-                    CONTA_CONTABIL_DEBITO_4966 AS ContaContabilDebito4966,
-                    CONTA_CONTABIL_CREDITO_COMISSAO_4966 AS ContaContabilCreditoComissao4966,
-                    CONTA_CONTABIL_DEBITO_COMISSAO_4966 AS ContaContabilDebitoComissao4966,
                     PORCENTAGEM_COMISSAO AS PorcentagemComissao
                 FROM unico.cd_prestamista");
             });
@@ -96,7 +92,6 @@ namespace MigracaoTabelas.Source
                 entity.HasNoKey();
                 entity.ToSqlQuery(@"
 WITH ResumoFinanceiro AS (
-    -- Busca na tabela específica de seguros (ep_segparcela)
     SELECT 
         cco_conta, seg_contrato AS contrato, con_seq,
         SUM(seg_valor) AS total_seg,
@@ -105,8 +100,6 @@ WITH ResumoFinanceiro AS (
     FROM ep_segparcela
     GROUP BY 1, 2, 3    
     UNION ALL    
-    -- Busca na tabela geral de parcelas (ep_parcela)
-    -- Apenas se não houver dados na ep_segparcela para evitar duplicidade
     SELECT 
         cco_conta, con_ndoc AS contrato, con_seq,
         SUM(emp_vlrseg) AS total_seg,

@@ -272,16 +272,16 @@ namespace MigracaoTabelas.Worker
                 DescricaoDebitoComissaoContratacao = "Conta Contábil de Débito de SEGP COMISSÃO contratado",
 
                 // Contas de Cancelamento Parcial/Total (4966)
-                CreditoCancelamentoComissaoParcTot = src.ContaContabilCredito4966 ?? string.Empty,
-                DescricaoCreditoCancelamentoComissaoParcTot = "Conta Contábil de Crédito de SEGP contratado 4966",
-                DebitoCancelamentoComissaoParcTot = src.ContaContabilDebito4966 ?? string.Empty,
-                DescricaoDebitoCancelamentoComissaoParcTot = "Conta Contábil de Débito de SEGP contratado 4966",
+                CreditoCancelamentoComissaoParcTot = "NI",
+                DescricaoCreditoCancelamentoComissaoParcTot = "Conta Contábil de Crédito de SEGP contratado ",
+                DebitoCancelamentoComissaoParcTot = "NI",
+                DescricaoDebitoCancelamentoComissaoParcTot = "Conta Contábil de Débito de SEGP contratado ",
 
                 // Contas de Cancelamento À Vista (Comissão 4966)
-                CreditoCancelamentoComissaoAVista = src.ContaContabilCreditoComissao4966 ?? string.Empty,
-                DescricaoCreditoCancelamentoComissaoAVista = "Conta Contábil de Crédito de SEGP COMISSÃO contratado 4966",
-                DebitoCancelamentoComissaoAVista = src.ContaContabilDebitoComissao4966 ?? string.Empty,
-                DescricaoDebitoCancelamentoComissaoAVista = "Conta Contábil de Débito de SEGP COMISSÃO contratado 4966",
+                CreditoCancelamentoComissaoAVista = "NI",
+                DescricaoCreditoCancelamentoComissaoAVista = "Conta Contábil de Crédito de SEGP COMISSÃO contratado ",
+                DebitoCancelamentoComissaoAVista = "NI",
+                DescricaoDebitoCancelamentoComissaoAVista = "Conta Contábil de Débito de SEGP COMISSÃO contratado ",
 
                 // Contas de Valor Pago
                 CreditoValorPago = src.ContaContabilCredito ?? string.Empty,

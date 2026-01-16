@@ -44,10 +44,10 @@ namespace MigracaoTabelas.Worker
             SxDbContext.Schema = "unico";
             using var srcctx = _Scope.ServiceProvider.GetRequiredService<SxDbContext>();
             databsess = srcctx.Database.SqlQueryRaw<DataBaseSess>("SELECT CONCAT('agencia_', CAST(AG_CODIGO AS CHAR(8))) TABLE_SCHEMA,AG_CODIGO Codigo FROM unico.cd_agencia WHERE AG_ATIVA = 1").ToList();
-            //IDbContextTransaction tx = null;
+            IDbContextTransaction tx = null;
             try
             {
-                //tx = _TContext.Database.BeginTransaction();
+                tx = _TContext.Database.BeginTransaction();
                 Agencia ag = null;
                 databsess.ForEach(d => Log.Information("Aência encontra para migração [" + d.TABLE_SCHEMA + "]"));
                 foreach (var sagencia in databsess)
@@ -77,12 +77,12 @@ namespace MigracaoTabelas.Worker
                         sctx.Dispose();
                     }
                 }
-                //tx.Commit();
+                tx.Commit();
                 Log.Information($"Migração da Agencia [{ag.Nome}] Código [{ag.Codigo}] id[{ag.Id}] concluída com sucesso!");
             }
             catch (Exception ex)
             {
-                //tx.Rollback();
+                tx.Rollback();
                 Log.Fatal(ex, "Erro durante a migração [REVISE CUIDADOSAMENTO E LOG]: " + ex.Message);
             }
         }

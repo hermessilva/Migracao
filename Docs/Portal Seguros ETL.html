@@ -1,0 +1,4544 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Portal Seguros ETL.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="documento-de-reconstru%C3%A7%C3%A3o-etl---migra%C3%A7%C3%A3o-de-seguros-prestamista">Documento de Reconstrução ETL - Migração de Seguros Prestamista</h1>
+<h1 id="parte-1-vis%C3%A3o-geral-arquitetura-e-cat%C3%A1logo-de-fontes">Parte 1: Visão Geral, Arquitetura e Catálogo de Fontes</h1>
+<hr>
+<h2 id="1-resumo-executivo">1. Resumo Executivo</h2>
+<p>Este documento descreve as regras, definições e lógica de um processo de ETL (Extract-Transform-Load) para migração de dados de <strong>Seguros Prestamista</strong> de um sistema legado para um novo sistema de gestão de seguros.</p>
+<h3 id="objetivo-de-neg%C3%B3cio">Objetivo de Negócio</h3>
+<p>O ETL realiza a migração de:</p>
+<ul>
+<li><strong>Contratos de seguro prestamista</strong> vinculados a operações de empréstimo</li>
+<li><strong>Parcelas financeiras</strong> dos seguros</li>
+<li><strong>Cadastros de cooperados</strong> (clientes) e suas contas correntes</li>
+<li><strong>Cadastros de agências</strong> e pontos de atendimento</li>
+<li><strong>Cadastros de seguradoras</strong> com suas configurações de comissões, limites por faixa etária e contas contábeis</li>
+</ul>
+<h3 id="contexto-do-dom%C3%ADnio">Contexto do Domínio</h3>
+<p>O seguro prestamista é um produto financeiro vinculado a operações de crédito (empréstimos), onde o cooperado (tomador do empréstimo) contrata um seguro que cobre o saldo devedor em caso de sinistro (morte, invalidez, etc.). As cooperativas de crédito atuam como intermediárias entre cooperados e seguradoras.</p>
+<hr>
+<h2 id="2-escopo-e-limites">2. Escopo e Limites</h2>
+<h3 id="o-que-est%C3%A1-inclu%C3%ADdo">O que está incluído</h3>
+<ol>
+<li><strong>Contratos de seguro prestamista</strong> da modalidade &quot;Empréstimo&quot; (modalidade = 4)</li>
+<li><strong>Contratos ativos</strong> (não cancelados, com vigência futura)</li>
+<li><strong>Contratos de contas correntes ativas</strong> (situação = 1)</li>
+<li><strong>Parcelas de seguro</strong> vinculadas aos contratos elegíveis</li>
+<li><strong>Dados cadastrais</strong> de:
+<ul>
+<li>Agências ativas</li>
+<li>Pontos de atendimento</li>
+<li>Cooperados (clientes)</li>
+<li>Seguradoras</li>
+<li>Limites e coeficientes por faixa etária</li>
+<li>Configurações de comissões</li>
+<li>Contas contábeis para contabilização</li>
+</ul>
+</li>
+</ol>
+<h3 id="o-que-n%C3%A3o-est%C3%A1-inclu%C3%ADdo">O que NÃO está incluído</h3>
+<ol>
+<li>Contratos cancelados (tipo de cancelamento ≠ 0)</li>
+<li>Contratos com vigência expirada (fim de vigência anterior a 01/01/2026)</li>
+<li>Contratos já pagos/liquidados (data de pagamento preenchida)</li>
+<li>Modalidades de seguro diferentes de &quot;Empréstimo&quot; (cheque especial, ECR, desconto)</li>
+<li>Contas correntes inativas (situação ≠ 1)</li>
+<li>Histórico de auditoria do sistema legado</li>
+<li>Documentos digitalizados/anexos</li>
+</ol>
+<h3 id="ambientes">Ambientes</h3>
+<ul>
+<li><strong>Origem</strong>: Múltiplos bancos de dados MySQL, um por agência (padrão: <code>agencia_XXXX</code>)</li>
+<li><strong>Destino</strong>: Banco de dados MySQL único consolidado</li>
+</ul>
+<hr>
+<h2 id="3-arquitetura-l%C3%B3gica-do-fluxo">3. Arquitetura Lógica do Fluxo</h2>
+<h3 id="diagrama-de-fluxo-ascii">Diagrama de Fluxo (ASCII)</h3>
+<pre class="hljs"><code><div>┌─────────────────────────────────────────────────────────────────────────────┐
+│                           BASE CENTRAL (unico)                               │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐     │
+│  │ cd_agencia   │  │ cd_pa        │  │ cd_cliente   │  │ cd_prestamista│     │
+│  │ (Agências)   │  │ (Pontos Atend)│ │ (Clientes)   │  │ (Seguradoras) │     │
+│  └──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘     │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    DESCOBERTA DE AGÊNCIAS ATIVAS                             │
+│         Consulta cd_agencia onde AG_ATIVA = 1 → Lista de schemas            │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+              ┌───────────────────────┼───────────────────────┐
+              ▼                       ▼                       ▼
+┌──────────────────────┐  ┌──────────────────────┐  ┌──────────────────────┐
+│   agencia_0001       │  │   agencia_0002       │  │   agencia_NNNN       │
+│  ┌────────────────┐  │  │  ┌────────────────┐  │  │  ┌────────────────┐  │
+│  │ep_segprestamista│ │  │  │ep_segprestamista│ │  │  │ep_segprestamista│ │
+│  │ep_segparcela    │ │  │  │ep_segparcela    │ │  │  │ep_segparcela    │ │
+│  │ep_contrato      │ │  │  │ep_contrato      │ │  │  │ep_contrato      │ │
+│  │ep_parcela       │ │  │  │ep_parcela       │ │  │  │ep_parcela       │ │
+│  │cc_conta         │ │  │  │cc_conta         │ │  │  │cc_conta         │ │
+│  └────────────────┘  │  │  └────────────────┘  │  │  └────────────────┘  │
+└──────────────────────┘  └──────────────────────┘  └──────────────────────┘
+              │                       │                       │
+              └───────────────────────┼───────────────────────┘
+                                      │
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         PROCESSO DE MIGRAÇÃO                                 │
+│                                                                              │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    ┌─────────────┐   │
+│  │  EXTRAÇÃO   │ ─► │ PREPARAÇÃO  │ ─► │ENRIQUECIM.  │ ─► │   CARGA     │   │
+│  │             │    │    CACHE    │    │  LOOKUP     │    │             │   │
+│  └─────────────┘    └─────────────┘    └─────────────┘    └─────────────┘   │
+│                                                                              │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                           BASE DESTINO                                       │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌───────────┐  │
+│  │  agencia   │ │ cooperado  │ │  seguro    │ │  parcela   │ │ seguradora│  │
+│  └────────────┘ └────────────┘ └────────────┘ └────────────┘ └───────────┘  │
+│  ┌────────────────────┐ ┌───────────────────────┐ ┌───────────────────────┐ │
+│  │ponto_atendimento   │ │cooperado_agencia_conta│ │apolice_grupo_seguradora││
+│  └────────────────────┘ └───────────────────────┘ └───────────────────────┘ │
+│  ┌────────────────┐ ┌──────────────────┐ ┌─────────────────┐                │
+│  │seguro_parametro│ │seguradora_limite │ │comissao_seguradora│              │
+│  └────────────────┘ └──────────────────┘ └─────────────────┘                │
+└─────────────────────────────────────────────────────────────────────────────┘
+</div></code></pre>
+<h3 id="etapas-do-processo">Etapas do Processo</h3>
+<h4 id="etapa-1-descoberta-de-ag%C3%AAncias">Etapa 1: Descoberta de Agências</h4>
+<ul>
+<li>Consulta a base central para identificar todas as agências ativas</li>
+<li>Gera a lista de schemas de banco de dados a serem processados</li>
+<li>Formato do schema: <code>agencia_</code> + código da agência (4 dígitos)</li>
+</ul>
+<h4 id="etapa-2-prepara%C3%A7%C3%A3o-de-cache-por-execu%C3%A7%C3%A3o">Etapa 2: Preparação de Cache (por execução)</h4>
+<ul>
+<li>Carrega em memória todos os registros existentes no destino:
+<ul>
+<li>Seguradoras (indexadas por CNPJ)</li>
+<li>Agências (indexadas por código)</li>
+<li>Pontos de atendimento (indexados por código da agência + código do PA)</li>
+<li>Cooperados (indexados por número do documento)</li>
+<li>Apólices/grupos de seguradoras (indexadas por ID da agência + ID da seguradora)</li>
+</ul>
+</li>
+</ul>
+<h4 id="etapa-3-extra%C3%A7%C3%A3o-por-ag%C3%AAncia">Etapa 3: Extração (por agência)</h4>
+<ul>
+<li>Para cada agência:
+<ul>
+<li>Carrega todos os contratos de seguro prestamista elegíveis</li>
+<li>Carrega todas as parcelas de seguro</li>
+<li>Agrupa parcelas por chave (conta corrente, número do contrato)</li>
+<li>Carrega cooperados (clientes) da agência</li>
+<li>Carrega contas correntes da agência</li>
+</ul>
+</li>
+</ul>
+<h4 id="etapa-4-enriquecimento-e-lookup">Etapa 4: Enriquecimento e Lookup</h4>
+<ul>
+<li>Para cada contrato:
+<ul>
+<li>Localiza ou cria a agência no destino</li>
+<li>Localiza ou cria o ponto de atendimento no destino</li>
+<li>Localiza ou cria o cooperado no destino</li>
+<li>Localiza ou cria o vínculo cooperado-agência-conta</li>
+<li>Localiza ou cria a seguradora no destino (com limites e comissões)</li>
+<li>Localiza ou cria a apólice/grupo no destino</li>
+</ul>
+</li>
+</ul>
+<h4 id="etapa-5-transforma%C3%A7%C3%A3o-e-carga">Etapa 5: Transformação e Carga</h4>
+<ul>
+<li>Transforma os dados do contrato para o formato destino</li>
+<li>Cria o registro de parâmetros do seguro</li>
+<li>Transforma e vincula as parcelas</li>
+<li>Persiste em lotes de 100 registros</li>
+</ul>
+<hr>
+<h2 id="4-cat%C3%A1logo-de-fontes-mysql">4. Catálogo de Fontes (MySQL)</h2>
+<h3 id="41-base-central-schema-unico">4.1 Base Central: Schema <code>unico</code></h3>
+<h4 id="tabela-cdagencia">Tabela: <code>cd_agencia</code></h4>
+<p><strong>Descrição</strong>: Cadastro de agências da cooperativa</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Descrição</th>
+<th>Uso no ETL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AG_CODIGO</td>
+<td>Código da agência (4 caracteres)</td>
+<td>Chave natural, usado para identificar o schema da agência</td>
+</tr>
+<tr>
+<td>AG_SIGLA</td>
+<td>Nome/sigla da agência</td>
+<td>Migrado para nome da agência</td>
+</tr>
+<tr>
+<td>AG_ATIVA</td>
+<td>Flag de agência ativa (1=ativa, 0=inativa)</td>
+<td>Filtro de elegibilidade</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Critério de seleção</strong>: <code>AG_ATIVA = 1</code></p>
+<hr>
+<h4 id="tabela-cdpa">Tabela: <code>cd_pa</code></h4>
+<p><strong>Descrição</strong>: Cadastro de pontos de atendimento</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Descrição</th>
+<th>Uso no ETL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PA_CODIGO</td>
+<td>Código do ponto de atendimento (3 caracteres)</td>
+<td>Chave natural (junto com agência)</td>
+</tr>
+<tr>
+<td>AG_CODIGO</td>
+<td>Código da agência</td>
+<td>Chave de relacionamento</td>
+</tr>
+<tr>
+<td>PA_SIGLA</td>
+<td>Nome/sigla do ponto de atendimento</td>
+<td>Migrado para nome</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h4 id="tabela-cdcliente">Tabela: <code>cd_cliente</code></h4>
+<p><strong>Descrição</strong>: Cadastro de clientes/cooperados</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Descrição</th>
+<th>Uso no ETL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CLI_CPFCNPJ</td>
+<td>CPF ou CNPJ do cliente (sem formatação)</td>
+<td>Chave natural de identificação</td>
+</tr>
+<tr>
+<td>CLI_TIPPES</td>
+<td>Tipo de pessoa: F (Física) ou J (Jurídica)</td>
+<td>Migrado como tipo de pessoa</td>
+</tr>
+<tr>
+<td>CLI_NOME</td>
+<td>Nome completo ou razão social</td>
+<td>Migrado para nome</td>
+</tr>
+<tr>
+<td>CLI_NFANTA</td>
+<td>Nome fantasia</td>
+<td>Migrado (opcional)</td>
+</tr>
+<tr>
+<td>CLI_EMAIL</td>
+<td>E-mail de contato</td>
+<td>Migrado (opcional)</td>
+</tr>
+<tr>
+<td>AG_CODIGO</td>
+<td>Código da agência</td>
+<td>Informativo</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h4 id="tabela-cdprestamista">Tabela: <code>cd_prestamista</code></h4>
+<p><strong>Descrição</strong>: Cadastro de seguradoras prestamista</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Descrição</th>
+<th>Uso no ETL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PST_CODIGO</td>
+<td>Código da seguradora (4 caracteres)</td>
+<td>Chave natural</td>
+</tr>
+<tr>
+<td>PST_NOME</td>
+<td>Nome da seguradora</td>
+<td>Migrado para nome e razão social</td>
+</tr>
+<tr>
+<td>PST_ATIVO</td>
+<td>Status ativo/inativo</td>
+<td>Migrado como status</td>
+</tr>
+<tr>
+<td>PST_MAXMESES</td>
+<td>Número máximo de meses do contrato</td>
+<td>Migrado para condição da seguradora</td>
+</tr>
+<tr>
+<td>PST_LIMITEIDADE</td>
+<td>Limite máximo de idade</td>
+<td>Migrado para condição da seguradora</td>
+</tr>
+<tr>
+<td>PST_VALORDPS</td>
+<td>Valor mínimo para exigir DPS</td>
+<td>Base para limites de DPS</td>
+</tr>
+<tr>
+<td>PORCENTAGEM_COMISSAO</td>
+<td>Percentual de comissão da cooperativa</td>
+<td>Migrado para comissão</td>
+</tr>
+<tr>
+<td>PST_LIMITE30 a PST_LIMITE85</td>
+<td>Limites por faixa etária</td>
+<td>Migrado para limites da seguradora</td>
+</tr>
+<tr>
+<td>PST_COEF30 a PST_COEF85</td>
+<td>Coeficientes por faixa etária</td>
+<td>Migrado para limites da seguradora</td>
+</tr>
+<tr>
+<td>PST_DPS30 a PST_DPS85</td>
+<td>Exigência de DPS por faixa</td>
+<td>Combinado com VALORDPS</td>
+</tr>
+<tr>
+<td>CONTA_CONTABIL_CREDITO</td>
+<td>Conta contábil de crédito</td>
+<td>Migrado para contabilização</td>
+</tr>
+<tr>
+<td>CONTA_CONTABIL_DEBITO</td>
+<td>Conta contábil de débito</td>
+<td>Migrado para contabilização</td>
+</tr>
+<tr>
+<td>CONTA_CONTABIL_CREDITO_COMISSAO</td>
+<td>Conta crédito comissão</td>
+<td>Migrado para contabilização</td>
+</tr>
+<tr>
+<td>CONTA_CONTABIL_DEBITO_COMISSAO</td>
+<td>Conta débito comissão</td>
+<td>Migrado para contabilização</td>
+</tr>
+<tr>
+<td>CONTA_CONTABIL_CREDITO_4966</td>
+<td>Conta crédito cancelamento</td>
+<td>Migrado para contabilização</td>
+</tr>
+<tr>
+<td>CONTA_CONTABIL_DEBITO_4966</td>
+<td>Conta débito cancelamento</td>
+<td>Migrado para contabilização</td>
+</tr>
+<tr>
+<td>CONTA_CONTABIL_CREDITO_COMISSAO_4966</td>
+<td>Conta crédito comissão cancelamento</td>
+<td>Migrado para contabilização</td>
+</tr>
+<tr>
+<td>CONTA_CONTABIL_DEBITO_COMISSAO_4966</td>
+<td>Conta débito comissão cancelamento</td>
+<td>Migrado para contabilização</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="42-base-por-ag%C3%AAncia-schema-agenciaxxxx">4.2 Base por Agência: Schema <code>agencia_XXXX</code></h3>
+<h4 id="tabela-epsegprestamista">Tabela: <code>ep_segprestamista</code></h4>
+<p><strong>Descrição</strong>: Contratos de seguro prestamista</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Descrição</th>
+<th>Uso no ETL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PST_CODIGO</td>
+<td>Código da seguradora</td>
+<td>Chave de lookup para seguradora</td>
+</tr>
+<tr>
+<td>CCO_CONTA</td>
+<td>Código da conta corrente (9 caracteres)</td>
+<td>Chave de relacionamento com conta/cooperado</td>
+</tr>
+<tr>
+<td>SEG_CPF</td>
+<td>CPF do segurado (11 caracteres)</td>
+<td>Chave de lookup para cooperado</td>
+</tr>
+<tr>
+<td>SEG_NOME</td>
+<td>Nome do segurado</td>
+<td>Informativo (não migrado)</td>
+</tr>
+<tr>
+<td>SEG_NASC</td>
+<td>Data de nascimento</td>
+<td>Não migrado diretamente</td>
+</tr>
+<tr>
+<td>SEG_CONTRATO</td>
+<td>Número do contrato (10 caracteres)</td>
+<td>Migrado como identificador do contrato</td>
+</tr>
+<tr>
+<td>SEG_MODALIDADE</td>
+<td>Modalidade: 1=Ch.Especial, 2=ECR, 3=Desconto, 4=Empréstimo</td>
+<td>Filtro de elegibilidade</td>
+</tr>
+<tr>
+<td>SEG_TIPOCONTA</td>
+<td>Tipo de conta: F=Física, J=Jurídica</td>
+<td>Informativo</td>
+</tr>
+<tr>
+<td>SEG_INICIO</td>
+<td>Data de início da vigência</td>
+<td>Migrado como início de vigência</td>
+</tr>
+<tr>
+<td>SEG_FIM</td>
+<td>Data de fim da vigência</td>
+<td>Migrado como fim de vigência e vencimento</td>
+</tr>
+<tr>
+<td>SEG_MESES</td>
+<td>Número de meses do seguro</td>
+<td>Migrado como quantidade de parcelas</td>
+</tr>
+<tr>
+<td>SEG_CANCELAMENTO</td>
+<td>Data do cancelamento</td>
+<td>Não migrado (filtro de exclusão)</td>
+</tr>
+<tr>
+<td>SEG_CANCTIPO</td>
+<td>Tipo de cancelamento: 0=Não cancelado, 1-4=Tipos de cancelamento</td>
+<td>Filtro de elegibilidade</td>
+</tr>
+<tr>
+<td>SEG_VRCONTRATO</td>
+<td>Valor total do contrato</td>
+<td>Informativo</td>
+</tr>
+<tr>
+<td>SEG_BASE</td>
+<td>Valor base segurado</td>
+<td>Migrado como capital segurado e valor base</td>
+</tr>
+<tr>
+<td>SEG_PREMIO</td>
+<td>Valor do prêmio</td>
+<td>Migrado como prêmio total</td>
+</tr>
+<tr>
+<td>SEG_IOF</td>
+<td>Valor do IOF</td>
+<td>Migrado</td>
+</tr>
+<tr>
+<td>SEG_DPS</td>
+<td>Flag de exigência de DPS</td>
+<td>Migrado</td>
+</tr>
+<tr>
+<td>SEG_EFETIVACAO</td>
+<td>Data de efetivação</td>
+<td>Não migrado</td>
+</tr>
+<tr>
+<td>CON_SEQ</td>
+<td>Sequencial do contrato (aditivos)</td>
+<td>Migrado como sequência do contrato</td>
+</tr>
+<tr>
+<td>sql_rowid</td>
+<td>ID técnico (auto-incremento)</td>
+<td>Não migrado</td>
+</tr>
+<tr>
+<td>sql_deleted</td>
+<td>Flag de exclusão lógica (F/T)</td>
+<td>Filtro de elegibilidade</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Critérios de seleção (inferido)</strong>:</p>
+<ul>
+<li><code>SEG_MODALIDADE = 4</code> (somente empréstimos)</li>
+<li><code>SEG_CANCTIPO = 0</code> (não cancelados)</li>
+<li><code>SEG_FIM &gt;= '2025-12-10'</code> (vigência futura)</li>
+<li><code>sql_deleted = 'F'</code> (não excluídos logicamente)</li>
+<li><code>SEG_FIM &gt; '2026-01-01'</code> (vigência posterior a data de corte)</li>
+</ul>
+<p><strong>Junção com tabela <code>ep_contrato</code></strong>:</p>
+<ul>
+<li>Chave: <code>SEG_CONTRATO = CON_NDOC</code> e <code>CON_SEQ</code></li>
+<li>Critério adicional: <code>CON_PGTO IS NULL</code> (contrato não liquidado)</li>
+</ul>
+<p><strong>Junção com tabela <code>cc_conta</code></strong>:</p>
+<ul>
+<li>Chave: <code>CCO_CONTA = CCO_CONTA</code></li>
+<li>Critério adicional: <code>CCO_SITUACAO = 1</code> (conta ativa)</li>
+</ul>
+<hr>
+<h4 id="tabela-epsegparcela">Tabela: <code>ep_segparcela</code></h4>
+<p><strong>Descrição</strong>: Parcelas dos contratos de seguro</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Descrição</th>
+<th>Uso no ETL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cco_conta</td>
+<td>Conta corrente do cooperado</td>
+<td>Chave de agrupamento</td>
+</tr>
+<tr>
+<td>seg_contrato</td>
+<td>Número do contrato</td>
+<td>Chave de agrupamento</td>
+</tr>
+<tr>
+<td>con_seq</td>
+<td>Sequencial do contrato</td>
+<td>Chave de agrupamento</td>
+</tr>
+<tr>
+<td>seg_parcela</td>
+<td>Número da parcela</td>
+<td>Migrado como número da parcela</td>
+</tr>
+<tr>
+<td>seg_valor</td>
+<td>Valor da parcela</td>
+<td>Migrado como valor da parcela e valor original</td>
+</tr>
+<tr>
+<td>seg_vcto</td>
+<td>Data de vencimento</td>
+<td>Migrado como vencimento</td>
+</tr>
+<tr>
+<td>seg_pgto</td>
+<td>Data de pagamento</td>
+<td>Migrado como data de liquidação</td>
+</tr>
+<tr>
+<td>seg_cancelado</td>
+<td>Data de cancelamento</td>
+<td>Usado para determinar status</td>
+</tr>
+<tr>
+<td>seg_liberado</td>
+<td>Flag de liberação (0=mesa, 1=liberado)</td>
+<td>Não migrado diretamente</td>
+</tr>
+<tr>
+<td>sql_rowid</td>
+<td>ID técnico</td>
+<td>Não migrado</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h4 id="tabela-epcontrato">Tabela: <code>ep_contrato</code></h4>
+<p><strong>Descrição</strong>: Contratos de empréstimo (usada apenas em junção)</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Descrição</th>
+<th>Uso no ETL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CON_NDOC</td>
+<td>Número do documento/contrato</td>
+<td>Chave de junção</td>
+</tr>
+<tr>
+<td>CON_SEQ</td>
+<td>Sequencial do contrato</td>
+<td>Chave de junção</td>
+</tr>
+<tr>
+<td>CON_DEBSEGURO</td>
+<td>Tipo de débito do seguro: 2=À Vista, 1=Parcelado</td>
+<td>Determina tipo de pagamento</td>
+</tr>
+<tr>
+<td>CON_PARCELAS</td>
+<td>Quantidade de parcelas do empréstimo</td>
+<td>Informativo</td>
+</tr>
+<tr>
+<td>MOD_CALCULO</td>
+<td>Modalidade de cálculo: 2,3=PRICE/SAC (variável), outros=fixo</td>
+<td>Determina tipo de capital (saldo)</td>
+</tr>
+<tr>
+<td>CON_PGTO</td>
+<td>Data de pagamento/liquidação</td>
+<td>Filtro de elegibilidade</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h4 id="tabela-epparcela">Tabela: <code>ep_parcela</code></h4>
+<p><strong>Descrição</strong>: Parcelas dos empréstimos (usada em agregação)</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Descrição</th>
+<th>Uso no ETL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>cco_conta</td>
+<td>Conta corrente</td>
+<td>Chave de agregação</td>
+</tr>
+<tr>
+<td>con_ndoc</td>
+<td>Número do contrato</td>
+<td>Chave de agregação</td>
+</tr>
+<tr>
+<td>con_seq</td>
+<td>Sequencial</td>
+<td>Chave de agregação</td>
+</tr>
+<tr>
+<td>emp_vlrseg</td>
+<td>Valor do seguro na parcela</td>
+<td>Agregado para validação</td>
+</tr>
+<tr>
+<td>emp_parcela</td>
+<td>Número da parcela</td>
+<td>Contagem para validação</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h4 id="tabela-ccconta">Tabela: <code>cc_conta</code></h4>
+<p><strong>Descrição</strong>: Contas correntes dos cooperados</p>
+<table>
+<thead>
+<tr>
+<th>Campo</th>
+<th>Descrição</th>
+<th>Uso no ETL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CCO_CONTA</td>
+<td>Código da conta corrente</td>
+<td>Chave de junção</td>
+</tr>
+<tr>
+<td>CLI_CPFCNPJ</td>
+<td>CPF/CNPJ do titular</td>
+<td>Lookup para cooperado</td>
+</tr>
+<tr>
+<td>PA_CODIGO</td>
+<td>Código do ponto de atendimento</td>
+<td>Determina PA do seguro</td>
+</tr>
+<tr>
+<td>CCO_SITUACAO</td>
+<td>Situação da conta: 1=Ativa</td>
+<td>Filtro de elegibilidade</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="43-campos-calculados-na-extra%C3%A7%C3%A3o">4.3 Campos Calculados na Extração</h3>
+<p>A consulta de extração de contratos realiza cálculos e agregações:</p>
+<table>
+<thead>
+<tr>
+<th>Campo Calculado</th>
+<th>Descrição</th>
+<th>Regra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>tipo_seguro</td>
+<td>Tipo de pagamento do seguro</td>
+<td>Se <code>CON_DEBSEGURO = 2</code> ou <code>CON_PARCELAS = 1</code> → 1 (À Vista); Se há mais de uma fonte com valor &gt; 0 → 2 (Parcelado); Caso contrário → 3 (Único)</td>
+</tr>
+<tr>
+<td>tipo_saldo</td>
+<td>Tipo de capital segurado</td>
+<td>Se <code>MOD_CALCULO IN (2, 3)</code> → 1 (Variável/PRICE/SAC); Caso contrário → 2 (Fixo)</td>
+</tr>
+<tr>
+<td>Soma_Das_Parcelas</td>
+<td>Soma dos valores das parcelas</td>
+<td>Primeiro tenta do módulo de seguro; fallback para tabela de parcelas</td>
+</tr>
+<tr>
+<td>Qtd_Parcelas_Seguro</td>
+<td>Quantidade de parcelas</td>
+<td>Primeiro tenta do módulo de seguro; fallback para tabela de parcelas</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="5-regras-de-extra%C3%A7%C3%A3o">5. Regras de Extração</h2>
+<h3 id="51-descoberta-de-ag%C3%AAncias">5.1 Descoberta de Agências</h3>
+<p><strong>Fonte</strong>: Schema <code>unico</code>, tabela <code>cd_agencia</code></p>
+<p><strong>Regras</strong>:</p>
+<ul>
+<li>Seleciona todas as agências onde o status é ativo (<code>AG_ATIVA = 1</code>)</li>
+<li>Gera o nome do schema concatenando <code>agencia_</code> com o código da agência</li>
+<li>O código da agência é convertido para texto (8 caracteres máximo)</li>
+</ul>
+<p><strong>Saída</strong>: Lista de schemas para iteração (ex: <code>agencia_0001</code>, <code>agencia_0012</code>, etc.)</p>
+<hr>
+<h3 id="52-extra%C3%A7%C3%A3o-de-contratos-de-seguro">5.2 Extração de Contratos de Seguro</h3>
+<p><strong>Fonte Principal</strong>: Tabela <code>ep_segprestamista</code></p>
+<p><strong>Junções</strong>:</p>
+<ol>
+<li>
+<p><strong>INNER JOIN</strong> com <code>ep_contrato</code>:</p>
+<ul>
+<li>Chave: <code>SEG_CONTRATO = CON_NDOC</code> e <code>CON_SEQ = CON_SEQ</code></li>
+<li>Propósito: Obter modalidade de cálculo e tipo de débito do seguro</li>
+</ul>
+</li>
+<li>
+<p><strong>JOIN</strong> com <code>cc_conta</code>:</p>
+<ul>
+<li>Chave: <code>CCO_CONTA = CCO_CONTA</code></li>
+<li>Propósito: Verificar situação da conta</li>
+</ul>
+</li>
+<li>
+<p><strong>LEFT JOIN</strong> com subconsulta <code>ResumoFinanceiro</code>:</p>
+<ul>
+<li>Chave: <code>SEG_CONTRATO = contrato</code> e <code>CON_SEQ = con_seq</code></li>
+<li>Propósito: Obter totais agregados de parcelas</li>
+</ul>
+</li>
+</ol>
+<p><strong>Agregação (ResumoFinanceiro)</strong>:
+A subconsulta combina duas fontes de dados de parcelas:</p>
+<ol>
+<li>
+<p><strong>Fonte 1 (MODULO_SEGURO)</strong>: Tabela <code>ep_segparcela</code></p>
+<ul>
+<li>Agrupa por conta, contrato, sequencial</li>
+<li>Soma valores (<code>seg_valor</code>)</li>
+<li>Conta parcelas (<code>seg_parcela</code>)</li>
+</ul>
+</li>
+<li>
+<p><strong>Fonte 2 (TABELA_PARCELAS)</strong>: Tabela <code>ep_parcela</code></p>
+<ul>
+<li>Filtra onde <code>emp_vlrseg &gt; 0</code></li>
+<li>Agrupa por conta, contrato, sequencial</li>
+<li>Soma valores de seguro (<code>emp_vlrseg</code>)</li>
+<li>Conta parcelas com seguro</li>
+</ul>
+</li>
+</ol>
+<p><strong>Filtros de Elegibilidade</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Filtro</th>
+<th>Valor</th>
+<th>Justificativa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SEG_MODALIDADE</td>
+<td>= 4</td>
+<td>Somente modalidade Empréstimo</td>
+</tr>
+<tr>
+<td>CCO_SITUACAO</td>
+<td>= 1</td>
+<td>Somente contas ativas</td>
+</tr>
+<tr>
+<td>SEG_CANCTIPO</td>
+<td>= 0</td>
+<td>Somente contratos não cancelados</td>
+</tr>
+<tr>
+<td>SEG_FIM</td>
+<td>&gt;= '2025-12-10'</td>
+<td>Vigência futura (data parametrizada - inferido)</td>
+</tr>
+<tr>
+<td>CON_PGTO</td>
+<td>IS NULL</td>
+<td>Contrato não liquidado</td>
+</tr>
+<tr>
+<td>sql_deleted</td>
+<td>= 'F'</td>
+<td>Não excluídos logicamente</td>
+</tr>
+<tr>
+<td>SEG_FIM</td>
+<td>&gt; '2026-01-01'</td>
+<td>Data de corte para migração</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Agrupamento Final</strong>:</p>
+<ul>
+<li>Agrupa por: <code>SEG_CONTRATO</code>, <code>CON_SEQ</code>, <code>SEG_PREMIO</code>, <code>CON_DEBSEGURO</code>, <code>CON_PARCELAS</code>, <code>MOD_CALCULO</code>, <code>SEG_FIM</code></li>
+</ul>
+<hr>
+<h3 id="53-extra%C3%A7%C3%A3o-de-parcelas">5.3 Extração de Parcelas</h3>
+<p><strong>Fonte</strong>: Tabela <code>ep_segparcela</code></p>
+<p><strong>Regras</strong>:</p>
+<ul>
+<li>Extrai todas as parcelas (sem filtro específico)</li>
+<li>Agrupa em memória por chave composta: (conta corrente, número do contrato)</li>
+<li>Associa a cada contrato durante o processamento</li>
+</ul>
+<p><strong>Campos extraídos</strong>: Todos os campos da tabela</p>
+<hr>
+<h3 id="54-extra%C3%A7%C3%A3o-de-cooperados">5.4 Extração de Cooperados</h3>
+<p><strong>Fonte</strong>: Tabela <code>cd_cliente</code> (schema <code>unico</code>)</p>
+<p><strong>Regras</strong>:</p>
+<ul>
+<li>Extrai todos os cooperados cadastrados</li>
+<li>Aplica tratamento de nulos com COALESCE para CPF/CNPJ e nome</li>
+<li>Carrega em cache indexado por número do documento</li>
+</ul>
+<hr>
+<h3 id="55-extra%C3%A7%C3%A3o-de-seguradoras">5.5 Extração de Seguradoras</h3>
+<p><strong>Fonte</strong>: Tabela <code>cd_prestamista</code> (schema <code>unico</code>)</p>
+<p><strong>Regras</strong>:</p>
+<ul>
+<li>Extrai todas as configurações de seguradoras</li>
+<li>Inclui todos os campos de limites por faixa etária</li>
+<li>Inclui todas as contas contábeis</li>
+<li>Indexa em cache por CNPJ (derivado do código)</li>
+</ul>
+<hr>
+<h3 id="56-extra%C3%A7%C3%A3o-de-contas-correntes">5.6 Extração de Contas Correntes</h3>
+<p><strong>Fonte</strong>: Tabela <code>cc_conta</code> (por agência)</p>
+<p><strong>Regras</strong>:</p>
+<ul>
+<li>Carrega quando o schema muda</li>
+<li>Extrai conta corrente, CPF/CNPJ do titular e código do PA</li>
+<li>Usado para determinar o ponto de atendimento do seguro</li>
+</ul>
+<h1 id="parte-2-cat%C3%A1logo-de-destinos-e-matriz-de-mapeamento">Parte 2: Catálogo de Destinos e Matriz de Mapeamento</h1>
+<hr>
+<h2 id="6-cat%C3%A1logo-de-destinos-mysql">6. Catálogo de Destinos (MySQL)</h2>
+<h3 id="61-tabela-agencia">6.1 Tabela: <code>agencia</code></h3>
+<p><strong>Descrição</strong>: Armazena informações cadastrais das agências da cooperativa</p>
+<table>
+<thead>
+<tr>
+<th>Coluna</th>
+<th>Tipo</th>
+<th>Obrigatório</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>Identificador único, auto-incremento</td>
+</tr>
+<tr>
+<td>codigo</td>
+<td>CHAR(4)</td>
+<td>Sim</td>
+<td>Código único da agência</td>
+</tr>
+<tr>
+<td>nome</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Nome completo da agência</td>
+</tr>
+<tr>
+<td>criado_em</td>
+<td>DATETIME</td>
+<td>Sim</td>
+<td>Data/hora de criação (automático)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Chave Primária</strong>: <code>id</code>
+<strong>Índices Únicos</strong>: <code>codigo</code>, <code>nome</code>
+<strong>Papel</strong>: Dimensão - Cadastro de agências</p>
+<hr>
+<h3 id="62-tabela-pontoatendimento">6.2 Tabela: <code>ponto_atendimento</code></h3>
+<p><strong>Descrição</strong>: Armazena informações dos pontos de atendimento vinculados às agências</p>
+<table>
+<thead>
+<tr>
+<th>Coluna</th>
+<th>Tipo</th>
+<th>Obrigatório</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>Identificador único, auto-incremento</td>
+</tr>
+<tr>
+<td>agencia_id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>FK para tabela agencia</td>
+</tr>
+<tr>
+<td>codigo</td>
+<td>CHAR(3)</td>
+<td>Sim</td>
+<td>Código do PA (único por agência)</td>
+</tr>
+<tr>
+<td>nome</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Nome completo do PA</td>
+</tr>
+<tr>
+<td>criado_em</td>
+<td>DATETIME</td>
+<td>Não</td>
+<td>Data/hora de criação</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Chave Primária</strong>: <code>id</code>
+<strong>Chaves Estrangeiras</strong>: <code>agencia_id</code> → <code>agencia.id</code>
+<strong>Índices Únicos</strong>: <code>nome</code>, <code>(agencia_id, codigo)</code>
+<strong>Papel</strong>: Dimensão - Local de atendimento</p>
+<hr>
+<h3 id="63-tabela-cooperado">6.3 Tabela: <code>cooperado</code></h3>
+<p><strong>Descrição</strong>: Cadastro de cooperados (clientes) da cooperativa</p>
+<table>
+<thead>
+<tr>
+<th>Coluna</th>
+<th>Tipo</th>
+<th>Obrigatório</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>Identificador único, auto-incremento</td>
+</tr>
+<tr>
+<td>numero_documento</td>
+<td>VARCHAR(14)</td>
+<td>Sim</td>
+<td>CPF (11) ou CNPJ (14), sem formatação</td>
+</tr>
+<tr>
+<td>tipo</td>
+<td>ENUM('Física', 'Jurídica')</td>
+<td>Sim</td>
+<td>Tipo de pessoa</td>
+</tr>
+<tr>
+<td>nome</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Nome completo ou razão social</td>
+</tr>
+<tr>
+<td>nome_fantasia</td>
+<td>VARCHAR(255)</td>
+<td>Não</td>
+<td>Nome fantasia (PJ)</td>
+</tr>
+<tr>
+<td>email</td>
+<td>VARCHAR(255)</td>
+<td>Não</td>
+<td>E-mail de contato</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Chave Primária</strong>: <code>id</code>
+<strong>Papel</strong>: Dimensão - Cadastro de clientes</p>
+<hr>
+<h3 id="64-tabela-cooperadoagenciaconta">6.4 Tabela: <code>cooperado_agencia_conta</code></h3>
+<p><strong>Descrição</strong>: Junção entre cooperados, agências e contas correntes</p>
+<table>
+<thead>
+<tr>
+<th>Coluna</th>
+<th>Tipo</th>
+<th>Obrigatório</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>Identificador único, auto-incremento</td>
+</tr>
+<tr>
+<td>cooperado_id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>FK para tabela cooperado</td>
+</tr>
+<tr>
+<td>agencia_id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>FK para tabela agencia</td>
+</tr>
+<tr>
+<td>conta_corrente</td>
+<td>CHAR(9)</td>
+<td>Sim</td>
+<td>Código da conta corrente</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Chave Primária</strong>: <code>id</code>
+<strong>Chaves Estrangeiras</strong>: <code>cooperado_id</code> → <code>cooperado.id</code>, <code>agencia_id</code> → <code>agencia.id</code>
+<strong>Índices Únicos</strong>: <code>(cooperado_id, agencia_id, conta_corrente)</code>
+<strong>Papel</strong>: Ponte - Relaciona cooperado, agência e conta</p>
+<hr>
+<h3 id="65-tabela-seguradora">6.5 Tabela: <code>seguradora</code></h3>
+<p><strong>Descrição</strong>: Cadastro das seguradoras parceiras</p>
+<table>
+<thead>
+<tr>
+<th>Coluna</th>
+<th>Tipo</th>
+<th>Obrigatório</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>Identificador único, auto-incremento</td>
+</tr>
+<tr>
+<td>nome</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Nome fantasia</td>
+</tr>
+<tr>
+<td>cnpj</td>
+<td>CHAR(14)</td>
+<td>Sim</td>
+<td>CNPJ sem formatação</td>
+</tr>
+<tr>
+<td>razao_social</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Razão social completa</td>
+</tr>
+<tr>
+<td>status</td>
+<td>ENUM('Ativo', 'Inativo')</td>
+<td>Sim</td>
+<td>Status da seguradora</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Chave Primária</strong>: <code>id</code>
+<strong>Índices Únicos</strong>: <code>cnpj</code>
+<strong>Papel</strong>: Dimensão - Cadastro de seguradoras</p>
+<hr>
+<h3 id="66-tabela-seguradoralimite">6.6 Tabela: <code>seguradora_limite</code></h3>
+<p><strong>Descrição</strong>: Faixas etárias, coeficientes e limites de DPS por seguradora</p>
+<table>
+<thead>
+<tr>
+<th>Coluna</th>
+<th>Tipo</th>
+<th>Obrigatório</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>Identificador único</td>
+</tr>
+<tr>
+<td>seguradora_id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>FK para tabela seguradora</td>
+</tr>
+<tr>
+<td>idade_inicial</td>
+<td>SMALLINT</td>
+<td>Sim</td>
+<td>Idade inicial da faixa</td>
+</tr>
+<tr>
+<td>idade_final</td>
+<td>SMALLINT</td>
+<td>Sim</td>
+<td>Idade final da faixa</td>
+</tr>
+<tr>
+<td>valor_maximo</td>
+<td>DECIMAL(10,2)</td>
+<td>Sim</td>
+<td>Valor máximo de capital segurado</td>
+</tr>
+<tr>
+<td>coeficiente</td>
+<td>DECIMAL(8,7)</td>
+<td>Sim</td>
+<td>Coeficiente multiplicador para cálculo</td>
+</tr>
+<tr>
+<td>limite_dps</td>
+<td>DECIMAL(10,2)</td>
+<td>Sim</td>
+<td>Limite para exigir DPS</td>
+</tr>
+<tr>
+<td>descricao_regra</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Descrição textual da regra</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Chave Primária</strong>: <code>id</code>
+<strong>Chaves Estrangeiras</strong>: <code>seguradora_id</code> → <code>seguradora.id</code>
+<strong>Papel</strong>: Configuração - Regras por faixa etária</p>
+<hr>
+<h3 id="67-tabela-comissaoseguradora">6.7 Tabela: <code>comissao_seguradora</code></h3>
+<p><strong>Descrição</strong>: Configurações de comissões por seguradora</p>
+<table>
+<thead>
+<tr>
+<th>Coluna</th>
+<th>Tipo</th>
+<th>Obrigatório</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>Identificador único</td>
+</tr>
+<tr>
+<td>seguradora_id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>FK para tabela seguradora</td>
+</tr>
+<tr>
+<td>porcentagem_comissao_corretora</td>
+<td>DECIMAL(5,4)</td>
+<td>Sim</td>
+<td>Percentual corretora (ex: 0.1500 = 15%)</td>
+</tr>
+<tr>
+<td>porcentagem_comissao_cooperativa</td>
+<td>DECIMAL(5,4)</td>
+<td>Sim</td>
+<td>Percentual cooperativa</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Chave Primária</strong>: <code>id</code>
+<strong>Chaves Estrangeiras</strong>: <code>seguradora_id</code> → <code>seguradora.id</code>
+<strong>Índices Únicos</strong>: <code>seguradora_id</code>
+<strong>Papel</strong>: Configuração - Percentuais de comissão</p>
+<hr>
+<h3 id="68-tabela-condicaoseguradora">6.8 Tabela: <code>condicao_seguradora</code></h3>
+<p><strong>Descrição</strong>: Parâmetros de condições operacionais por seguradora</p>
+<table>
+<thead>
+<tr>
+<th>Coluna</th>
+<th>Tipo</th>
+<th>Obrigatório</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>Identificador único</td>
+</tr>
+<tr>
+<td>seguradora_id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>FK para tabela seguradora</td>
+</tr>
+<tr>
+<td>max_meses_contrato</td>
+<td>SMALLINT</td>
+<td>Sim</td>
+<td>Máximo de meses de vigência</td>
+</tr>
+<tr>
+<td>max_idade</td>
+<td>SMALLINT</td>
+<td>Sim</td>
+<td>Idade máxima permitida</td>
+</tr>
+<tr>
+<td>porcentagem_cobertura_morte</td>
+<td>DECIMAL(5,4)</td>
+<td>Sim</td>
+<td>% cobertura morte</td>
+</tr>
+<tr>
+<td>porcentagem_cobertura_invalidez</td>
+<td>DECIMAL(5,4)</td>
+<td>Sim</td>
+<td>% cobertura invalidez</td>
+</tr>
+<tr>
+<td>porcentagem_cobertura_perda_renda</td>
+<td>DECIMAL(5,4)</td>
+<td>Sim</td>
+<td>% cobertura perda de renda</td>
+</tr>
+<tr>
+<td>periodicidade_30dias</td>
+<td>TINYINT(1)</td>
+<td>Sim</td>
+<td>Se vencimento é a cada 30 dias</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Chave Primária</strong>: <code>id</code>
+<strong>Chaves Estrangeiras</strong>: <code>seguradora_id</code> → <code>seguradora.id</code>
+<strong>Índices Únicos</strong>: <code>seguradora_id</code>
+<strong>Papel</strong>: Configuração - Condições contratuais</p>
+<hr>
+<h3 id="69-tabela-contabilizacaoseguradora">6.9 Tabela: <code>contabilizacao_seguradora</code></h3>
+<p><strong>Descrição</strong>: Contas contábeis para lançamentos da seguradora</p>
+<table>
+<thead>
+<tr>
+<th>Coluna</th>
+<th>Tipo</th>
+<th>Obrigatório</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>Identificador único</td>
+</tr>
+<tr>
+<td>seguradora_id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>FK para tabela seguradora</td>
+</tr>
+<tr>
+<td>credito_premio_contratacao</td>
+<td>VARCHAR(50)</td>
+<td>Sim</td>
+<td>Conta crédito prêmio</td>
+</tr>
+<tr>
+<td>descricao_credito_premio_contratacao</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Descrição</td>
+</tr>
+<tr>
+<td>debito_premio_contratacao</td>
+<td>VARCHAR(50)</td>
+<td>Sim</td>
+<td>Conta débito prêmio</td>
+</tr>
+<tr>
+<td>descricao_debito_premio_contratacao</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Descrição</td>
+</tr>
+<tr>
+<td>credito_comissao_contratacao</td>
+<td>VARCHAR(50)</td>
+<td>Sim</td>
+<td>Conta crédito comissão</td>
+</tr>
+<tr>
+<td>descricao_credito_comissao_contratacao</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Descrição</td>
+</tr>
+<tr>
+<td>debito_comissao_contratacao</td>
+<td>VARCHAR(50)</td>
+<td>Sim</td>
+<td>Conta débito comissão</td>
+</tr>
+<tr>
+<td>descricao_debito_comissao_contratacao</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Descrição</td>
+</tr>
+<tr>
+<td>credito_cancelamento_comissao_parc_tot</td>
+<td>VARCHAR(50)</td>
+<td>Sim</td>
+<td>Conta crédito cancelamento</td>
+</tr>
+<tr>
+<td>descricao_credito_cancelamento_comissao_parc_tot</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Descrição</td>
+</tr>
+<tr>
+<td>debito_cancelamento_comissao_parc_tot</td>
+<td>VARCHAR(50)</td>
+<td>Sim</td>
+<td>Conta débito cancelamento</td>
+</tr>
+<tr>
+<td>descricao_debito_cancelamento_comissao_parc_tot</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Descrição</td>
+</tr>
+<tr>
+<td>credito_cancelamento_comissao_avista</td>
+<td>VARCHAR(50)</td>
+<td>Sim</td>
+<td>Conta crédito cancel. à vista</td>
+</tr>
+<tr>
+<td>descricao_credito_cancelamento_comissao_avista</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Descrição</td>
+</tr>
+<tr>
+<td>debito_cancelamento_comissao_avista</td>
+<td>VARCHAR(50)</td>
+<td>Sim</td>
+<td>Conta débito cancel. à vista</td>
+</tr>
+<tr>
+<td>descricao_debito_cancelamento_comissao_avista</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Descrição</td>
+</tr>
+<tr>
+<td>credito_valor_pago</td>
+<td>VARCHAR(50)</td>
+<td>Sim</td>
+<td>Conta crédito valor pago</td>
+</tr>
+<tr>
+<td>descricao_credito_valor_pago</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Descrição</td>
+</tr>
+<tr>
+<td>debito_valor_pago</td>
+<td>VARCHAR(50)</td>
+<td>Sim</td>
+<td>Conta débito valor pago</td>
+</tr>
+<tr>
+<td>descricao_debito_valor_pago</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Descrição</td>
+</tr>
+<tr>
+<td>credito_comissao_valor_pago</td>
+<td>VARCHAR(50)</td>
+<td>Sim</td>
+<td>Conta crédito comissão pago</td>
+</tr>
+<tr>
+<td>descricao_comissao_credito_valor_pago</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Descrição</td>
+</tr>
+<tr>
+<td>debito_comissao_valor_pago</td>
+<td>VARCHAR(50)</td>
+<td>Sim</td>
+<td>Conta débito comissão pago</td>
+</tr>
+<tr>
+<td>descricao_comissao_debito_valor_pago</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Descrição</td>
+</tr>
+<tr>
+<td>debito_premio_parcela</td>
+<td>VARCHAR(50)</td>
+<td>Sim</td>
+<td>Conta débito parcela</td>
+</tr>
+<tr>
+<td>descricao_debito_premio_parcela</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Descrição</td>
+</tr>
+<tr>
+<td>credito_premio_parcela</td>
+<td>VARCHAR(50)</td>
+<td>Sim</td>
+<td>Conta crédito parcela</td>
+</tr>
+<tr>
+<td>descricao_credito_premio_parcela</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Descrição</td>
+</tr>
+<tr>
+<td>debito_comissao_parcela</td>
+<td>VARCHAR(50)</td>
+<td>Sim</td>
+<td>Conta débito comissão parcela</td>
+</tr>
+<tr>
+<td>descricao_debito_comissao_parcela</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Descrição</td>
+</tr>
+<tr>
+<td>credito_comissao_parcela</td>
+<td>VARCHAR(50)</td>
+<td>Sim</td>
+<td>Conta crédito comissão parcela</td>
+</tr>
+<tr>
+<td>descricao_credito_comissao_parcela</td>
+<td>VARCHAR(255)</td>
+<td>Sim</td>
+<td>Descrição</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Chave Primária</strong>: <code>id</code>
+<strong>Chaves Estrangeiras</strong>: <code>seguradora_id</code> → <code>seguradora.id</code>
+<strong>Papel</strong>: Configuração - Plano de contas contábeis</p>
+<hr>
+<h3 id="610-tabela-apolicegruposeguradora">6.10 Tabela: <code>apolice_grupo_seguradora</code></h3>
+<p><strong>Descrição</strong>: Configurações de apólices e grupos por vínculo agência-seguradora</p>
+<table>
+<thead>
+<tr>
+<th>Coluna</th>
+<th>Tipo</th>
+<th>Obrigatório</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>Identificador único</td>
+</tr>
+<tr>
+<td>agencia_id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>FK para tabela agencia</td>
+</tr>
+<tr>
+<td>seguradora_id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>FK para tabela seguradora</td>
+</tr>
+<tr>
+<td>ordem</td>
+<td>INT</td>
+<td>Sim</td>
+<td>Ordem de prioridade</td>
+</tr>
+<tr>
+<td>apolice</td>
+<td>VARCHAR(255)</td>
+<td>Não</td>
+<td>Número da apólice</td>
+</tr>
+<tr>
+<td>grupo</td>
+<td>VARCHAR(255)</td>
+<td>Não</td>
+<td>Código do grupo</td>
+</tr>
+<tr>
+<td>subgrupo</td>
+<td>VARCHAR(255)</td>
+<td>Não</td>
+<td>Código do subgrupo</td>
+</tr>
+<tr>
+<td>tipo_capital</td>
+<td>ENUM('Fixo', 'Variável')</td>
+<td>Sim</td>
+<td>Tipo de capital segurado</td>
+</tr>
+<tr>
+<td>modalidade_unico</td>
+<td>VARCHAR(50)</td>
+<td>Não</td>
+<td>Identificador modalidade única</td>
+</tr>
+<tr>
+<td>modalidade_avista</td>
+<td>DECIMAL(10,2)</td>
+<td>Não</td>
+<td>Taxa para à vista</td>
+</tr>
+<tr>
+<td>modalidade_parcelado</td>
+<td>DECIMAL(10,2)</td>
+<td>Não</td>
+<td>Taxa para parcelado</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Chave Primária</strong>: <code>id</code>
+<strong>Chaves Estrangeiras</strong>: <code>agencia_id</code> → <code>agencia.id</code>, <code>seguradora_id</code> → <code>seguradora.id</code>
+<strong>Papel</strong>: Ponte - Relaciona agência com seguradora e apólice</p>
+<hr>
+<h3 id="611-tabela-seguro">6.11 Tabela: <code>seguro</code></h3>
+<p><strong>Descrição</strong>: Contratos de seguros e seus metadados financeiros</p>
+<table>
+<thead>
+<tr>
+<th>Coluna</th>
+<th>Tipo</th>
+<th>Obrigatório</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>Identificador único</td>
+</tr>
+<tr>
+<td>cooperado_agencia_conta_id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>FK para cooperado_agencia_conta</td>
+</tr>
+<tr>
+<td>ponto_atendimento_id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>FK para ponto_atendimento</td>
+</tr>
+<tr>
+<td>apolice_grupo_seguradora_id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>FK para apolice_grupo_seguradora</td>
+</tr>
+<tr>
+<td>seguro_parametro_id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>FK para seguro_parametro</td>
+</tr>
+<tr>
+<td>usuario_id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Não</td>
+<td>FK para usuario (quem contratou)</td>
+</tr>
+<tr>
+<td>contrato_sequencia</td>
+<td>VARCHAR(2)</td>
+<td>Sim</td>
+<td>Sequência do contrato (00, 01, etc.)</td>
+</tr>
+<tr>
+<td>status</td>
+<td>ENUM('Pendente', 'Ativo', 'Recusado', 'Expirado', 'Cancelado')</td>
+<td>Sim</td>
+<td>Status atual do seguro</td>
+</tr>
+<tr>
+<td>motivo</td>
+<td>ENUM (ver lista completa abaixo)</td>
+<td>Sim</td>
+<td>Motivo do status</td>
+</tr>
+<tr>
+<td>contrato</td>
+<td>VARCHAR(10)</td>
+<td>Sim</td>
+<td>Número do contrato</td>
+</tr>
+<tr>
+<td>inicio_vigencia</td>
+<td>DATE</td>
+<td>Não</td>
+<td>Data de início</td>
+</tr>
+<tr>
+<td>fim_vigencia</td>
+<td>DATE</td>
+<td>Não</td>
+<td>Data de término</td>
+</tr>
+<tr>
+<td>codigo_grupo</td>
+<td>INT</td>
+<td>Sim</td>
+<td>Código do grupo/produto</td>
+</tr>
+<tr>
+<td>quantidade_parcelas</td>
+<td>SMALLINT</td>
+<td>Sim</td>
+<td>Quantidade de parcelas</td>
+</tr>
+<tr>
+<td>vencimento</td>
+<td>DATE</td>
+<td>Não</td>
+<td>Data de vencimento base</td>
+</tr>
+<tr>
+<td>capital_segurado</td>
+<td>DECIMAL(10,2)</td>
+<td>Sim</td>
+<td>Valor do capital segurado</td>
+</tr>
+<tr>
+<td>premio_total</td>
+<td>DECIMAL(10,2)</td>
+<td>Sim</td>
+<td>Valor do prêmio total</td>
+</tr>
+<tr>
+<td>tipo_pagamento</td>
+<td>ENUM('À Vista', 'Parcelado', 'Único')</td>
+<td>Sim</td>
+<td>Modalidade de pagamento</td>
+</tr>
+<tr>
+<td>estorno_proporcional</td>
+<td>DECIMAL(10,2)</td>
+<td>Sim</td>
+<td>Valor de estorno (cancelamento)</td>
+</tr>
+<tr>
+<td>valor_base</td>
+<td>DECIMAL(10,2)</td>
+<td>Não</td>
+<td>Valor base para cálculo</td>
+</tr>
+<tr>
+<td>declaracao_pessoal_saude</td>
+<td>TINYINT(1)</td>
+<td>Não</td>
+<td>Se exigiu DPS</td>
+</tr>
+<tr>
+<td>valor_iof</td>
+<td>DECIMAL(10,2)</td>
+<td>Não</td>
+<td>Valor do IOF</td>
+</tr>
+<tr>
+<td>numero_contrato_emprestimo</td>
+<td>VARCHAR(20)</td>
+<td>Não</td>
+<td>Número do contrato de crédito</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Valores do campo <code>motivo</code></strong>:</p>
+<ul>
+<li><code>Em analise na seguradora</code></li>
+<li><code>Aguardando faturamento</code></li>
+<li><code>Aguardando documentação</code></li>
+<li><code>Pagamento à vista</code></li>
+<li><code>Pagamento parcelado</code></li>
+<li><code>Inadimplente</code></li>
+<li><code>Regular</code></li>
+<li><code>Recusado pela seguradora</code></li>
+<li><code>Expiração da vigência do seguro</code></li>
+<li><code>Aditivo</code></li>
+<li><code>Cancelamento por prejuízo</code></li>
+<li><code>Renegociação</code></li>
+<li><code>Sinistro</code></li>
+<li><code>Solicitado pela cooperativa</code></li>
+<li><code>Solicitado pelo cooperado</code></li>
+<li><code>Liquidação antecipada</code></li>
+</ul>
+<p><strong>Chave Primária</strong>: <code>id</code>
+<strong>Chaves Estrangeiras</strong>: Todas as FKs referenciadas acima
+<strong>Papel</strong>: Fato - Registro principal de contratos de seguro</p>
+<hr>
+<h3 id="612-tabela-seguroparametro">6.12 Tabela: <code>seguro_parametro</code></h3>
+<p><strong>Descrição</strong>: Parâmetros de contratação do seguro para cálculos</p>
+<table>
+<thead>
+<tr>
+<th>Coluna</th>
+<th>Tipo</th>
+<th>Obrigatório</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>Identificador único</td>
+</tr>
+<tr>
+<td>tipo_capital</td>
+<td>ENUM('Fixo', 'Variável')</td>
+<td>Sim</td>
+<td>Tipo de capital</td>
+</tr>
+<tr>
+<td>periodicidade_30dias</td>
+<td>TINYINT(1)</td>
+<td>Sim</td>
+<td>Se periodicidade é 30 dias</td>
+</tr>
+<tr>
+<td>coeficiente</td>
+<td>DECIMAL(8,7)</td>
+<td>Sim</td>
+<td>Coeficiente multiplicador</td>
+</tr>
+<tr>
+<td>porcentual_iof</td>
+<td>DECIMAL(5,4)</td>
+<td>Sim</td>
+<td>Percentual de IOF</td>
+</tr>
+<tr>
+<td>porcentagem_comissao_corretora</td>
+<td>DECIMAL(5,4)</td>
+<td>Sim</td>
+<td>% comissão corretora</td>
+</tr>
+<tr>
+<td>porcentagem_comissao_cooperativa</td>
+<td>DECIMAL(5,4)</td>
+<td>Sim</td>
+<td>% comissão cooperativa</td>
+</tr>
+<tr>
+<td>porcentagem_cobertura_morte</td>
+<td>DECIMAL(5,4)</td>
+<td>Não</td>
+<td>% cobertura morte</td>
+</tr>
+<tr>
+<td>capital_morte</td>
+<td>DECIMAL(18,2)</td>
+<td>Não</td>
+<td>Capital por morte</td>
+</tr>
+<tr>
+<td>premio_morte</td>
+<td>DECIMAL(18,2)</td>
+<td>Não</td>
+<td>Prêmio por morte</td>
+</tr>
+<tr>
+<td>porcentagem_cobertura_invalidez</td>
+<td>DECIMAL(5,4)</td>
+<td>Não</td>
+<td>% cobertura invalidez</td>
+</tr>
+<tr>
+<td>capital_invalidez</td>
+<td>DECIMAL(18,2)</td>
+<td>Não</td>
+<td>Capital por invalidez</td>
+</tr>
+<tr>
+<td>premio_invalidez</td>
+<td>DECIMAL(18,2)</td>
+<td>Não</td>
+<td>Prêmio por invalidez</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Chave Primária</strong>: <code>id</code>
+<strong>Relacionamento</strong>: 1:1 com <code>seguro</code>
+<strong>Papel</strong>: Configuração - Parâmetros de cálculo por contrato</p>
+<hr>
+<h3 id="613-tabela-parcela">6.13 Tabela: <code>parcela</code></h3>
+<p><strong>Descrição</strong>: Parcelas financeiras de prêmio vinculadas a contratos de seguro</p>
+<table>
+<thead>
+<tr>
+<th>Coluna</th>
+<th>Tipo</th>
+<th>Obrigatório</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>Identificador único</td>
+</tr>
+<tr>
+<td>seguro_id</td>
+<td>BIGINT UNSIGNED</td>
+<td>Sim</td>
+<td>FK para tabela seguro</td>
+</tr>
+<tr>
+<td>status</td>
+<td>ENUM('Pendente', 'Em Aberto', 'Pago', 'Cancelada')</td>
+<td>Sim</td>
+<td>Status da parcela</td>
+</tr>
+<tr>
+<td>numero_parcela</td>
+<td>SMALLINT</td>
+<td>Sim</td>
+<td>Número sequencial (1, 2, 3...)</td>
+</tr>
+<tr>
+<td>valor_parcela</td>
+<td>DECIMAL(10,2)</td>
+<td>Sim</td>
+<td>Valor atual da parcela</td>
+</tr>
+<tr>
+<td>valor_original</td>
+<td>DECIMAL(10,2)</td>
+<td>Sim</td>
+<td>Valor original calculado</td>
+</tr>
+<tr>
+<td>valor_pago</td>
+<td>DECIMAL(10,2)</td>
+<td>Sim</td>
+<td>Valor efetivamente pago</td>
+</tr>
+<tr>
+<td>vencimento</td>
+<td>DATE</td>
+<td>Sim</td>
+<td>Data de vencimento</td>
+</tr>
+<tr>
+<td>liquidacao</td>
+<td>DATETIME</td>
+<td>Não</td>
+<td>Data/hora de quitação</td>
+</tr>
+<tr>
+<td>data_ultimo_pagamento</td>
+<td>DATETIME</td>
+<td>Não</td>
+<td>Data/hora do último pagamento</td>
+</tr>
+<tr>
+<td>comissao_corretora</td>
+<td>DECIMAL(10,2)</td>
+<td>Sim</td>
+<td>Valor da comissão do corretor</td>
+</tr>
+<tr>
+<td>comissao_cooperativa</td>
+<td>DECIMAL(10,2)</td>
+<td>Sim</td>
+<td>Valor da comissão da cooperativa</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Chave Primária</strong>: <code>id</code>
+<strong>Chaves Estrangeiras</strong>: <code>seguro_id</code> → <code>seguro.id</code>
+<strong>Papel</strong>: Fato - Parcelas de pagamento</p>
+<hr>
+<h2 id="7-regras-de-transforma%C3%A7%C3%A3o">7. Regras de Transformação</h2>
+<h3 id="71-transforma%C3%A7%C3%A3o-de-ag%C3%AAncias">7.1 Transformação de Agências</h3>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Regra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Origem</strong></td>
+<td><code>cd_agencia.AG_CODIGO</code>, <code>cd_agencia.AG_SIGLA</code></td>
+</tr>
+<tr>
+<td><strong>Destino</strong></td>
+<td>Tabela <code>agencia</code></td>
+</tr>
+<tr>
+<td><strong>Código</strong></td>
+<td>Copia diretamente <code>AG_CODIGO</code></td>
+</tr>
+<tr>
+<td><strong>Nome</strong></td>
+<td>Copia diretamente <code>AG_SIGLA</code></td>
+</tr>
+<tr>
+<td><strong>Deduplicação</strong></td>
+<td>Agrupa por código para evitar duplicatas</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="72-transforma%C3%A7%C3%A3o-de-pontos-de-atendimento">7.2 Transformação de Pontos de Atendimento</h3>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Regra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Origem</strong></td>
+<td><code>cd_pa.PA_CODIGO</code>, <code>cd_pa.PA_SIGLA</code>, <code>cd_pa.AG_CODIGO</code></td>
+</tr>
+<tr>
+<td><strong>Destino</strong></td>
+<td>Tabela <code>ponto_atendimento</code></td>
+</tr>
+<tr>
+<td><strong>AgenciaId</strong></td>
+<td>Lookup por código da agência</td>
+</tr>
+<tr>
+<td><strong>Código</strong></td>
+<td>Copia <code>PA_CODIGO</code></td>
+</tr>
+<tr>
+<td><strong>Nome</strong></td>
+<td>Concatena: código + &quot; - &quot; + sigla</td>
+</tr>
+<tr>
+<td><strong>Verificação</strong></td>
+<td>Verifica existência antes de inserir (agencia_id + codigo)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="73-transforma%C3%A7%C3%A3o-de-cooperados">7.3 Transformação de Cooperados</h3>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Regra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Origem</strong></td>
+<td><code>cd_cliente</code></td>
+</tr>
+<tr>
+<td><strong>Destino</strong></td>
+<td>Tabela <code>cooperado</code></td>
+</tr>
+<tr>
+<td><strong>NumeroDocumento</strong></td>
+<td>Copia <code>CLI_CPFCNPJ</code> (COALESCE com vazio)</td>
+</tr>
+<tr>
+<td><strong>Tipo</strong></td>
+<td>Converte: &quot;F&quot; → &quot;Física&quot;, demais → &quot;Jurídica&quot;</td>
+</tr>
+<tr>
+<td><strong>Nome</strong></td>
+<td>Copia <code>CLI_NOME</code> (COALESCE com vazio)</td>
+</tr>
+<tr>
+<td><strong>NomeFantasia</strong></td>
+<td>Copia <code>CLI_NFANTA</code> (pode ser nulo)</td>
+</tr>
+<tr>
+<td><strong>Email</strong></td>
+<td>Copia <code>CLI_EMAIL</code> (pode ser nulo)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="74-transforma%C3%A7%C3%A3o-de-seguradoras">7.4 Transformação de Seguradoras</h3>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Regra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Origem</strong></td>
+<td><code>cd_prestamista</code></td>
+</tr>
+<tr>
+<td><strong>Destino</strong></td>
+<td>Tabela <code>seguradora</code> + tabelas relacionadas</td>
+</tr>
+<tr>
+<td><strong>CNPJ</strong></td>
+<td>Deriva do código: preenche com zeros à direita até 14 caracteres, depois trunca em 14</td>
+</tr>
+<tr>
+<td><strong>Nome</strong></td>
+<td>Copia <code>PST_NOME</code></td>
+</tr>
+<tr>
+<td><strong>RazaoSocial</strong></td>
+<td>Copia <code>PST_NOME</code> (mesmo valor)</td>
+</tr>
+<tr>
+<td><strong>Status</strong></td>
+<td>Converte: <code>PST_ATIVO = true</code> → &quot;Ativo&quot;, false → &quot;Inativo&quot;</td>
+</tr>
+</tbody>
+</table>
+<h4 id="cria%C3%A7%C3%A3o-de-comiss%C3%B5es">Criação de Comissões</h4>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Regra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>PorcentagemComissaoCorretora</strong></td>
+<td>Valor fixo: 0.15 (15%)</td>
+</tr>
+<tr>
+<td><strong>PorcentagemComissaoCooperativa</strong></td>
+<td>Copia <code>PORCENTAGEM_COMISSAO</code></td>
+</tr>
+</tbody>
+</table>
+<h4 id="cria%C3%A7%C3%A3o-de-condi%C3%A7%C3%B5es">Criação de Condições</h4>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Regra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>MaxMesesContrato</strong></td>
+<td>Copia <code>PST_MAXMESES</code></td>
+</tr>
+<tr>
+<td><strong>MaxIdade</strong></td>
+<td>Copia <code>PST_LIMITEIDADE</code></td>
+</tr>
+<tr>
+<td><strong>PorcentagemCoberturaMorte</strong></td>
+<td>Valor fixo: 0.1 (10%)</td>
+</tr>
+<tr>
+<td><strong>PorcentagemCoberturaInvalidez</strong></td>
+<td>Valor fixo: 0.1 (10%)</td>
+</tr>
+<tr>
+<td><strong>PorcentagemCoberturaPerdaRenda</strong></td>
+<td>Valor fixo: 0.1 (10%)</td>
+</tr>
+<tr>
+<td><strong>Periodicidade30Dias</strong></td>
+<td>Condição: código ≠ &quot;0005&quot; → true, senão false</td>
+</tr>
+</tbody>
+</table>
+<h4 id="cria%C3%A7%C3%A3o-de-contabiliza%C3%A7%C3%A3o">Criação de Contabilização</h4>
+<table>
+<thead>
+<tr>
+<th>Campo Destino</th>
+<th>Campo Origem</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CreditoPremioContratacao</td>
+<td>CONTA_CONTABIL_CREDITO</td>
+</tr>
+<tr>
+<td>DebitoPremioContratacao</td>
+<td>CONTA_CONTABIL_DEBITO</td>
+</tr>
+<tr>
+<td>CreditoComissaoContratacao</td>
+<td>CONTA_CONTABIL_CREDITO_COMISSAO</td>
+</tr>
+<tr>
+<td>DebitoComissaoContratacao</td>
+<td>CONTA_CONTABIL_DEBITO_COMISSAO</td>
+</tr>
+<tr>
+<td>CreditoCancelamentoComissaoParcTot</td>
+<td>CONTA_CONTABIL_CREDITO_4966</td>
+</tr>
+<tr>
+<td>DebitoCancelamentoComissaoParcTot</td>
+<td>CONTA_CONTABIL_DEBITO_4966</td>
+</tr>
+<tr>
+<td>CreditoCancelamentoComissaoAVista</td>
+<td>CONTA_CONTABIL_CREDITO_COMISSAO_4966</td>
+</tr>
+<tr>
+<td>DebitoCancelamentoComissaoAVista</td>
+<td>CONTA_CONTABIL_DEBITO_COMISSAO_4966</td>
+</tr>
+<tr>
+<td>CreditoValorPago</td>
+<td>CONTA_CONTABIL_CREDITO</td>
+</tr>
+<tr>
+<td>DebitoValorPago</td>
+<td>CONTA_CONTABIL_DEBITO</td>
+</tr>
+<tr>
+<td>CreditoComissaoValorPago</td>
+<td>CONTA_CONTABIL_CREDITO_COMISSAO</td>
+</tr>
+<tr>
+<td>DebitoComissaoValorPago</td>
+<td>CONTA_CONTABIL_DEBITO_COMISSAO</td>
+</tr>
+<tr>
+<td>Demais campos</td>
+<td>String vazia (não migrados)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="cria%C3%A7%C3%A3o-de-limites-por-faixa-et%C3%A1ria">Criação de Limites por Faixa Etária</h4>
+<p>Para cada faixa etária (30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85):</p>
+<ul>
+<li><strong>Condição de criação</strong>: Limite &gt; 0 OU Coeficiente &gt; 0 para a faixa</li>
+<li><strong>IdadeInicial</strong>: Idade anterior + 1 (ex: faixa 35 → idade inicial 31)</li>
+<li><strong>IdadeFinal</strong>: Valor da faixa (ex: faixa 35 → idade final 35)</li>
+<li><strong>Coeficiente</strong>: Valor do campo <code>PST_COEFXX</code></li>
+<li><strong>ValorMaximo</strong>: Valor do campo <code>PST_LIMITEXX</code></li>
+<li><strong>LimiteDps</strong>: Se <code>PST_DPSXX = true</code> → <code>PST_VALORDPS</code>, senão 0</li>
+<li><strong>DescricaoRegra</strong>: Texto descritivo (ex: &quot;Faixa 31 a 35 anos&quot;)</li>
+</ul>
+<p><strong>Faixa padrão</strong>: Se nenhuma faixa definida, cria uma faixa de 18 até <code>LimiteIdade</code> com valores padrão.</p>
+<hr>
+<h3 id="75-transforma%C3%A7%C3%A3o-de-ap%C3%B3licegrupo-seguradora">7.5 Transformação de Apólice/Grupo Seguradora</h3>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Regra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Quando criar</strong></td>
+<td>Quando não existe vínculo (agencia_id, seguradora_id)</td>
+</tr>
+<tr>
+<td><strong>Apolice</strong></td>
+<td>Valor fixo: &quot;APO-001&quot;</td>
+</tr>
+<tr>
+<td><strong>Grupo</strong></td>
+<td>Valor fixo: &quot;GRP-001&quot;</td>
+</tr>
+<tr>
+<td><strong>SubGrupo</strong></td>
+<td>Valor fixo: &quot;SUB-001&quot;</td>
+</tr>
+<tr>
+<td><strong>TipoCapital</strong></td>
+<td>Valor fixo: &quot;Fixo&quot;</td>
+</tr>
+<tr>
+<td><strong>ModalidadeUnico</strong></td>
+<td>Valor fixo: &quot;Unico&quot;</td>
+</tr>
+<tr>
+<td><strong>ModalidadeAVista</strong></td>
+<td>Valor fixo: 1.5</td>
+</tr>
+<tr>
+<td><strong>ModalidadeParcelado</strong></td>
+<td>Valor fixo: 10</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="76-transforma%C3%A7%C3%A3o-de-seguros">7.6 Transformação de Seguros</h3>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Regra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Status</strong></td>
+<td>Derivado do Motivo (ver regra de derivação)</td>
+</tr>
+<tr>
+<td><strong>Motivo</strong></td>
+<td>Valor fixo: &quot;Regular&quot; (para contratos migrados)</td>
+</tr>
+<tr>
+<td><strong>Contrato</strong></td>
+<td>Copia <code>SEG_CONTRATO</code> (COALESCE com vazio)</td>
+</tr>
+<tr>
+<td><strong>InicioVigencia</strong></td>
+<td>Copia <code>SEG_INICIO</code></td>
+</tr>
+<tr>
+<td><strong>FimVigencia</strong></td>
+<td>Copia <code>SEG_FIM</code></td>
+</tr>
+<tr>
+<td><strong>QuantidadeParcelas</strong></td>
+<td>Copia <code>SEG_MESES</code> (COALESCE com 0), converte para short</td>
+</tr>
+<tr>
+<td><strong>Vencimento</strong></td>
+<td>Copia <code>SEG_FIM</code></td>
+</tr>
+<tr>
+<td><strong>CapitalSegurado</strong></td>
+<td>Copia <code>SEG_BASE</code> (COALESCE com 0.00)</td>
+</tr>
+<tr>
+<td><strong>PremioTotal</strong></td>
+<td>Copia <code>SEG_PREMIO</code> (COALESCE com 0.00)</td>
+</tr>
+<tr>
+<td><strong>ValorBase</strong></td>
+<td>Copia <code>SEG_BASE</code></td>
+</tr>
+<tr>
+<td><strong>ValorIof</strong></td>
+<td>Copia <code>SEG_IOF</code></td>
+</tr>
+<tr>
+<td><strong>ContratoSequencia</strong></td>
+<td>Formata <code>CON_SEQ</code> como 2 dígitos (ex: &quot;00&quot;, &quot;01&quot;)</td>
+</tr>
+<tr>
+<td><strong>TipoPagamento</strong></td>
+<td>Converte: tipo_seguro = 1 → &quot;À Vista&quot;, demais → &quot;Parcelado&quot;</td>
+</tr>
+<tr>
+<td><strong>EstornoProporcional</strong></td>
+<td>Valor fixo: 0</td>
+</tr>
+<tr>
+<td><strong>CodigoGrupo</strong></td>
+<td>Valor fixo: 0 (inferido)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="regra-de-deriva%C3%A7%C3%A3o-de-status-pelo-motivo">Regra de Derivação de Status pelo Motivo</h4>
+<table>
+<thead>
+<tr>
+<th>Motivo</th>
+<th>Status Resultante</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>EmAnaliseNaSeguradora, AguardandoFaturamento, AguardandoDocumentacao</td>
+<td>Pendente</td>
+</tr>
+<tr>
+<td>PagamentoAVista, PagamentoParcelado, Inadimplente, Regular</td>
+<td>Ativo</td>
+</tr>
+<tr>
+<td>RecusadoPelaSeguradora</td>
+<td>Recusado</td>
+</tr>
+<tr>
+<td>ExpiracaoVigenciaSeguro</td>
+<td>Expirado</td>
+</tr>
+<tr>
+<td>Aditivo, CancelamentoPorPrejuizo, Renegociacao, Sinistro, SolicitadoPelaCooperativa, SolicitadoPeloCooperado, LiquidacaoAntecipada</td>
+<td>Cancelado</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="77-transforma%C3%A7%C3%A3o-de-par%C3%A2metros-do-seguro">7.7 Transformação de Parâmetros do Seguro</h3>
+<table>
+<thead>
+<tr>
+<th>Campo Destino</th>
+<th>Regra de Transformação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>TipoCapital</td>
+<td>Converte: tipo_saldo = 1 → &quot;Variável&quot;, demais → &quot;Fixo&quot;</td>
+</tr>
+<tr>
+<td>Coeficiente</td>
+<td>Condicional: Se Variável → 0.0003511, Se Fixo → 0.0005945</td>
+</tr>
+<tr>
+<td>Periodicidade30Dias</td>
+<td>Valor fixo: true</td>
+</tr>
+<tr>
+<td>PorcentualIof</td>
+<td>Valor fixo: 0.0038 (0.38%)</td>
+</tr>
+<tr>
+<td>PorcentagemComissaoCorretora</td>
+<td>Da comissão da seguradora ou padrão 0.45 (45%)</td>
+</tr>
+<tr>
+<td>PorcentagemComissaoCooperativa</td>
+<td>Da comissão da seguradora ou padrão 0.20 (20%)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="78-transforma%C3%A7%C3%A3o-de-parcelas">7.8 Transformação de Parcelas</h3>
+<table>
+<thead>
+<tr>
+<th>Campo Destino</th>
+<th>Regra de Transformação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Status</td>
+<td>Se <code>seg_cancelado</code> preenchido → &quot;Pago&quot;, senão → &quot;Pendente&quot;</td>
+</tr>
+<tr>
+<td>NumeroParcela</td>
+<td>Copia <code>seg_parcela</code>, converte para ushort</td>
+</tr>
+<tr>
+<td>ValorParcela</td>
+<td>Copia <code>seg_valor</code></td>
+</tr>
+<tr>
+<td>ValorOriginal</td>
+<td>Copia <code>seg_valor</code> (mesmo valor)</td>
+</tr>
+<tr>
+<td>Vencimento</td>
+<td>Copia <code>seg_vcto</code></td>
+</tr>
+<tr>
+<td>Liquidacao</td>
+<td>Copia <code>seg_pgto</code></td>
+</tr>
+<tr>
+<td>DataUltimoPagamento</td>
+<td>Copia <code>seg_pgto</code></td>
+</tr>
+<tr>
+<td>ValorPago</td>
+<td>Se <code>seg_pgto</code> preenchido → <code>seg_valor</code>, senão → 0.00</td>
+</tr>
+<tr>
+<td>ComissaoCorretora</td>
+<td>Valor fixo: 0 (não calculado na migração)</td>
+</tr>
+<tr>
+<td>ComissaoCooperativa</td>
+<td>Valor fixo: 0 (não calculado na migração)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="8-matriz-de-mapeamento-linhagem">8. Matriz de Mapeamento (Linhagem)</h2>
+<h3 id="81-tabela-agencia">8.1 Tabela <code>agencia</code></h3>
+<table>
+<thead>
+<tr>
+<th>Coluna Destino</th>
+<th>Origem (Tabela.Coluna)</th>
+<th>Regra/Transformação</th>
+<th>Observações</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>-</td>
+<td>Auto-incremento</td>
+<td>Gerado pelo banco</td>
+</tr>
+<tr>
+<td>codigo</td>
+<td>cd_agencia.AG_CODIGO</td>
+<td>Cópia direta</td>
+<td>Chave natural</td>
+</tr>
+<tr>
+<td>nome</td>
+<td>cd_agencia.AG_SIGLA</td>
+<td>Cópia direta</td>
+<td>-</td>
+</tr>
+<tr>
+<td>criado_em</td>
+<td>-</td>
+<td>CURRENT_TIMESTAMP</td>
+<td>Automático</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="82-tabela-pontoatendimento">8.2 Tabela <code>ponto_atendimento</code></h3>
+<table>
+<thead>
+<tr>
+<th>Coluna Destino</th>
+<th>Origem (Tabela.Coluna)</th>
+<th>Regra/Transformação</th>
+<th>Observações</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>-</td>
+<td>Auto-incremento</td>
+<td>Gerado pelo banco</td>
+</tr>
+<tr>
+<td>agencia_id</td>
+<td>agencia.id</td>
+<td>Lookup por cd_pa.AG_CODIGO</td>
+<td>Busca ID da agência</td>
+</tr>
+<tr>
+<td>codigo</td>
+<td>cd_pa.PA_CODIGO</td>
+<td>Cópia direta</td>
+<td>3 caracteres</td>
+</tr>
+<tr>
+<td>nome</td>
+<td>cd_pa.PA_CODIGO + cd_pa.PA_SIGLA</td>
+<td>Concatenação: código + &quot; - &quot; + sigla</td>
+<td>-</td>
+</tr>
+<tr>
+<td>criado_em</td>
+<td>-</td>
+<td>CURRENT_TIMESTAMP</td>
+<td>Automático</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="83-tabela-cooperado">8.3 Tabela <code>cooperado</code></h3>
+<table>
+<thead>
+<tr>
+<th>Coluna Destino</th>
+<th>Origem (Tabela.Coluna)</th>
+<th>Regra/Transformação</th>
+<th>Observações</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>-</td>
+<td>Auto-incremento</td>
+<td>Gerado pelo banco</td>
+</tr>
+<tr>
+<td>numero_documento</td>
+<td>cd_cliente.CLI_CPFCNPJ</td>
+<td>COALESCE(valor, '')</td>
+<td>Nunca nulo</td>
+</tr>
+<tr>
+<td>tipo</td>
+<td>cd_cliente.CLI_TIPPES</td>
+<td>&quot;F&quot; → &quot;Física&quot;, outros → &quot;Jurídica&quot;</td>
+<td>Enumerado</td>
+</tr>
+<tr>
+<td>nome</td>
+<td>cd_cliente.cli_nome</td>
+<td>COALESCE(valor, '')</td>
+<td>Nunca nulo</td>
+</tr>
+<tr>
+<td>nome_fantasia</td>
+<td>cd_cliente.CLI_NFANTA</td>
+<td>Cópia direta</td>
+<td>Pode ser nulo</td>
+</tr>
+<tr>
+<td>email</td>
+<td>cd_cliente.CLI_EMAIL</td>
+<td>Cópia direta</td>
+<td>Pode ser nulo</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="84-tabela-cooperadoagenciaconta">8.4 Tabela <code>cooperado_agencia_conta</code></h3>
+<table>
+<thead>
+<tr>
+<th>Coluna Destino</th>
+<th>Origem (Tabela.Coluna)</th>
+<th>Regra/Transformação</th>
+<th>Observações</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>-</td>
+<td>Auto-incremento</td>
+<td>Gerado pelo banco</td>
+</tr>
+<tr>
+<td>cooperado_id</td>
+<td>cooperado.id</td>
+<td>Lookup por CPF/CNPJ</td>
+<td>Busca ou cria cooperado</td>
+</tr>
+<tr>
+<td>agencia_id</td>
+<td>agencia.id</td>
+<td>Lookup por código</td>
+<td>Busca agência existente</td>
+</tr>
+<tr>
+<td>conta_corrente</td>
+<td>cc_conta.CCO_CONTA</td>
+<td>Cópia direta</td>
+<td>9 caracteres</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="85-tabela-seguradora">8.5 Tabela <code>seguradora</code></h3>
+<table>
+<thead>
+<tr>
+<th>Coluna Destino</th>
+<th>Origem (Tabela.Coluna)</th>
+<th>Regra/Transformação</th>
+<th>Observações</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>-</td>
+<td>Auto-incremento</td>
+<td>Gerado pelo banco</td>
+</tr>
+<tr>
+<td>nome</td>
+<td>cd_prestamista.PST_NOME</td>
+<td>Cópia direta</td>
+<td>-</td>
+</tr>
+<tr>
+<td>cnpj</td>
+<td>cd_prestamista.PST_CODIGO</td>
+<td>PadRight(14,'0').Substring(0,14)</td>
+<td>Derivado do código</td>
+</tr>
+<tr>
+<td>razao_social</td>
+<td>cd_prestamista.PST_NOME</td>
+<td>Cópia direta</td>
+<td>Mesmo valor do nome</td>
+</tr>
+<tr>
+<td>status</td>
+<td>cd_prestamista.PST_ATIVO</td>
+<td>true → &quot;Ativo&quot;, false → &quot;Inativo&quot;</td>
+<td>Enumerado</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="86-tabela-seguradoralimite">8.6 Tabela <code>seguradora_limite</code></h3>
+<table>
+<thead>
+<tr>
+<th>Coluna Destino</th>
+<th>Origem (Tabela.Coluna)</th>
+<th>Regra/Transformação</th>
+<th>Observações</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>-</td>
+<td>Auto-incremento</td>
+<td>Gerado pelo banco</td>
+</tr>
+<tr>
+<td>seguradora_id</td>
+<td>seguradora.id</td>
+<td>FK gerado na criação</td>
+<td>-</td>
+</tr>
+<tr>
+<td>idade_inicial</td>
+<td>Constante</td>
+<td>Idade anterior + 1</td>
+<td>Ex: 31 para faixa 35</td>
+</tr>
+<tr>
+<td>idade_final</td>
+<td>cd_prestamista.PST_LIMITEXX</td>
+<td>Valor da faixa (30, 35, 40...)</td>
+<td>-</td>
+</tr>
+<tr>
+<td>valor_maximo</td>
+<td>cd_prestamista.PST_LIMITEXX</td>
+<td>Cópia direta</td>
+<td>-</td>
+</tr>
+<tr>
+<td>coeficiente</td>
+<td>cd_prestamista.PST_COEFXX</td>
+<td>Cópia direta</td>
+<td>7 casas decimais</td>
+</tr>
+<tr>
+<td>limite_dps</td>
+<td>cd_prestamista.PST_DPSXX + PST_VALORDPS</td>
+<td>Se DPS=true → VALORDPS, senão 0</td>
+<td>Condicional</td>
+</tr>
+<tr>
+<td>descricao_regra</td>
+<td>Constante</td>
+<td>Texto descritivo gerado</td>
+<td>Ex: &quot;Faixa 31 a 35 anos&quot;</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="87-tabela-seguro">8.7 Tabela <code>seguro</code></h3>
+<table>
+<thead>
+<tr>
+<th>Coluna Destino</th>
+<th>Origem (Tabela.Coluna)</th>
+<th>Regra/Transformação</th>
+<th>Observações</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>-</td>
+<td>Auto-incremento</td>
+<td>Gerado pelo banco</td>
+</tr>
+<tr>
+<td>cooperado_agencia_conta_id</td>
+<td>cooperado_agencia_conta.id</td>
+<td>Lookup por CPF + conta + agência</td>
+<td>-</td>
+</tr>
+<tr>
+<td>ponto_atendimento_id</td>
+<td>ponto_atendimento.id</td>
+<td>Lookup por código do PA da conta</td>
+<td>Via cc_conta.PA_CODIGO</td>
+</tr>
+<tr>
+<td>apolice_grupo_seguradora_id</td>
+<td>apolice_grupo_seguradora.id</td>
+<td>Lookup por agência + seguradora</td>
+<td>Cria se não existir</td>
+</tr>
+<tr>
+<td>seguro_parametro_id</td>
+<td>seguro_parametro.id</td>
+<td>FK do parâmetro criado</td>
+<td>Criado junto</td>
+</tr>
+<tr>
+<td>usuario_id</td>
+<td>-</td>
+<td>NULL</td>
+<td>Não migrado</td>
+</tr>
+<tr>
+<td>contrato_sequencia</td>
+<td>ep_segprestamista.CON_SEQ</td>
+<td>ToString(&quot;00&quot;)</td>
+<td>Formato 2 dígitos</td>
+</tr>
+<tr>
+<td>status</td>
+<td>ep_segprestamista (derivado)</td>
+<td>Derivado do Motivo</td>
+<td>Ver regra de status</td>
+</tr>
+<tr>
+<td>motivo</td>
+<td>Constante</td>
+<td>&quot;Regular&quot;</td>
+<td>Contratos ativos</td>
+</tr>
+<tr>
+<td>contrato</td>
+<td>ep_segprestamista.SEG_CONTRATO</td>
+<td>COALESCE(valor, '')</td>
+<td>10 caracteres</td>
+</tr>
+<tr>
+<td>inicio_vigencia</td>
+<td>ep_segprestamista.SEG_INICIO</td>
+<td>Cópia direta</td>
+<td>DATE</td>
+</tr>
+<tr>
+<td>fim_vigencia</td>
+<td>ep_segprestamista.SEG_FIM</td>
+<td>Cópia direta</td>
+<td>DATE</td>
+</tr>
+<tr>
+<td>codigo_grupo</td>
+<td>Constante</td>
+<td>0</td>
+<td>Não mapeado</td>
+</tr>
+<tr>
+<td>quantidade_parcelas</td>
+<td>ep_segprestamista.SEG_MESES</td>
+<td>COALESCE(valor, 0)</td>
+<td>SMALLINT</td>
+</tr>
+<tr>
+<td>vencimento</td>
+<td>ep_segprestamista.SEG_FIM</td>
+<td>Cópia direta</td>
+<td>DATE</td>
+</tr>
+<tr>
+<td>capital_segurado</td>
+<td>ep_segprestamista.SEG_BASE</td>
+<td>COALESCE(valor, 0.00)</td>
+<td>DECIMAL(10,2)</td>
+</tr>
+<tr>
+<td>premio_total</td>
+<td>ep_segprestamista.SEG_PREMIO</td>
+<td>COALESCE(valor, 0.00)</td>
+<td>DECIMAL(10,2)</td>
+</tr>
+<tr>
+<td>tipo_pagamento</td>
+<td>ep_segprestamista.tipo_seguro</td>
+<td>1 → &quot;À Vista&quot;, outros → &quot;Parcelado&quot;</td>
+<td>Campo calculado</td>
+</tr>
+<tr>
+<td>estorno_proporcional</td>
+<td>Constante</td>
+<td>0</td>
+<td>Não migrado</td>
+</tr>
+<tr>
+<td>valor_base</td>
+<td>ep_segprestamista.SEG_BASE</td>
+<td>Cópia direta</td>
+<td>Pode ser nulo</td>
+</tr>
+<tr>
+<td>declaracao_pessoal_saude</td>
+<td>ep_segprestamista.SEG_DPS</td>
+<td>Cópia direta</td>
+<td>BOOLEAN</td>
+</tr>
+<tr>
+<td>valor_iof</td>
+<td>ep_segprestamista.SEG_IOF</td>
+<td>Cópia direta</td>
+<td>DECIMAL(10,2)</td>
+</tr>
+<tr>
+<td>numero_contrato_emprestimo</td>
+<td>-</td>
+<td>NULL</td>
+<td>Não migrado</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="88-tabela-seguroparametro">8.8 Tabela <code>seguro_parametro</code></h3>
+<table>
+<thead>
+<tr>
+<th>Coluna Destino</th>
+<th>Origem (Tabela.Coluna)</th>
+<th>Regra/Transformação</th>
+<th>Observações</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>-</td>
+<td>Auto-incremento</td>
+<td>Gerado pelo banco</td>
+</tr>
+<tr>
+<td>tipo_capital</td>
+<td>ep_segprestamista.tipo_saldo</td>
+<td>1 → &quot;Variável&quot;, outros → &quot;Fixo&quot;</td>
+<td>Campo calculado</td>
+</tr>
+<tr>
+<td>periodicidade_30dias</td>
+<td>Constante</td>
+<td>true</td>
+<td>Fixo na migração</td>
+</tr>
+<tr>
+<td>coeficiente</td>
+<td>ep_segprestamista.tipo_saldo</td>
+<td>Variável: 0.0003511, Fixo: 0.0005945</td>
+<td>Condicional</td>
+</tr>
+<tr>
+<td>porcentual_iof</td>
+<td>Constante</td>
+<td>0.0038</td>
+<td>0.38%</td>
+</tr>
+<tr>
+<td>porcentagem_comissao_corretora</td>
+<td>comissao_seguradora.porcentagem_comissao_corretora</td>
+<td>COALESCE(valor, 0.45)</td>
+<td>Fallback 45%</td>
+</tr>
+<tr>
+<td>porcentagem_comissao_cooperativa</td>
+<td>comissao_seguradora.porcentagem_comissao_cooperativa</td>
+<td>COALESCE(valor, 0.20)</td>
+<td>Fallback 20%</td>
+</tr>
+<tr>
+<td>porcentagem_cobertura_morte</td>
+<td>Constante</td>
+<td>0</td>
+<td>Não migrado</td>
+</tr>
+<tr>
+<td>capital_morte</td>
+<td>Constante</td>
+<td>0</td>
+<td>Não migrado</td>
+</tr>
+<tr>
+<td>premio_morte</td>
+<td>Constante</td>
+<td>0</td>
+<td>Não migrado</td>
+</tr>
+<tr>
+<td>porcentagem_cobertura_invalidez</td>
+<td>Constante</td>
+<td>0</td>
+<td>Não migrado</td>
+</tr>
+<tr>
+<td>capital_invalidez</td>
+<td>Constante</td>
+<td>0</td>
+<td>Não migrado</td>
+</tr>
+<tr>
+<td>premio_invalidez</td>
+<td>Constante</td>
+<td>0</td>
+<td>Não migrado</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="89-tabela-parcela">8.9 Tabela <code>parcela</code></h3>
+<table>
+<thead>
+<tr>
+<th>Coluna Destino</th>
+<th>Origem (Tabela.Coluna)</th>
+<th>Regra/Transformação</th>
+<th>Observações</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>-</td>
+<td>Auto-incremento</td>
+<td>Gerado pelo banco</td>
+</tr>
+<tr>
+<td>seguro_id</td>
+<td>seguro.id</td>
+<td>FK do seguro pai</td>
+<td>Vinculado na criação</td>
+</tr>
+<tr>
+<td>status</td>
+<td>ep_segparcela.seg_cancelado</td>
+<td>Se preenchido → &quot;Pago&quot;, senão → &quot;Pendente&quot;</td>
+<td><strong>Nota: inferido que usa seg_cancelado, ver observação</strong></td>
+</tr>
+<tr>
+<td>numero_parcela</td>
+<td>ep_segparcela.seg_parcela</td>
+<td>Cast para ushort</td>
+<td>SMALLINT</td>
+</tr>
+<tr>
+<td>valor_parcela</td>
+<td>ep_segparcela.seg_valor</td>
+<td>Cópia direta</td>
+<td>DECIMAL(10,2)</td>
+</tr>
+<tr>
+<td>valor_original</td>
+<td>ep_segparcela.seg_valor</td>
+<td>Cópia direta</td>
+<td>Mesmo valor</td>
+</tr>
+<tr>
+<td>valor_pago</td>
+<td>ep_segparcela.seg_pgto</td>
+<td>Se preenchido → seg_valor, senão 0.00</td>
+<td>Condicional</td>
+</tr>
+<tr>
+<td>vencimento</td>
+<td>ep_segparcela.seg_vcto</td>
+<td>Cópia direta</td>
+<td>DATE</td>
+</tr>
+<tr>
+<td>liquidacao</td>
+<td>ep_segparcela.seg_pgto</td>
+<td>Cópia direta</td>
+<td>DATETIME</td>
+</tr>
+<tr>
+<td>data_ultimo_pagamento</td>
+<td>ep_segparcela.seg_pgto</td>
+<td>Cópia direta</td>
+<td>DATETIME</td>
+</tr>
+<tr>
+<td>comissao_corretora</td>
+<td>Constante</td>
+<td>0</td>
+<td>Não calculado</td>
+</tr>
+<tr>
+<td>comissao_cooperativa</td>
+<td>Constante</td>
+<td>0</td>
+<td>Não calculado</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Observação sobre status da parcela</strong>: A lógica usa o campo <code>seg_cancelado</code> para determinar status &quot;Pago&quot;, o que parece ser uma inversão semântica (cancelado usado para pago). Isto deve ser validado na reimplementação.</p>
+<h1 id="parte-3-regras-de-carga-controles-operacionais-e-crit%C3%A9rios-de-aceita%C3%A7%C3%A3o">Parte 3: Regras de Carga, Controles Operacionais e Critérios de Aceitação</h1>
+<hr>
+<h2 id="9-regras-de-carga-e-consist%C3%AAncia">9. Regras de Carga e Consistência</h2>
+<h3 id="91-estrat%C3%A9gia-geral-de-carga">9.1 Estratégia Geral de Carga</h3>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Estratégia</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Tipo de Carga</strong></td>
+<td>Carga inicial completa (full load)</td>
+</tr>
+<tr>
+<td><strong>Modo de Operação</strong></td>
+<td>Incremental por agência (processa uma agência por vez)</td>
+</tr>
+<tr>
+<td><strong>Persistência</strong></td>
+<td>Em lotes de 100 registros de seguro</td>
+</tr>
+<tr>
+<td><strong>Transações</strong></td>
+<td>Não utiliza transação global (comentado no código original)</td>
+</tr>
+<tr>
+<td><strong>Idempotência</strong></td>
+<td>Parcial - verifica existência antes de inserir para dimensões</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="92-estrat%C3%A9gias-por-tabela-de-destino">9.2 Estratégias por Tabela de Destino</h3>
+<h4 id="tabela-agencia">Tabela: <code>agencia</code></h4>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Regra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Estratégia</strong></td>
+<td>Upsert lógico (busca ou cria)</td>
+</tr>
+<tr>
+<td><strong>Chave de Identificação</strong></td>
+<td><code>codigo</code> (4 caracteres)</td>
+</tr>
+<tr>
+<td><strong>Verificação</strong></td>
+<td>Busca em cache por código</td>
+</tr>
+<tr>
+<td><strong>Se não existe</strong></td>
+<td>Insere todos os registros de agências distintas e atualiza cache</td>
+</tr>
+<tr>
+<td><strong>Se existe</strong></td>
+<td>Retorna do cache, não atualiza</td>
+</tr>
+<tr>
+<td><strong>Campos atualizáveis</strong></td>
+<td>Nenhum (insert-only)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="tabela-pontoatendimento">Tabela: <code>ponto_atendimento</code></h4>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Regra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Estratégia</strong></td>
+<td>Upsert lógico (busca ou cria)</td>
+</tr>
+<tr>
+<td><strong>Chave de Identificação</strong></td>
+<td><code>(agencia_id, codigo)</code></td>
+</tr>
+<tr>
+<td><strong>Verificação</strong></td>
+<td>Busca em cache por (código_agência, código_pa)</td>
+</tr>
+<tr>
+<td><strong>Se não existe</strong></td>
+<td>Insere e adiciona ao cache</td>
+</tr>
+<tr>
+<td><strong>Se existe</strong></td>
+<td>Retorna do cache</td>
+</tr>
+<tr>
+<td><strong>Verificação adicional</strong></td>
+<td>Antes do insert, verifica se já existe no banco</td>
+</tr>
+<tr>
+<td><strong>Campos atualizáveis</strong></td>
+<td>Nenhum (insert-only)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="tabela-cooperado">Tabela: <code>cooperado</code></h4>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Regra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Estratégia</strong></td>
+<td>Upsert lógico (busca ou cria)</td>
+</tr>
+<tr>
+<td><strong>Chave de Identificação</strong></td>
+<td><code>numero_documento</code> (CPF/CNPJ)</td>
+</tr>
+<tr>
+<td><strong>Verificação</strong></td>
+<td>Busca em cache por documento</td>
+</tr>
+<tr>
+<td><strong>Se não existe</strong></td>
+<td>Busca na origem, insere no destino, adiciona ao cache</td>
+</tr>
+<tr>
+<td><strong>Se existe</strong></td>
+<td>Retorna do cache</td>
+</tr>
+<tr>
+<td><strong>Campos atualizáveis</strong></td>
+<td>Nenhum (insert-only)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="tabela-cooperadoagenciaconta">Tabela: <code>cooperado_agencia_conta</code></h4>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Regra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Estratégia</strong></td>
+<td>Upsert lógico (busca ou cria)</td>
+</tr>
+<tr>
+<td><strong>Chave de Identificação</strong></td>
+<td><code>(cooperado_id, agencia_id, conta_corrente)</code></td>
+</tr>
+<tr>
+<td><strong>Verificação</strong></td>
+<td>Verifica nas contas do cooperado em cache</td>
+</tr>
+<tr>
+<td><strong>Se não existe</strong></td>
+<td>Insere e recarrega cache do cooperado</td>
+</tr>
+<tr>
+<td><strong>Se existe</strong></td>
+<td>Retorna o vínculo existente</td>
+</tr>
+<tr>
+<td><strong>Campos atualizáveis</strong></td>
+<td>Nenhum (insert-only)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="tabela-seguradora">Tabela: <code>seguradora</code></h4>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Regra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Estratégia</strong></td>
+<td>Upsert lógico (busca ou cria)</td>
+</tr>
+<tr>
+<td><strong>Chave de Identificação</strong></td>
+<td><code>cnpj</code> (derivado do código, 14 caracteres)</td>
+</tr>
+<tr>
+<td><strong>Verificação</strong></td>
+<td>Busca em cache por CNPJ</td>
+</tr>
+<tr>
+<td><strong>Se não existe</strong></td>
+<td>Cria seguradora com todas as tabelas relacionadas (comissão, condição, contabilização, limites)</td>
+</tr>
+<tr>
+<td><strong>Se existe</strong></td>
+<td>Retorna do cache</td>
+</tr>
+<tr>
+<td><strong>Campos atualizáveis</strong></td>
+<td>Nenhum (insert-only)</td>
+</tr>
+<tr>
+<td><strong>Cascata de criação</strong></td>
+<td>Sim - cria automaticamente registros em tabelas dependentes</td>
+</tr>
+</tbody>
+</table>
+<h4 id="tabela-apolicegruposeguradora">Tabela: <code>apolice_grupo_seguradora</code></h4>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Regra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Estratégia</strong></td>
+<td>Upsert lógico (busca ou cria)</td>
+</tr>
+<tr>
+<td><strong>Chave de Identificação</strong></td>
+<td><code>(agencia_id, seguradora_id)</code></td>
+</tr>
+<tr>
+<td><strong>Verificação</strong></td>
+<td>Busca em cache por (agencia_id, seguradora_id)</td>
+</tr>
+<tr>
+<td><strong>Se não existe</strong></td>
+<td>Insere com valores padrão e adiciona ao cache</td>
+</tr>
+<tr>
+<td><strong>Se existe</strong></td>
+<td>Retorna ID do cache</td>
+</tr>
+<tr>
+<td><strong>Campos atualizáveis</strong></td>
+<td>Nenhum (insert-only)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="tabela-seguro">Tabela: <code>seguro</code></h4>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Regra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Estratégia</strong></td>
+<td>Insert only (carga inicial)</td>
+</tr>
+<tr>
+<td><strong>Verificação de duplicidade</strong></td>
+<td>Não há verificação explícita</td>
+</tr>
+<tr>
+<td><strong>Persistência</strong></td>
+<td>Em lotes de 100 registros</td>
+</tr>
+<tr>
+<td><strong>Criação em cascata</strong></td>
+<td>Cria <code>seguro_parametro</code> automaticamente</td>
+</tr>
+<tr>
+<td><strong>Campos atualizáveis</strong></td>
+<td>N/A (insert-only)</td>
+</tr>
+</tbody>
+</table>
+<h4 id="tabela-seguroparametro">Tabela: <code>seguro_parametro</code></h4>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Regra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Estratégia</strong></td>
+<td>Insert junto com seguro</td>
+</tr>
+<tr>
+<td><strong>Relacionamento</strong></td>
+<td>1:1 com seguro</td>
+</tr>
+<tr>
+<td><strong>Criação</strong></td>
+<td>Automática ao criar seguro</td>
+</tr>
+</tbody>
+</table>
+<h4 id="tabela-parcela">Tabela: <code>parcela</code></h4>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Regra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Estratégia</strong></td>
+<td>Insert only (carga inicial)</td>
+</tr>
+<tr>
+<td><strong>Verificação</strong></td>
+<td>Não há</td>
+</tr>
+<tr>
+<td><strong>Criação</strong></td>
+<td>Em cascata com seguro (via navegação)</td>
+</tr>
+<tr>
+<td><strong>Persistência</strong></td>
+<td>Junto com o seguro (AddRange)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="93-tratamento-de-exclus%C3%B5es">9.3 Tratamento de Exclusões</h3>
+<table>
+<thead>
+<tr>
+<th>Tipo</th>
+<th>Comportamento</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Hard Delete na origem</strong></td>
+<td>Registros com <code>sql_deleted = 'T'</code> são ignorados na extração</td>
+</tr>
+<tr>
+<td><strong>Soft Delete</strong></td>
+<td>Não implementado no destino</td>
+</tr>
+<tr>
+<td><strong>Espelhamento de status</strong></td>
+<td>Não implementado</td>
+</tr>
+<tr>
+<td><strong>Sincronia de exclusões</strong></td>
+<td>Não há - registros excluídos na origem após migração inicial permanecerão no destino</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="94-garantias-de-idempot%C3%AAncia">9.4 Garantias de Idempotência</h3>
+<table>
+<thead>
+<tr>
+<th>Cenário</th>
+<th>Comportamento</th>
+<th>Idempotente?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Reexecução completa (tabelas vazias)</td>
+<td>Cria todos os registros</td>
+<td>✅ Sim</td>
+</tr>
+<tr>
+<td>Reexecução com dados existentes - Dimensões</td>
+<td>Busca em cache, não duplica</td>
+<td>✅ Sim</td>
+</tr>
+<tr>
+<td>Reexecução com dados existentes - Seguros</td>
+<td>Cria todos os registros</td>
+<td>✅ Sim</td>
+</tr>
+<tr>
+<td>Reexecução com dados existentes - Parcelas</td>
+<td>Cria todos os registros</td>
+<td>✅ Sim</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="95-consist%C3%AAncia-e-integridade">9.5 Consistência e Integridade</h3>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Implementação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Integridade referencial</strong></td>
+<td>Garantida pelo processo (cria dependências antes)</td>
+</tr>
+<tr>
+<td><strong>Ordem de criação</strong></td>
+<td>Agência → PA → Cooperado → CoopAgConta → Seguradora → ApóliceGrupo → Seguro → Parcelas</td>
+</tr>
+<tr>
+<td><strong>Transações</strong></td>
+<td>deve utilizar transação englobante</td>
+</tr>
+<tr>
+<td><strong>Rollback em caso de erro</strong></td>
+<td>Total, deve reiniciar os Generator de PK</td>
+</tr>
+<tr>
+<td><strong>Consistência eventual</strong></td>
+<td>Processo síncrono, sem filas</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="10-controles-operacionais">10. Controles Operacionais</h2>
+<h3 id="101-logs-e-auditoria">10.1 Logs e Auditoria</h3>
+<table>
+<thead>
+<tr>
+<th>Tipo de Log</th>
+<th>Informação Registrada</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Início da aplicação</strong></td>
+<td>Timestamp de início</td>
+</tr>
+<tr>
+<td><strong>Agências encontradas</strong></td>
+<td>Lista de schemas a processar</td>
+</tr>
+<tr>
+<td><strong>Início por agência</strong></td>
+<td>Nome, código e ID da agência</td>
+</tr>
+<tr>
+<td><strong>Nenhum contrato</strong></td>
+<td>Mensagem quando base não tem contratos elegíveis</td>
+</tr>
+<tr>
+<td><strong>Nenhuma parcela</strong></td>
+<td>Mensagem quando não há parcelas</td>
+</tr>
+<tr>
+<td><strong>Progresso</strong></td>
+<td>Processados/Total, percentual, tempo restante estimado</td>
+</tr>
+<tr>
+<td><strong>Conclusão por agência</strong></td>
+<td>Quantidade de prestamistas e parcelas migrados</td>
+</tr>
+<tr>
+<td><strong>Erro por registro</strong></td>
+<td>Conta, contrato e mensagem de erro</td>
+</tr>
+<tr>
+<td><strong>Erro fatal</strong></td>
+<td>Stack trace completo</td>
+</tr>
+<tr>
+<td><strong>Conclusão geral</strong></td>
+<td>Total migrado vs total geral</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Formato de log</strong>: JSON compacto (via Serilog)
+<strong>Destino</strong>: Console + Arquivo diário (Logs/log-YYYYMMDD.txt)
+<strong>Enriquecimento</strong>: Nome da máquina, ID do processo, ID da thread</p>
+<hr>
+<h3 id="102-m%C3%A9tricas-coletadas">10.2 Métricas Coletadas</h3>
+<table>
+<thead>
+<tr>
+<th>Métrica</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>TotalContratos</strong></td>
+<td>Contador de contratos encontrados (todas agências)</td>
+</tr>
+<tr>
+<td><strong>TotalMigrado</strong></td>
+<td>Contador de seguros efetivamente persistidos</td>
+</tr>
+<tr>
+<td><strong>Tempo por lote</strong></td>
+<td>Calculado para estimativa de tempo restante</td>
+</tr>
+<tr>
+<td><strong>Tempo total</strong></td>
+<td>Cronometrado por agência</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="103-tratamento-de-falhas">10.3 Tratamento de Falhas</h3>
+<table>
+<thead>
+<tr>
+<th>Cenário</th>
+<th>Comportamento</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Erro em um registro</strong></td>
+<td>Log de erro, continua para próximo registro</td>
+</tr>
+<tr>
+<td><strong>Erro fatal</strong></td>
+<td>Log fatal, encerra execução, faz rollback</td>
+</tr>
+<tr>
+<td><strong>Agência sem dados</strong></td>
+<td>Log informativo, continua para próxima</td>
+</tr>
+<tr>
+<td><strong>Lookup não encontrado</strong></td>
+<td>Lança exceção (ex: cooperado não encontrado)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Estratégia de retry</strong>: Não implementada
+<strong>Backoff</strong>: Não implementado
+<strong>Circuit breaker</strong>: Não implementado</p>
+<hr>
+<h3 id="104-par%C3%A2metros-de-execu%C3%A7%C3%A3o">10.4 Parâmetros de Execução</h3>
+<table>
+<thead>
+<tr>
+<th>Parâmetro</th>
+<th>Fonte</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>SOURCE_DB</strong></td>
+<td>Variável de ambiente</td>
+<td>Connection string do banco de origem</td>
+</tr>
+<tr>
+<td><strong>TARGET_DB</strong></td>
+<td>Variável de ambiente</td>
+<td>Connection string do banco de destino</td>
+</tr>
+<tr>
+<td><strong>Schema dinâmico</strong></td>
+<td>Calculado</td>
+<td><code>agencia_XXXX</code> derivado do código</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Observação</strong>: Não há parâmetros para data de corte, modo dry-run ou filtros adicionais no código analisado. As datas de filtro estão hardcoded nas queries.</p>
+<hr>
+<h3 id="105-concorr%C3%AAncia-e-paralelismo">10.5 Concorrência e Paralelismo</h3>
+<table>
+<thead>
+<tr>
+<th>Aspecto</th>
+<th>Implementação</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Processamento de agências</strong></td>
+<td>Sequencial (uma por vez)</td>
+</tr>
+<tr>
+<td><strong>Processamento de contratos</strong></td>
+<td>Sequencial com preparação paralela (código comentado)</td>
+</tr>
+<tr>
+<td><strong>Acesso a cache</strong></td>
+<td>Thread-safe via <code>lock</code></td>
+</tr>
+<tr>
+<td><strong>Conexões de banco</strong></td>
+<td>Pool gerenciado pelo driver</td>
+</tr>
+<tr>
+<td><strong>MaxDegreeOfParallelism</strong></td>
+<td>Definido como número de processadores (mas não utilizado ativamente)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="11-casos-especiais-e-exce%C3%A7%C3%B5es">11. Casos Especiais e Exceções</h2>
+<h3 id="111-regras-condicionais">11.1 Regras Condicionais</h3>
+<h4 id="determina%C3%A7%C3%A3o-do-tipo-de-seguro-tipopagamento">Determinação do Tipo de Seguro (tipo_pagamento)</h4>
+<pre class="hljs"><code><div>SE (CON_DEBSEGURO = 2) OU (CON_PARCELAS = 1)
+    ENTÃO tipo_seguro = 1 (À Vista)
+SENÃO SE (há mais de uma fonte com valor &gt; 0 no ResumoFinanceiro)
+    ENTÃO tipo_seguro = 2 (Parcelado)
+SENÃO
+    tipo_seguro = 3 (Único/À Vista Lançamento Único)
+</div></code></pre>
+<h4 id="determina%C3%A7%C3%A3o-do-tipo-de-saldo-capital">Determinação do Tipo de Saldo (capital)</h4>
+<pre class="hljs"><code><div>SE MOD_CALCULO IN (2, 3)
+    ENTÃO tipo_saldo = 1 (Variável - PRICE/SAC)
+SENÃO
+    tipo_saldo = 2 (Fixo)
+</div></code></pre>
+<h4 id="determina%C3%A7%C3%A3o-do-coeficiente">Determinação do Coeficiente</h4>
+<pre class="hljs"><code><div>SE tipo_capital = Variável
+    ENTÃO coeficiente = 0.0003511
+SENÃO
+    coeficiente = 0.0005945
+</div></code></pre>
+<h4 id="periodicidade-por-seguradora">Periodicidade por Seguradora</h4>
+<pre class="hljs"><code><div>SE codigo_seguradora = &quot;0005&quot;
+    ENTÃO Periodicidade30Dias = false
+SENÃO
+    Periodicidade30Dias = true
+</div></code></pre>
+<hr>
+<h3 id="112-tratamento-de-dados-fora-do-padr%C3%A3o">11.2 Tratamento de Dados Fora do Padrão</h3>
+<table>
+<thead>
+<tr>
+<th>Situação</th>
+<th>Tratamento</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CPF/CNPJ nulo ou vazio</strong></td>
+<td>COALESCE com string vazia</td>
+</tr>
+<tr>
+<td><strong>Nome nulo</strong></td>
+<td>COALESCE com string vazia</td>
+</tr>
+<tr>
+<td><strong>Data de nascimento nula</strong></td>
+<td>Aceita (não validado)</td>
+</tr>
+<tr>
+<td><strong>Valor de prêmio nulo</strong></td>
+<td>COALESCE com 0.00</td>
+</tr>
+<tr>
+<td><strong>Valor base nulo</strong></td>
+<td>COALESCE com 0.00</td>
+</tr>
+<tr>
+<td><strong>Meses nulo</strong></td>
+<td>COALESCE com 0</td>
+</tr>
+<tr>
+<td><strong>Conta contábil nula</strong></td>
+<td>COALESCE com string vazia</td>
+</tr>
+<tr>
+<td><strong>Comissão não encontrada</strong></td>
+<td>Usa valores padrão (45%/20%)</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="113-ramos-alternativos">11.3 Ramos Alternativos</h3>
+<h4 id="cooperado-n%C3%A3o-encontrado-no-cache">Cooperado Não Encontrado no Cache</h4>
+<ol>
+<li>Busca lista de cooperados da origem (se ainda não carregada)</li>
+<li>Procura por número do documento</li>
+<li>Se não encontrado: <strong>lança exceção</strong></li>
+<li>Se encontrado: cria no destino e adiciona ao cache</li>
+</ol>
+<h4 id="conta-n%C3%A3o-encontrada">Conta Não Encontrada</h4>
+<ol>
+<li>Carrega lista de contas da agência (se schema mudou)</li>
+<li>Procura por código da conta</li>
+<li>Se não encontrada: <strong>lança exceção</strong></li>
+</ol>
+<h4 id="contrato-sem-parcelas">Contrato Sem Parcelas</h4>
+<ol>
+<li>Verifica se há parcelas agrupadas para (conta, contrato)</li>
+<li>Se não há parcelas: <strong>retorna 0, não cria seguro</strong></li>
+</ol>
+<hr>
+<h2 id="12-crit%C3%A9rios-de-aceita%C3%A7%C3%A3o-para-reimplementa%C3%A7%C3%A3o">12. Critérios de Aceitação para Reimplementação</h2>
+<h3 id="121-checklist-de-equival%C3%AAncia-funcional">12.1 Checklist de Equivalência Funcional</h3>
+<h4 id="descoberta-e-itera%C3%A7%C3%A3o">Descoberta e Iteração</h4>
+<ul>
+<li><input type="checkbox" id="checkbox0"><label for="checkbox0">Conecta-se à base central (schema </label><code>unico</code>)</li>
+<li><input type="checkbox" id="checkbox1"><label for="checkbox1">Identifica todas as agências ativas (</label><code>AG_ATIVA = 1</code>)</li>
+<li><input type="checkbox" id="checkbox2"><label for="checkbox2">Itera sobre cada agência em sequência</label></li>
+<li><input type="checkbox" id="checkbox3"><label for="checkbox3">Alterna dinamicamente o schema de conexão para cada agência</label></li>
+</ul>
+<h4 id="extra%C3%A7%C3%A3o-de-dados">Extração de Dados</h4>
+<ul>
+<li><input type="checkbox" id="checkbox4"><label for="checkbox4">Extrai contratos de seguro prestamista com todos os filtros:</label>
+<ul>
+<li><input type="checkbox" id="checkbox5"><label for="checkbox5">Modalidade = 4 (Empréstimo)</label></li>
+<li><input type="checkbox" id="checkbox6"><label for="checkbox6">Não cancelado (tipo_cancelamento = 0)</label></li>
+<li><input type="checkbox" id="checkbox7"><label for="checkbox7">Vigência futura (fim_vigencia &gt;= data de corte)</label></li>
+<li><input type="checkbox" id="checkbox8"><label for="checkbox8">Não excluído logicamente (sql_deleted = 'F')</label></li>
+<li><input type="checkbox" id="checkbox9"><label for="checkbox9">Conta ativa (situação = 1)</label></li>
+<li><input type="checkbox" id="checkbox10"><label for="checkbox10">Contrato não liquidado (data_pagamento IS NULL)</label></li>
+</ul>
+</li>
+<li><input type="checkbox" id="checkbox11"><label for="checkbox11">Calcula campos derivados (tipo_seguro, tipo_saldo)</label></li>
+<li><input type="checkbox" id="checkbox12"><label for="checkbox12">Agrupa parcelas por (conta, contrato)</label></li>
+</ul>
+<h4 id="transforma%C3%A7%C3%B5es">Transformações</h4>
+<ul>
+<li><input type="checkbox" id="checkbox13"><label for="checkbox13">Converte tipo de pessoa corretamente (F/J → Física/Jurídica)</label></li>
+<li><input type="checkbox" id="checkbox14"><label for="checkbox14">Deriva CNPJ da seguradora a partir do código</label></li>
+<li><input type="checkbox" id="checkbox15"><label for="checkbox15">Aplica coeficientes condicionais por tipo de capital</label></li>
+<li><input type="checkbox" id="checkbox16"><label for="checkbox16">Formata sequência do contrato com 2 dígitos</label></li>
+<li><input type="checkbox" id="checkbox17"><label for="checkbox17">Determina tipo de pagamento corretamente</label></li>
+</ul>
+<h4 id="lookup-e-cria%C3%A7%C3%A3o-de-dimens%C3%B5es">Lookup e Criação de Dimensões</h4>
+<ul>
+<li><input type="checkbox" id="checkbox18"><label for="checkbox18">Cria agências não existentes</label></li>
+<li><input type="checkbox" id="checkbox19"><label for="checkbox19">Cria pontos de atendimento não existentes</label></li>
+<li><input type="checkbox" id="checkbox20"><label for="checkbox20">Cria cooperados não existentes</label></li>
+<li><input type="checkbox" id="checkbox21"><label for="checkbox21">Cria vínculos cooperado-agência-conta não existentes</label></li>
+<li><input type="checkbox" id="checkbox22"><label for="checkbox22">Cria seguradoras não existentes (com toda a cascata)</label></li>
+<li><input type="checkbox" id="checkbox23"><label for="checkbox23">Cria limites por faixa etária para cada seguradora</label></li>
+<li><input type="checkbox" id="checkbox24"><label for="checkbox24">Cria apólice/grupo não existente</label></li>
+</ul>
+<h4 id="carga-de-dados">Carga de Dados</h4>
+<ul>
+<li><input type="checkbox" id="checkbox25"><label for="checkbox25">Insere seguros com todos os campos mapeados</label></li>
+<li><input type="checkbox" id="checkbox26"><label for="checkbox26">Insere parâmetros de seguro</label></li>
+<li><input type="checkbox" id="checkbox27"><label for="checkbox27">Insere parcelas vinculadas ao seguro</label></li>
+<li><input type="checkbox" id="checkbox28"><label for="checkbox28">Persiste em lotes para performance</label></li>
+</ul>
+<h4 id="logs-e-m%C3%A9tricas">Logs e Métricas</h4>
+<ul>
+<li><input type="checkbox" id="checkbox29"><label for="checkbox29">Registra início e fim de processamento</label></li>
+<li><input type="checkbox" id="checkbox30"><label for="checkbox30">Registra progresso por agência</label></li>
+<li><input type="checkbox" id="checkbox31"><label for="checkbox31">Conta total de contratos processados</label></li>
+<li><input type="checkbox" id="checkbox32"><label for="checkbox32">Registra erros individuais sem interromper o fluxo</label></li>
+</ul>
+<hr>
+<h3 id="122-n%C3%BAmeros-esperados-por-etapa">12.2 Números Esperados por Etapa</h3>
+<p>Os números abaixo devem ser validados comparando a execução da implementação original com a nova implementação, utilizando a mesma base de dados de origem:</p>
+<table>
+<thead>
+<tr>
+<th>Etapa</th>
+<th>Métrica</th>
+<th>Como Validar</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Descoberta</td>
+<td>Quantidade de agências</td>
+<td>Contar resultado da query de agências ativas</td>
+</tr>
+<tr>
+<td>Extração</td>
+<td>Contratos por agência</td>
+<td>Contar registros retornados pela query principal</td>
+</tr>
+<tr>
+<td>Extração</td>
+<td>Parcelas por agência</td>
+<td>Contar registros da tabela ep_segparcela</td>
+</tr>
+<tr>
+<td>Transformação</td>
+<td>Cooperados criados</td>
+<td>Contar INSERT na tabela cooperado</td>
+</tr>
+<tr>
+<td>Transformação</td>
+<td>Seguradoras criadas</td>
+<td>Contar INSERT na tabela seguradora</td>
+</tr>
+<tr>
+<td>Carga</td>
+<td>Seguros inseridos</td>
+<td>Contar INSERT na tabela seguro</td>
+</tr>
+<tr>
+<td>Carga</td>
+<td>Parcelas inseridas</td>
+<td>Contar INSERT na tabela parcela</td>
+</tr>
+<tr>
+<td>Final</td>
+<td>Total migrado</td>
+<td>Deve igualar soma dos seguros por agência</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h3 id="123-testes-de-valida%C3%A7%C3%A3o-sugeridos">12.3 Testes de Validação Sugeridos</h3>
+<h4 id="teste-de-integridade-referencial">Teste de Integridade Referencial</h4>
+<pre class="hljs"><code><div>Para cada seguro:
+  - Existe cooperado_agencia_conta com o ID referenciado
+  - Existe ponto_atendimento com o ID referenciado
+  - Existe apolice_grupo_seguradora com o ID referenciado
+  - Existe seguro_parametro com o ID referenciado
+  
+Para cada parcela:
+  - Existe seguro com o ID referenciado
+</div></code></pre>
+<h4 id="teste-de-valores-calculados">Teste de Valores Calculados</h4>
+<pre class="hljs"><code><div>Para amostras de registros:
+  - tipo_pagamento corresponde à regra de tipo_seguro
+  - coeficiente corresponde ao tipo_capital
+  - valor_pago = valor_parcela quando liquidacao preenchido
+  - valor_pago = 0 quando liquidacao nulo
+</div></code></pre>
+<h4 id="teste-de-completude">Teste de Completude</h4>
+<pre class="hljs"><code><div>- Total de seguros no destino &gt;= total de contratos elegíveis na origem
+- Para cada seguro, quantidade de parcelas no destino = quantidade na origem
+- Todas as agências ativas foram processadas
+</div></code></pre>
+<hr>
+<h2 id="13-gloss%C3%A1rio">13. Glossário</h2>
+<table>
+<thead>
+<tr>
+<th>Termo</th>
+<th>Definição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Agência</strong></td>
+<td>Unidade operacional da cooperativa de crédito, identificada por código de 4 dígitos</td>
+</tr>
+<tr>
+<td><strong>Apólice</strong></td>
+<td>Documento que formaliza o contrato de seguro entre seguradora e segurado</td>
+</tr>
+<tr>
+<td><strong>Capital Segurado</strong></td>
+<td>Valor máximo coberto pelo seguro em caso de sinistro</td>
+</tr>
+<tr>
+<td><strong>Capital Fixo</strong></td>
+<td>Modalidade onde o valor segurado permanece constante durante a vigência</td>
+</tr>
+<tr>
+<td><strong>Capital Variável</strong></td>
+<td>Modalidade onde o valor segurado acompanha o saldo devedor (decresce)</td>
+</tr>
+<tr>
+<td><strong>Coeficiente</strong></td>
+<td>Fator multiplicador usado no cálculo do prêmio do seguro</td>
+</tr>
+<tr>
+<td><strong>Comissão</strong></td>
+<td>Percentual do prêmio destinado à corretora e/ou cooperativa como remuneração</td>
+</tr>
+<tr>
+<td><strong>Cooperado</strong></td>
+<td>Cliente/associado da cooperativa de crédito</td>
+</tr>
+<tr>
+<td><strong>DPS</strong></td>
+<td>Declaração Pessoal de Saúde - documento exigido acima de certos valores ou idades</td>
+</tr>
+<tr>
+<td><strong>ECR</strong></td>
+<td>Empréstimo com Consignação em Renda</td>
+</tr>
+<tr>
+<td><strong>Grupo</strong></td>
+<td>Subdivisão da apólice que agrupa riscos similares</td>
+</tr>
+<tr>
+<td><strong>IOF</strong></td>
+<td>Imposto sobre Operações Financeiras - tributo incidente sobre o prêmio</td>
+</tr>
+<tr>
+<td><strong>Liquidação</strong></td>
+<td>Quitação/pagamento de uma parcela ou contrato</td>
+</tr>
+<tr>
+<td><strong>Modalidade</strong></td>
+<td>Tipo de produto de crédito: Cheque Especial, ECR, Desconto ou Empréstimo</td>
+</tr>
+<tr>
+<td><strong>PA</strong></td>
+<td>Ponto de Atendimento - subdivisão da agência</td>
+</tr>
+<tr>
+<td><strong>Periodicidade 30 Dias</strong></td>
+<td>Regime onde os vencimentos são a cada 30 dias corridos (vs mensal no mesmo dia)</td>
+</tr>
+<tr>
+<td><strong>Prêmio</strong></td>
+<td>Valor pago pelo segurado à seguradora pela cobertura do seguro</td>
+</tr>
+<tr>
+<td><strong>Prestamista</strong></td>
+<td>Tipo de seguro vinculado a operações de crédito</td>
+</tr>
+<tr>
+<td><strong>Renegociação</strong></td>
+<td>Nova negociação das condições de um contrato existente</td>
+</tr>
+<tr>
+<td><strong>Seguradora</strong></td>
+<td>Empresa que assume o risco e paga a indenização em caso de sinistro</td>
+</tr>
+<tr>
+<td><strong>Sequencial</strong></td>
+<td>Número que identifica aditivos/renegociações de um mesmo contrato</td>
+</tr>
+<tr>
+<td><strong>Sinistro</strong></td>
+<td>Ocorrência do evento coberto pelo seguro (morte, invalidez, etc.)</td>
+</tr>
+<tr>
+<td><strong>Vigência</strong></td>
+<td>Período durante o qual o seguro está ativo e garante cobertura</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="14-assun%C3%A7%C3%B5es-e-invariantes">14. Assunções e Invariantes</h2>
+<h3 id="141-assun%C3%A7%C3%B5es-do-etl">14.1 Assunções do ETL</h3>
+<table>
+<thead>
+<tr>
+<th>Assunção</th>
+<th>Evidência</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>O código da seguradora pode ser convertido em CNPJ preenchendo com zeros</td>
+<td>Lógica de conversão explícita</td>
+</tr>
+<tr>
+<td>Todos os cooperados da base de origem possuem CPF/CNPJ válido</td>
+<td>Query não trata inconsistências</td>
+</tr>
+<tr>
+<td>As contas correntes sempre têm PA_CODIGO preenchido</td>
+<td>Usado sem verificação de nulo</td>
+</tr>
+<tr>
+<td>A seguradora código &quot;0005&quot; tem periodicidade diferente das demais</td>
+<td>Condição explícita no código</td>
+</tr>
+<tr>
+<td>Contratos sem parcelas devem ser ignorados</td>
+<td>Retorna 0 se não há parcelas</td>
+</tr>
+<tr>
+<td>O campo sql_deleted com valor 'F' indica registro ativo</td>
+<td>Filtro explícito na extração</td>
+</tr>
+</tbody>
+</table>
+<h3 id="142-invariantes-esperadas">14.2 Invariantes Esperadas</h3>
+<table>
+<thead>
+<tr>
+<th>Invariante</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unicidade de agência por código</td>
+<td>Código de 4 dígitos é único</td>
+</tr>
+<tr>
+<td>Unicidade de PA por agência</td>
+<td>Código de 3 dígitos é único dentro da agência</td>
+</tr>
+<tr>
+<td>Unicidade de cooperado por documento</td>
+<td>CPF/CNPJ identifica unicamente um cooperado</td>
+</tr>
+<tr>
+<td>Unicidade de vínculo coop-ag-conta</td>
+<td>Combinação é única</td>
+</tr>
+<tr>
+<td>Unicidade de seguradora por CNPJ</td>
+<td>CNPJ identifica unicamente uma seguradora</td>
+</tr>
+<tr>
+<td>Relação 1:1 seguro-parametro</td>
+<td>Cada seguro tem exatamente um registro de parâmetros</td>
+</tr>
+</tbody>
+</table>
+<h3 id="143-limita%C3%A7%C3%B5es-conhecidas">14.3 Limitações Conhecidas</h3>
+<table>
+<thead>
+<tr>
+<th>Limitação</th>
+<th>Impacto</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Datas de filtro hardcoded</td>
+<td>Requer modificação de código para alterar janela de migração</td>
+</tr>
+<tr>
+<td>Não idempotente para fatos</td>
+<td>Segunda execução cria duplicatas</td>
+</tr>
+<tr>
+<td>Sem transação global</td>
+<td>Falha parcial deixa dados inconsistentes</td>
+</tr>
+<tr>
+<td>Sem retry automático</td>
+<td>Erros transitórios podem causar perda de dados</td>
+</tr>
+<tr>
+<td>Comissões fixas na criação</td>
+<td>Não reflete alterações posteriores na seguradora</td>
+</tr>
+<tr>
+<td>Valores de apólice fixos</td>
+<td>Não captura configuração real da apólice</td>
+</tr>
+<tr>
+<td>Usuário não migrado</td>
+<td>Campo usuario_id sempre NULL</td>
+</tr>
+<tr>
+<td>Histórico de auditoria não migrado</td>
+<td>Não há rastreabilidade de alterações anteriores</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="15-ap%C3%AAndice-queries-de-valida%C3%A7%C3%A3o">15. Apêndice: Queries de Validação</h2>
+<h3 id="151-valida%C3%A7%C3%A3o-de-completude-executar-ap%C3%B3s-migra%C3%A7%C3%A3o">15.1 Validação de Completude (executar após migração)</h3>
+<p><strong>Contar seguros por agência no destino:</strong></p>
+<pre class="hljs"><code><div>Selecionar agência, contar seguros
+Agrupar por agência
+Ordenar por agência
+</div></code></pre>
+<p><strong>Verificar seguros sem parcelas:</strong></p>
+<pre class="hljs"><code><div>Selecionar seguros onde não existe nenhuma parcela vinculada
+</div></code></pre>
+<p><strong>Verificar parcelas órfãs:</strong></p>
+<pre class="hljs"><code><div>Selecionar parcelas onde não existe seguro com o ID referenciado
+</div></code></pre>
+<h3 id="152-valida%C3%A7%C3%A3o-de-integridade">15.2 Validação de Integridade</h3>
+<p><strong>Cooperados sem vínculo agência-conta:</strong></p>
+<pre class="hljs"><code><div>Selecionar cooperados onde não existe vínculo na tabela cooperado_agencia_conta
+</div></code></pre>
+<p><strong>Apólices sem seguros:</strong></p>
+<pre class="hljs"><code><div>Selecionar apólice_grupo_seguradora onde não existe seguro vinculado
+</div></code></pre>
+<h3 id="153-valida%C3%A7%C3%A3o-de-valores">15.3 Validação de Valores</h3>
+<p><strong>Parcelas com valor pago inconsistente:</strong></p>
+<pre class="hljs"><code><div>Selecionar parcelas onde:
+  (liquidação preenchida E valor_pago = 0)
+  OU
+  (liquidação nula E valor_pago &gt; 0)
+</div></code></pre>
+<p><strong>Seguros com tipo de pagamento inconsistente:</strong></p>
+<pre class="hljs"><code><div>Selecionar seguros onde:
+  (tipo_pagamento = 'À Vista' E quantidade_parcelas &gt; 1 E existe mais de uma parcela)
+</div></code></pre>
+<hr>
+<p><em>Fim do documento de reconstrução ETL - Parte 3</em></p>
+<hr>
+<h2 id="hist%C3%B3rico-de-vers%C3%B5es">Histórico de Versões</h2>
+<table>
+<thead>
+<tr>
+<th>Versão</th>
+<th>Data</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0</td>
+<td>09/01/2026</td>
+<td>Versão inicial - Análise completa do projeto de migração</td>
+</tr>
+</tbody>
+</table>
+
+</body>
+</html>

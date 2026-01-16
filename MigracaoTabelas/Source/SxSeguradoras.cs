@@ -159,18 +159,6 @@ namespace MigracaoTabelas.Source
         /// <summary>Conta Contábil de Débito de SEGP COMISSAO contratado (CONTA_CONTABIL_DEBITO_COMISSAO)</summary>
         public string ContaContabilDebitoComissao { get; set; } = string.Empty;
 
-        /// <summary>Conta Contábil de Credito de SEGP contratado 4966 (CONTA_CONTABIL_CREDITO_4966)</summary>
-        public string? ContaContabilCredito4966 { get; set; }
-
-        /// <summary>Conta Contábil de Débito de SEGP contratado 4966 (CONTA_CONTABIL_DEBITO_4966)</summary>
-        public string? ContaContabilDebito4966 { get; set; }
-
-        /// <summary>Conta Contábil de Credito de SEGP COMISSAO contratado 4966 (CONTA_CONTABIL_CREDITO_COMISSAO_4966)</summary>
-        public string? ContaContabilCreditoComissao4966 { get; set; }
-
-        /// <summary>Conta Contábil de Débito de SEGP COMISSAO contratado 4966 (CONTA_CONTABIL_DEBITO_COMISSAO_4966)</summary>
-        public string? ContaContabilDebitoComissao4966 { get; set; }
-
         /// <summary>Porcentagem das cooperativas referente ao Seguro prestamista (PORCENTAGEM_COMISSAO)</summary>
         public decimal PorcentagemComissao { get; set; }
     }
