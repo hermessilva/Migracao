@@ -41,5 +41,23 @@ public class ContabilizacaoSeguradora
     public string CreditoComissaoParcela { get; set; }
     public string DescricaoCreditoComissaoParcela { get; set; }
 
+    public string DebitoFaturamentoPremio { get; set; }
+    public string DescricaoDebitoFaturamentoPremio { get; set; }
+
+    public string CreditoFaturamentoPremio { get; set; }
+    public string DescricaoCreditoFaturamentoPremio { get; set; }
+
+    public string DebitoFaturamentoComissao { get; set; }
+    public string DescricaoDebitoFaturamentoComissao { get; set; }
+
+    public string CreditoFaturamentoComissao { get; set; }
+    public string DescricaoCreditoFaturamentoComissao { get; set; }
+
+    public string DebitoFaturamentoIRRF { get; set; }
+    public string DescricaoDebitoFaturamentoIRRF { get; set; }
+
+    public string CreditoFaturamentoIRRF { get; set; }
+    public string DescricaoCreditoFaturamentoIRRF { get; set; }
+
     public virtual Seguradora Seguradoras { get; set; }
 }

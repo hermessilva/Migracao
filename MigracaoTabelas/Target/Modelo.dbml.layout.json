@@ -1,0 +1,127 @@
+{
+  "positions": {
+    "agencia": {
+      "x": 1160,
+      "y": 1000
+    },
+    "ponto_atendimento": {
+      "x": -1500,
+      "y": 840
+    },
+    "perfil": {
+      "x": 1240,
+      "y": 440
+    },
+    "acao": {
+      "x": 120,
+      "y": 980
+    },
+    "auditoria": {
+      "x": 2580,
+      "y": 520
+    },
+    "contabilizacao_seguradora": {
+      "x": 3640,
+      "y": 380
+    },
+    "condicao_seguradora": {
+      "x": 3260,
+      "y": 1660
+    },
+    "seguradora": {
+      "x": 2440,
+      "y": 1440
+    },
+    "gestao_documento": {
+      "x": 3020,
+      "y": 1140
+    },
+    "comissao_seguradora": {
+      "x": 2920,
+      "y": 880
+    },
+    "proposta_seguradora": {
+      "x": 3880,
+      "y": 1940
+    },
+    "apolice_grupo_seguradora": {
+      "x": 1940,
+      "y": 1340
+    },
+    "seguradora_limite": {
+      "x": 3060,
+      "y": 2080
+    },
+    "cooperado_agencia_conta": {
+      "x": 600,
+      "y": 2000
+    },
+    "evento_outbox": {
+      "x": -780,
+      "y": -80
+    },
+    "conta_corrente_seguradora": {
+      "x": 2440,
+      "y": 1880
+    },
+    "usuario": {
+      "x": 1760,
+      "y": -80
+    },
+    "tela_acao": {
+      "x": -520,
+      "y": 600
+    },
+    "tela_acao_perfil": {
+      "x": 780,
+      "y": 600
+    },
+    "tela": {
+      "x": 140,
+      "y": 480
+    },
+    "cooperado": {
+      "x": 1120,
+      "y": 2260
+    },
+    "lancamento_efetivar": {
+      "x": 1060,
+      "y": 1500
+    },
+    "armazenamento_documento": {
+      "x": -1360,
+      "y": 2120
+    },
+    "seguro": {
+      "x": -720,
+      "y": 1380
+    },
+    "seguro_parametro": {
+      "x": -1620,
+      "y": 1500
+    },
+    "parcela": {
+      "x": 80,
+      "y": 1560
+    },
+    "parametrizacao": {
+      "x": -1420,
+      "y": -40
+    },
+    "integracao_senior": {
+      "x": -580,
+      "y": 2680
+    },
+    "seguro_cancelamento": {
+      "x": 600,
+      "y": 1480
+    }
+  },
+  "viewBox": {
+    "x": -815.6106365903764,
+    "y": -239.52577230054553,
+    "width": 3837.1845324180267,
+    "height": 3837.1845324180267
+  },
+  "views": []
+}

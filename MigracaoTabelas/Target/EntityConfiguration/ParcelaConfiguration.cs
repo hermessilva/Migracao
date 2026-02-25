@@ -1,7 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-using Seguros.Helpers;
+using MigracaoTabelas.Target;
+
+
 
 
 namespace MigracaoTabelas.Target.EntityConfiguration;

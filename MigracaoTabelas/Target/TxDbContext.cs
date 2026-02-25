@@ -1,9 +1,11 @@
 using System.Diagnostics;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using Microsoft.Extensions.Options;
 
 namespace MigracaoTabelas.Target
 {
@@ -58,6 +60,8 @@ namespace MigracaoTabelas.Target
 
         protected override void OnConfiguring(DbContextOptionsBuilder pBuilder)
         {
+            pBuilder.AddInterceptors(new MySqlAuditInterceptor());
+
             if (!pBuilder.IsConfigured)
             {
                 var str = Utils.Read("TARGET_DB", "");
@@ -90,6 +94,65 @@ namespace MigracaoTabelas.Target
             var source = index.GetConfigurationSource();
             if (source == ConfigurationSource.Convention)
                 entity.RemoveIndex(index);
+        }
+    }
+
+    public class MySqlAuditInterceptor : SaveChangesInterceptor
+    {
+        public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
+        {
+            GenerateMySqlInserts(eventData.Context);
+            return base.SavingChanges(eventData, result);
+        }
+
+        private void GenerateMySqlInserts(DbContext? context)
+        {
+            if (context == null)
+                return;
+
+            var entries = context.ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Added);
+
+            foreach (var entry in entries)
+            {
+                var entityType = entry.Metadata;
+                var tableName = entityType.GetTableName();
+                var schema = entityType.GetSchema(); // MySQL raramente usa schema, mas é bom ter
+
+                var columns = new List<string>();
+                var values = new List<string>();
+
+                foreach (var property in entry.CurrentValues.Properties)
+                {
+                    // Ignora propriedades marcadas como ValueGeneratedOnAdd (ex: IDs Auto Increment)
+                    // a menos que você queira forçar o ID.
+                    if (property.ValueGenerated == Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.OnAdd)
+                        continue;
+
+                    columns.Add($"`{property.GetColumnName()}`");
+
+                    var value = entry.CurrentValues[property];
+                    values.Add(FormatValueForMySql(value));
+                }
+
+                var sql = $"INSERT INTO `{tableName}` ({string.Join(", ", columns)}) VALUES ({string.Join(", ", values)});";
+                File.AppendAllText(@$"D:\CrediSIS\DBs\inserts.sql", sql + Environment.NewLine);
+            }
+        }
+
+        private string FormatValueForMySql(object? value)
+        {
+            if (value == null)
+                return "NULL";
+
+            return value switch
+            {
+                string s => $"'{s.Replace("'", "''")}'", // Escape simples para strings
+                bool b => b ? "1" : "0",
+                DateTime dt => $"'{dt:yyyy-MM-dd HH:mm:ss}'",
+                Guid g => $"'{g}'",
+                _ => value.ToString()?.Replace(",", ".") ?? "NULL" // Garante ponto decimal em floats/doubles
+            };
         }
     }
 }

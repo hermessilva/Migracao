@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-using Seguros.Helpers;
+
 
 namespace MigracaoTabelas.Target;
 
@@ -17,6 +17,7 @@ public class IntegracaoSenior
     public decimal Valor { get; private set; }
     public string Descricao { get; private set; }
     public string NumeroLancamento { get; private set; }
+    public bool Visualizar { get; private set; } = true;
     public virtual Agencia Agencia { get; private set; }
 
     protected IntegracaoSenior() { }
@@ -53,6 +54,11 @@ public class IntegracaoSenior
         Status = StatusEnvioIntegracaoSenior.Falha;
         Descricao = $"{tipoLancamentoContabil.AsString()} falhou ao enviar. Motivo: {mensagemErroSenior}";
     }
+
+    public void DefinirVisualizar(bool visualizar)
+    {
+        Visualizar = visualizar;
+    }
 }
 
 public enum StatusEnvioIntegracaoSenior
@@ -87,5 +93,14 @@ public enum TipoLancamentoContabilIntegracaoSenior
     RecebimentoPremioParcelaSeguroPrestamista = 7,
 
     [Description("Recebimento Comissão Seguro Prestamista Parcelado")]
-    RecebimentoComissaoParcelaSeguroPrestamista = 8
+    RecebimentoComissaoParcelaSeguroPrestamista = 8,
+
+    [Description("Faturamento Prêmio Seguro Prestamista")]
+    FaturamentoPremioSeguroPrestamista = 9,
+
+    [Description("Faturamento Comissão Seguro Prestamista")]
+    FaturamentoComissaoSeguroPrestamista = 10,
+
+    [Description("Faturamento IRRF Seguro Prestamista")]
+    FaturamentoIRRFSeguroPrestamista = 11
 }

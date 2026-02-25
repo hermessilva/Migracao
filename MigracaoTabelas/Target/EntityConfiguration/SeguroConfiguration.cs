@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using MigracaoTabelas.Target;
 
-using Seguros.Helpers;
+
 
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
@@ -111,12 +111,12 @@ public class SeguroConfiguration : BaseEntityConfiguration<Seguro>
             .IsRequired();
 
         ConfigureEnum(builder.Property(x => x.TipoPagamento)
-            .HasColumnName("tipo_pagamento"), "À Vista", "Parcelado", "Único")
+            .HasColumnName("tipo_pagamento"), "À Vista", "Parcelado")
             .HasConversion(
                 v => v.AsString(),
                 v => EnumHelper.FromString<TipoPagamentoSeguro>(v)
             )
-            .HasComment("Modalidade de pagamento: À Vista, Parcelado ou Único")
+            .HasComment("Modalidade de pagamento: À Vista ou Parcelado")
             .IsRequired();
 
         builder.Property(x => x.EstornoProporcional)
@@ -150,6 +150,11 @@ public class SeguroConfiguration : BaseEntityConfiguration<Seguro>
             .HasMaxLength(2)
             .HasDefaultValue("00")
             .HasComment("Numero sequêncial do contrato");
+
+        builder.Property(x => x.UploadDocumento)
+            .HasColumnName("upload_documento")
+            .HasColumnType(DateTime())
+            .HasComment("Data e hora do upload dos documentos relacionados ao seguro");
 
         // Relacionamentos
         builder.HasOne(x => x.CooperadosAgenciasContas)

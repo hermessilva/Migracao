@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using MigracaoTabelas.Target;
 
-using Seguros.Helpers;
+
 
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
@@ -47,9 +47,26 @@ public class CooperadoConfiguration : BaseEntityConfiguration<Cooperado>
             .HasMaxLength(255)
             .HasComment("Nome fantasia do cooperado (aplicável apenas para pessoa jurídica)");
 
+        builder.Property(x => x.NomeSocial)
+            .HasColumnName("nome_social")
+            .HasMaxLength(255)
+            .HasComment("Nome social do cooperado (nome pelo qual a pessoa prefere ser chamada)");
+
         builder.Property(x => x.Email)
             .HasColumnName("email")
             .HasMaxLength(255)
             .HasComment("Endereço de e-mail para contato e comunicações com o cooperado");
+
+        builder.Property(x => x.DataNascimento)
+            .HasColumnName("data_nascimento")
+            .HasComment("Data de nascimento do cooperado");
+
+        ConfigureEnum(builder.Property(x => x.Sexo)
+            .HasColumnName("sexo"), "Masculino", "Feminino")
+            .HasConversion(
+                v => v.HasValue ? v.Value.AsString() : null,
+                v => EnumHelper.FromStringNull<SexoCooperado>(v)
+            )
+            .HasComment("Sexo do cooperado: Masculino, Feminino ou Juridico (para pessoa jurídica)");
     }
 }

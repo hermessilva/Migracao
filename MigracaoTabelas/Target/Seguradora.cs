@@ -35,7 +35,7 @@ public class Seguradora
     public virtual ICollection<SeguradoraLimite> SeguradorasLimites { get; set; } = new List<SeguradoraLimite>();
     public virtual ICollection<ApoliceGrupoSeguradora> ApolicesGruposSeguradoras { get; set; } = new List<ApoliceGrupoSeguradora>();
 
-    private void InitializeDefaults()
+    public void InitializeDefaults()
     {
         CondicoesSeguradora.Add(new CondicaoSeguradora
         {
@@ -80,7 +80,19 @@ public class Seguradora
             DebitoComissaoParcela = string.Empty,
             DescricaoDebitoComissaoParcela = string.Empty,
             CreditoComissaoParcela = string.Empty,
-            DescricaoCreditoComissaoParcela = string.Empty
+            DescricaoCreditoComissaoParcela = string.Empty,
+            DebitoFaturamentoPremio = string.Empty,
+            DescricaoDebitoFaturamentoPremio = string.Empty,
+            CreditoFaturamentoPremio = string.Empty,
+            DescricaoCreditoFaturamentoPremio = string.Empty,
+            DebitoFaturamentoComissao = string.Empty,
+            DescricaoDebitoFaturamentoComissao = string.Empty,
+            CreditoFaturamentoComissao = string.Empty,
+            DescricaoCreditoFaturamentoComissao = string.Empty,
+            DebitoFaturamentoIRRF = string.Empty,
+            DescricaoDebitoFaturamentoIRRF = string.Empty,
+            CreditoFaturamentoIRRF = string.Empty,
+            DescricaoCreditoFaturamentoIRRF = string.Empty
         });
 
         PropostasSeguradoras.Add(new PropostaSeguradora

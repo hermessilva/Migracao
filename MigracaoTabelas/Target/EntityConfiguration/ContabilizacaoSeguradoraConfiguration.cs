@@ -215,6 +215,78 @@ public class ContabilizacaoSeguradoraConfiguration : BaseEntityConfiguration<Con
             .HasComment("Descrição da conta contábil credito comissao parcela")
             .IsRequired();
 
+        builder.Property(x => x.DebitoFaturamentoPremio)
+            .HasColumnName("debito_faturamento_premio")
+            .HasMaxLength(50)
+            .HasComment("Código da conta contábil debito faturamento premio")
+            .IsRequired();
+
+        builder.Property(x => x.DescricaoDebitoFaturamentoPremio)
+            .HasColumnName("descricao_debito_faturamento_premio")
+            .HasMaxLength(255)
+            .HasComment("Descrição da conta contábil debito faturamento premio")
+            .IsRequired();
+
+        builder.Property(x => x.CreditoFaturamentoPremio)
+            .HasColumnName("credito_faturamento_premio")
+            .HasMaxLength(50)
+            .HasComment("Código da conta contábil credito faturamento premio")
+            .IsRequired();
+
+        builder.Property(x => x.DescricaoCreditoFaturamentoPremio)
+            .HasColumnName("descricao_credito_faturamento_premio")
+            .HasMaxLength(255)
+            .HasComment("Descrição da conta contábil credito faturamento premio")
+            .IsRequired();
+
+        builder.Property(x => x.DebitoFaturamentoComissao)
+            .HasColumnName("debito_faturamento_comissao")
+            .HasMaxLength(50)
+            .HasComment("Código da conta contábil débito faturamento comissão")
+            .IsRequired();
+
+        builder.Property(x => x.DescricaoDebitoFaturamentoComissao)
+            .HasColumnName("descricao_debito_faturamento_comissao")
+            .HasMaxLength(255)
+            .HasComment("Descrição da conta contábil débito faturamento comissão")
+            .IsRequired();
+
+        builder.Property(x => x.CreditoFaturamentoComissao)
+            .HasColumnName("credito_faturamento_comissao")
+            .HasMaxLength(50)
+            .HasComment("Código da conta contábil crédito faturamento comissão")
+            .IsRequired();
+
+        builder.Property(x => x.DescricaoCreditoFaturamentoComissao)
+            .HasColumnName("descricao_credito_faturamento_comissao")
+            .HasMaxLength(255)
+            .HasComment("Descrição da conta contábil crédito faturamento comissão")
+            .IsRequired();
+
+        builder.Property(x => x.DebitoFaturamentoIRRF)
+            .HasColumnName("debito_faturamento_irrf")
+            .HasMaxLength(50)
+            .HasComment("Código da conta contábil débito faturamento IRRF")
+            .IsRequired();
+
+        builder.Property(x => x.DescricaoDebitoFaturamentoIRRF)
+            .HasColumnName("descricao_debito_faturamento_irrf")
+            .HasMaxLength(255)
+            .HasComment("Descrição da conta contábil débito faturamento IRRF")
+            .IsRequired();
+
+        builder.Property(x => x.CreditoFaturamentoIRRF)
+            .HasColumnName("credito_faturamento_irrf")
+            .HasMaxLength(50)
+            .HasComment("Código da conta contábil crédito faturamento IRRF")
+            .IsRequired();
+
+        builder.Property(x => x.DescricaoCreditoFaturamentoIRRF)
+            .HasColumnName("descricao_credito_faturamento_irrf")
+            .HasMaxLength(255)
+            .HasComment("Descrição da conta contábil crédito faturamento IRRF")
+            .IsRequired();
+
 
         // Relacionamentos
         builder.HasOne(x => x.Seguradoras)

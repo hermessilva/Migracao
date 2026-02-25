@@ -1,0 +1,185 @@
+{
+  "version": "1.0.0",
+  "darkMode": true,
+  "gridEnabling": false,
+  "detailLevel": "All",
+  "tablePositions": [
+    {
+      "name": "agencia",
+      "schemaName": "public",
+      "x": 769.84521484375,
+      "y": 740
+    },
+    {
+      "name": "ponto_atendimento",
+      "schemaName": "public",
+      "x": 1520.9990234375,
+      "y": 3368
+    },
+    {
+      "name": "perfil",
+      "schemaName": "public",
+      "x": 769.84521484375,
+      "y": 12
+    },
+    {
+      "name": "usuario",
+      "schemaName": "public",
+      "x": 2352.1220703125,
+      "y": 53
+    },
+    {
+      "name": "tela",
+      "schemaName": "public",
+      "x": 769.84521484375,
+      "y": 186
+    },
+    {
+      "name": "acao",
+      "schemaName": "public",
+      "x": 769.84521484375,
+      "y": 360
+    },
+    {
+      "name": "tela_acao",
+      "schemaName": "public",
+      "x": 1520.9990234375,
+      "y": 280
+    },
+    {
+      "name": "tela_acao_perfil",
+      "schemaName": "public",
+      "x": 1520.9990234375,
+      "y": 74
+    },
+    {
+      "name": "auditoria",
+      "schemaName": "public",
+      "x": 3034.11181640625,
+      "y": 12
+    },
+    {
+      "name": "seguradora",
+      "schemaName": "public",
+      "x": 769.84521484375,
+      "y": 502
+    },
+    {
+      "name": "condicao_seguradora",
+      "schemaName": "public",
+      "x": 1520.9990234375,
+      "y": 454
+    },
+    {
+      "name": "seguradora_limite",
+      "schemaName": "public",
+      "x": 1520.9990234375,
+      "y": 788
+    },
+    {
+      "name": "apolice_grupo_seguradora",
+      "schemaName": "public",
+      "x": 1520.9990234375,
+      "y": 3606
+    },
+    {
+      "name": "proposta_seguradora",
+      "schemaName": "public",
+      "x": 1520.9990234375,
+      "y": 1122
+    },
+    {
+      "name": "contabilizacao_seguradora",
+      "schemaName": "public",
+      "x": 1520.9990234375,
+      "y": 1328
+    },
+    {
+      "name": "conta_corrente_seguradora",
+      "schemaName": "public",
+      "x": 1520.9990234375,
+      "y": 2494
+    },
+    {
+      "name": "comissao_seguradora",
+      "schemaName": "public",
+      "x": 1520.9990234375,
+      "y": 2828
+    },
+    {
+      "name": "gestao_documento",
+      "schemaName": "public",
+      "x": 1520.9990234375,
+      "y": 3034
+    },
+    {
+      "name": "armazenamento_documento",
+      "schemaName": "public",
+      "x": 5758.380120354729,
+      "y": -23.89189189189193
+    },
+    {
+      "name": "cooperado",
+      "schemaName": "public",
+      "x": 769.84521484375,
+      "y": 946
+    },
+    {
+      "name": "cooperado_agencia_conta",
+      "schemaName": "public",
+      "x": 1520.9990234375,
+      "y": 4498
+    },
+    {
+      "name": "seguro",
+      "schemaName": "public",
+      "x": 3034.11181640625,
+      "y": 410
+    },
+    {
+      "name": "seguro_parametro",
+      "schemaName": "public",
+      "x": 769.84521484375,
+      "y": 1216
+    },
+    {
+      "name": "evento_outbox",
+      "schemaName": "public",
+      "x": 365.73828125,
+      "y": 12
+    },
+    {
+      "name": "parcela",
+      "schemaName": "public",
+      "x": 4922.168949172214,
+      "y": 1612.32810869385
+    },
+    {
+      "name": "parametrizacao",
+      "schemaName": "public",
+      "x": 12,
+      "y": 12
+    },
+    {
+      "name": "lancamento_efetivar",
+      "schemaName": "public",
+      "x": 1520.9990234375,
+      "y": 4704
+    },
+    {
+      "name": "integracao_senior",
+      "schemaName": "public",
+      "x": 1520.9990234375,
+      "y": 4036
+    },
+    {
+      "name": "seguro_cancelamento",
+      "schemaName": "public",
+      "x": 3925.481650674657,
+      "y": 1078.3836276071038
+    }
+  ],
+  "tableGroupCollapseStates": [],
+  "stickyNoteLayouts": [],
+  "referencePaths": []
+}

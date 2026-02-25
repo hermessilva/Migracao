@@ -9,7 +9,10 @@ public class Cooperado
     public TipoPessoaCooperado Tipo { get; set; }
     public string Nome { get; set; }
     public string NomeFantasia { get; set; }
+    public string NomeSocial { get; set; }
     public string Email { get; set; }
+    public DateTime? DataNascimento { get; set; }
+    public SexoCooperado? Sexo { get; set; }
 
     public virtual ICollection<CooperadoAgenciaConta> CooperadosAgenciasContas { get; set; } = new List<CooperadoAgenciaConta>();
     public virtual ICollection<LancamentoEfetivar> LancamentosEfetivar { get; set; } = new List<LancamentoEfetivar>();
@@ -22,4 +25,13 @@ public enum TipoPessoaCooperado
 
     [Description("Jurídica")]
     Juridica = 2
+}
+
+public enum SexoCooperado
+{
+    [Description("Masculino")]
+    Masculino = 1,
+
+    [Description("Feminino")]
+    Feminino = 2
 }

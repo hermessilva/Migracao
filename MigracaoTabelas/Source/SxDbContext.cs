@@ -90,7 +90,7 @@ namespace MigracaoTabelas.Source
             modelBuilder.Entity<SxEpSegPrestamista>(entity =>
             {
                 entity.HasNoKey();
-                entity.ToSqlQuery(@"
+                entity.ToSqlQuery(@$"
 WITH ResumoFinanceiro AS (
     SELECT 
         cco_conta, seg_contrato AS contrato, con_seq,
@@ -131,8 +131,8 @@ INNER JOIN ep_contrato C ON S.SEG_CONTRATO = C.CON_NDOC AND S.CON_SEQ = C.CON_SE
 join cc_conta cc on cc.cco_conta = S.cco_conta
 LEFT JOIN ResumoFinanceiro RF ON S.SEG_CONTRATO = RF.contrato AND S.CON_SEQ = RF.con_seq
 WHERE 
-	S.seg_modalidade = 4 and cc.cco_situacao = 1 and S.seg_canctipo = 0 and S.seg_fim  >= '2025-12-10' and C.con_pgto is null and  
-	S.sql_deleted = 'F' AND S.SEG_FIM > '2026-01-01'
+	S.seg_modalidade = 4 and cc.cco_situacao = 1 and S.seg_canctipo = 0 and S.seg_fim  >= '{DateTime.Now:yyyy-MM-dd}' and C.con_pgto is null and  
+	S.sql_deleted = 'F'
 GROUP BY S.SEG_CONTRATO, S.CON_SEQ, S.SEG_PREMIO, C.CON_DEBSEGURO, C.CON_PARCELAS, C.MOD_CALCULO, S.SEG_FIM;
 ");
             });

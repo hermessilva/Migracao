@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using MigracaoTabelas.Target;
 
-using Seguros.Helpers;
+
 
 
 namespace MigracaoTabelas.Target.EntityConfiguration;
@@ -69,7 +69,8 @@ public class IntegracaoSeniorConfiguration : BaseEntityConfiguration<IntegracaoS
             .HasColumnName("tipo_lancamento_contabil"), "Seguro Prestamista Contratado", "Comissão Seguro Prestamista Contratado",
                                                        "Cancelamento Seguro Prestamista Parcelado Comissão", "Cancelamento Seguro Prestamista À Vista Proporcional Comissão",
                                                        "Pagamento Seguro Prestamista", "Recebimento Comissão Seguro Prestamista",
-                                                       "Recebimento Premio Seguro Prestamista Parcelado", "Recebimento Comissão Seguro Prestamista Parcelado")
+                                                       "Recebimento Premio Seguro Prestamista Parcelado", "Recebimento Comissão Seguro Prestamista Parcelado",
+                                                       "Faturamento Prêmio Seguro Prestamista")
             .HasConversion(v =>
                 v.AsString(),
                 v => EnumHelper.FromString<TipoLancamentoContabilIntegracaoSenior>(v)
@@ -87,6 +88,12 @@ public class IntegracaoSeniorConfiguration : BaseEntityConfiguration<IntegracaoS
             .HasColumnName("numero_lancamento")
             .HasMaxLength(50)
             .HasComment("Número do lançamento (ID do lançamento de origem)");
+
+        builder.Property(x => x.Visualizar)
+            .HasColumnName("visualizar")
+            .HasDefaultValue(true)
+            .HasComment("Indica se o registro deve ser visualizado nas consultas")
+            .IsRequired();
 
         // Relacionamentos
         builder.HasOne(x => x.Agencia)

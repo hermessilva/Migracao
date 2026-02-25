@@ -16,6 +16,15 @@ public static class EnumHelper
         return false;
     }
 
+    public static TEnum? FromStringNull<TEnum>(string text)
+        where TEnum : struct, Enum
+    {
+        if (string.IsNullOrWhiteSpace(text) && EnumCache<TEnum>.TryGetValue(text, out var value))
+            return value;
+
+        return null;
+    }
+
     public static bool IsEqual<TEnum>(string leftEnum, TEnum rightEnum) where TEnum : struct, Enum
     {
         var rkey = rightEnum.AsString();

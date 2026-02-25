@@ -3,10 +3,13 @@ using System.ComponentModel;
 using MigracaoTabelas.Source;
 
 
+
 namespace MigracaoTabelas.Target;
 
 public class Seguro
 {
+    public const string SEQUENCIA_INICIAL_PADRAO = "00";
+
     private MotivoSeguro _motivo;
     public ulong Id { get; set; }
     public ulong CooperadoAgenciaContaId { get; set; }
@@ -14,7 +17,7 @@ public class Seguro
     public ulong ApoliceGrupoSeguradoraId { get; set; }
     public ulong SeguroParametroId { get; set; }
     public ulong? UsuarioId { get; set; }
-    public string ContratoSequencia { get; set; } = "00";
+    public string ContratoSequencia { get; set; } = SEQUENCIA_INICIAL_PADRAO;
     public StatusSeguro Status { get; private set; }
     public MotivoSeguro Motivo
     {
@@ -45,12 +48,10 @@ public class Seguro
                         Status = StatusSeguro.Ativo;
                     }
                     break;
-                case MotivoSeguro.RecusadoPelaSeguradora:
-                    Status = StatusSeguro.Recusado;
-                    break;
                 case MotivoSeguro.ExpiracaoVigenciaSeguro:
                     Status = StatusSeguro.Expirado;
                     break;
+                case MotivoSeguro.RecusadoPelaSeguradora:
                 case MotivoSeguro.Aditivo:
                 case MotivoSeguro.CancelamentoPorPrejuizo:
                 case MotivoSeguro.Renegociacao:
@@ -67,8 +68,16 @@ public class Seguro
         }
     }
 
+    /// <summary>
+    /// Número do contrato do seguro (mesmo valor do contrato do empréstimo)
+    /// </summary>
     public string Contrato { get; set; }
+
+    /// <summary>
+    /// Número do contrato do empréstimo vinculado ao seguro (mantido para referência histórica)
+    /// </summary>
     public string NumeroContratoEmprestimo { get; set; }
+
     public DateTime? InicioVigencia { get; set; }
     public DateTime? FimVigencia { get; set; }
     public int CodigoGrupo { get; set; }
@@ -82,6 +91,11 @@ public class Seguro
     public bool? DeclaracaoPessoalSaude { get; set; }
     public decimal? ValorIof { get; set; }
 
+    /// <summary>
+    /// Data e hora do upload dos documentos relacionados ao seguro
+    /// </summary>
+    public DateTime? UploadDocumento { get; set; }
+
     public virtual CooperadoAgenciaConta CooperadosAgenciasContas { get; set; }
     public virtual ApoliceGrupoSeguradora ApolicesGruposSeguradoras { get; set; }
     public virtual PontoAtendimento PontosAtendimentos { get; set; }
@@ -89,13 +103,16 @@ public class Seguro
     public virtual Usuario Usuarios { get; set; }
     public virtual ICollection<Parcela> Parcelas { get; set; } = new List<Parcela>();
     public virtual ICollection<SeguroCancelamento> SegurosCancelamentos { get; set; } = new List<SeguroCancelamento>();
+    public virtual ICollection<ArmazenamentoDocumento> ArmazenamentosDocumentos { get; set; } = new List<ArmazenamentoDocumento>();
 
     public static bool PermiteAlteracaoManual(MotivoSeguro motivo)
     {
         return MotivoSeguro.EmAnaliseNaSeguradora == motivo ||
                MotivoSeguro.AguardandoFaturamento == motivo ||
-               MotivoSeguro.RecusadoPelaSeguradora == motivo;
+               MotivoSeguro.AguardandoDocumentacao == motivo ||
+               MotivoSeguro.Regular == motivo;
     }
+
     public static MotivoSeguro Convert(MotivoSeguroCancelamento motivoCancelamento)
     {
         switch (motivoCancelamento)
@@ -114,6 +131,8 @@ public class Seguro
                 return MotivoSeguro.SolicitadoPeloCooperado;
             case MotivoSeguroCancelamento.LiquidacaoAntecipada:
                 return MotivoSeguro.LiquidacaoAntecipada;
+            case MotivoSeguroCancelamento.RecusadoPelaSeguradora:
+                return MotivoSeguro.RecusadoPelaSeguradora;
             default:
                 throw new ArgumentOutOfRangeException(nameof(motivoCancelamento), $"MotivoSeguroCancelamento '{motivoCancelamento}' não pode ser convertido para MotivoSeguro.");
         }
@@ -141,9 +160,7 @@ public enum TipoPagamentoSeguro
     [Description("À Vista")]
     AVista = 1,
     [Description("Parcelado")]
-    Parcelado = 2,
-    [Description("Único")]
-    Unico = 3
+    Parcelado = 2
 }
 
 
@@ -201,3 +218,24 @@ public enum MotivoSeguro
     [Description("Liquidação antecipada")]
     LiquidacaoAntecipada = 16,
 }
+
+public enum TipoExportacao
+{
+    [Description("CSV")]
+    CSV = 1,
+    [Description("XLSX")]
+    XLSX = 2
+}
+
+public enum ModalidadeOperacao
+{
+    [Description("Não Permitido")]
+    NaoPermitido = 0,
+    [Description("À Vista")]
+    AVista = 1,
+    [Description("Parcelado")]
+    Parcelado = 2,
+    [Description("Parcelado Variável")]
+    ParceladoVariavel = 3
+}
+

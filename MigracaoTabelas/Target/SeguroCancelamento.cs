@@ -28,6 +28,8 @@ namespace MigracaoTabelas.Target
                     return MotivoSeguroCancelamento.Aditivo;
                 case 6:
                     return MotivoSeguroCancelamento.LiquidacaoAntecipada;
+                case 7:
+                    return MotivoSeguroCancelamento.Renegociacao;
                 default:
                     return MotivoSeguroCancelamento.NãoPermitido;
             }
@@ -41,6 +43,7 @@ namespace MigracaoTabelas.Target
                 MotivoSeguroCancelamento.Sinistro => 3,
                 MotivoSeguroCancelamento.Aditivo => 5,
                 MotivoSeguroCancelamento.LiquidacaoAntecipada => 6,
+                MotivoSeguroCancelamento.Renegociacao => 7,
                 _ => 0
             };
         }
@@ -87,7 +90,9 @@ namespace MigracaoTabelas.Target
         [Description("Solicitado pelo cooperado")]
         SolicitadoPeloCooperado = 6,
         [Description("Liquidação Antecipada")]
-        LiquidacaoAntecipada = 7,
+        LiquidacaoAntecipada = 7, 
+        [Description("Recusado pela Seguradora")]
+        RecusadoPelaSeguradora = 8
     }
 
     public enum MotivoCancelamentoERP

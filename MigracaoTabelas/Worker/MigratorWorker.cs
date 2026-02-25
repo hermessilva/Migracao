@@ -107,7 +107,7 @@ namespace MigracaoTabelas.Worker
             }
 
             var parcelas = segparcelas
-                .GroupBy(p => (p.CcoConta, p.SegContrato))
+                .GroupBy(p => (p.CcoConta, p.SegContrato, p.ConSeq))
                 .ToDictionary(g => g.Key, g => g.ToList());
 
             var totalPrestamistas = segprestamistas.Count;
@@ -182,9 +182,9 @@ namespace MigracaoTabelas.Worker
             return lastUpdate;
         }
 
-        private int Migrate(Dictionary<(string CcoConta, string SegContrato), List<SxEpSegParcela>> pParcelas, List<Seguro> pSeguros, SxEpSegPrestamista pPrestamista)
+        private int Migrate(Dictionary<(string CcoConta, string SegContrato, short ConSeq), List<SxEpSegParcela>> pParcelas, List<Seguro> pSeguros, SxEpSegPrestamista pPrestamista)
         {
-            pParcelas.TryGetValue((pPrestamista.CcoConta, pPrestamista.SegContrato), out var parcelasSrc);
+            pParcelas.TryGetValue((pPrestamista.CcoConta, pPrestamista.SegContrato, pPrestamista.ConSeq), out var parcelasSrc);
             if (parcelasSrc == null || parcelasSrc.Count == 0)
                 return 0;
             var tgt = new Seguro();
@@ -194,7 +194,8 @@ namespace MigracaoTabelas.Worker
 
             tgt.CooperadoAgenciaContaId = cooagct.Id;
             tgt.PontoAtendimentoId = GetPontoAtendimentoId(conta.PaCodigo);
-            tgt.ApoliceGrupoSeguradoraId = GetAgenciaSeguradoraId(pPrestamista, agenciaId);
+            var (apoliceGrupoSeguradoraId, seguradoraNome) = GetAgenciaSeguradoraId(pPrestamista, agenciaId);
+            tgt.ApoliceGrupoSeguradoraId = apoliceGrupoSeguradoraId;
             tgt.CooperadoAgenciaContaId = cooagct.Id;
 
             //tgt.UsuarioId = 18;
@@ -204,9 +205,9 @@ namespace MigracaoTabelas.Worker
             var comissao = seguradora.ComissoesSeguradoras.FirstOrDefault();
 
             var spar = new SeguroParametro();
-            spar.TipoCapital = pPrestamista.TipoSaldo == 1 ? TipoCapitalApolice.Fixo : TipoCapitalApolice.Variavel;
+            spar.TipoCapital = seguradoraNome.Contains("VAIAVEL") ? TipoCapitalApolice.Variavel : TipoCapitalApolice.Fixo;
 
-            if (spar.TipoCapital == TipoCapitalApolice.Variavel)
+            if (seguradoraNome.Contains("VAIAVEL"))
                 spar.Coeficiente = 0.0003511M;
             else
                 spar.Coeficiente = 0.0005945M;
@@ -229,10 +230,10 @@ namespace MigracaoTabelas.Worker
             return parcelasSrc?.Count ?? 0;
         }
 
-        private ulong GetAgenciaSeguradoraId(SxEpSegPrestamista prestamista, ulong agenciaId)
+        private (ulong ID, string Nome) GetAgenciaSeguradoraId(SxEpSegPrestamista prestamista, ulong agenciaId)
         {
             var seguradoraId = _DataCache.GetSeguradora(_SContext, prestamista.PstCodigo).Id;
-            return _DataCache.GetAgenciaSeguradora(agenciaId, seguradoraId);
+            return (_DataCache.GetAgenciaSeguradora(agenciaId, seguradoraId, prestamista.SegNome), prestamista.SegNome);
         }
 
         private (CooperadoAgenciaConta, Cooperado, SxContas) GetCooperadoId(SxEpSegPrestamista prestamista)

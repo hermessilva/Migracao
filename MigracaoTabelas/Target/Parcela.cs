@@ -1,7 +1,10 @@
+#nullable enable
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 
 using MigracaoTabelas.Source;
+
+
 
 namespace MigracaoTabelas.Target;
 
@@ -43,7 +46,9 @@ public class Parcela
     public decimal ComissaoCorretora { get; set; }
     public decimal ComissaoCooperativa { get; set; }
 
+    // Relacionamentos
     public virtual Seguro Seguros { get; set; } = null!;
+    public virtual FaturamentoParcela? FaturamentoParcela { get; set; }
 
     public void PagarManualmente(decimal valor)
     {

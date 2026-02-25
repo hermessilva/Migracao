@@ -237,7 +237,6 @@ namespace MigracaoTabelas.Worker
                 Cnpj = cnpj,
                 RazaoSocial = src.Nome
             };
-
             // ComissaoSeguradora - utiliza PorcentagemComissao da fonte
             seguradora.ComissoesSeguradoras.Add(new ComissaoSeguradora
             {
@@ -302,7 +301,20 @@ namespace MigracaoTabelas.Worker
                 DebitoComissaoParcela = string.Empty,
                 DescricaoDebitoComissaoParcela = "Conta Contábil de Débito - Comissão Parcela",
                 CreditoComissaoParcela = string.Empty,
-                DescricaoCreditoComissaoParcela = "Conta Contábil de Crédito - Comissão Parcela"
+                DescricaoCreditoComissaoParcela = "Conta Contábil de Crédito - Comissão Parcela",
+
+                DebitoFaturamentoPremio = string.Empty,
+                DescricaoDebitoFaturamentoPremio = string.Empty,
+                CreditoFaturamentoPremio = string.Empty,
+                DescricaoCreditoFaturamentoPremio = string.Empty,
+                DebitoFaturamentoComissao = string.Empty,
+                DescricaoDebitoFaturamentoComissao = string.Empty,
+                CreditoFaturamentoComissao = string.Empty,
+                DescricaoCreditoFaturamentoComissao = string.Empty,
+                DebitoFaturamentoIRRF = string.Empty,
+                DescricaoDebitoFaturamentoIRRF = string.Empty,
+                CreditoFaturamentoIRRF = string.Empty,
+                DescricaoCreditoFaturamentoIRRF = string.Empty
 
             });
 
@@ -492,7 +504,7 @@ namespace MigracaoTabelas.Worker
             return seguradora;
         }
 
-        public ulong GetAgenciaSeguradora(ulong pAgenciaId, ulong pSeguradoraId)
+        public ulong GetAgenciaSeguradora(ulong pAgenciaId, ulong pSeguradoraId, string pSeguradoraNome )
         {
             ArgumentOutOfRangeException.ThrowIfZero(pAgenciaId, nameof(pAgenciaId));
             lock (_ToLock)
@@ -505,7 +517,7 @@ namespace MigracaoTabelas.Worker
                     Apolice = "APO-001",
                     Grupo = "GRP-001",
                     SubGrupo = "SUB-001",
-                    TipoCapital = TipoCapitalApolice.Fixo,
+                    TipoCapital = pSeguradoraNome.Contains("VARIAVEL") ? TipoCapitalApolice.Variavel : TipoCapitalApolice.Fixo,
                     ModalidadeUnico = "Unico",
                     ModalidadeAVista = 1.5m,
                     ModalidadeParcelado = 10m,
