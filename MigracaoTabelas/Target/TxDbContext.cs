@@ -1,6 +1,10 @@
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
+using System.Reflection;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -99,10 +103,105 @@ namespace MigracaoTabelas.Target
 
     public class MySqlAuditInterceptor : SaveChangesInterceptor
     {
+        // Lista temporária para segurar as referências das entidades que entraram como 'Added'
+        private List<EntityEntry>? _entriesToBeInserted;
+
         public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
         {
-            GenerateMySqlInserts(eventData.Context);
+            CaptureInserts(eventData.Context);
             return base.SavingChanges(eventData, result);
+        }
+
+        public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result, CancellationToken cancellationToken = default)
+        {
+            CaptureInserts(eventData.Context);
+            return base.SavingChangesAsync(eventData, result, cancellationToken);
+        }
+
+        private void CaptureInserts(DbContext? context)
+        {
+            if (context == null)
+                return;
+
+            // Capturamos as referências das entidades ANTES de elas perderem o estado 'Added'
+            _entriesToBeInserted = context.ChangeTracker.Entries()
+                .Where(e => e.State == EntityState.Added)
+                .ToList();
+        }
+
+        public override int SavedChanges(SaveChangesCompletedEventData eventData, int result)
+        {
+            ProcessCapturedInserts();
+            return base.SavedChanges(eventData, result);
+        }
+
+        public override ValueTask<int> SavedChangesAsync(SaveChangesCompletedEventData eventData, int result, CancellationToken cancellationToken = default)
+        {
+            ProcessCapturedInserts();
+            return base.SavedChangesAsync(eventData, result, cancellationToken);
+        }
+
+        private void ProcessCapturedInserts()
+        {
+            if (_entriesToBeInserted == null || !_entriesToBeInserted.Any())
+                return;
+
+            foreach (var entry in _entriesToBeInserted)
+            {
+                var entityType = entry.Metadata;
+                var tableName = entityType.GetTableName();
+                var columns = new List<string>();
+                var values = new List<string>();
+
+                foreach (var property in entry.CurrentValues.Properties)
+                {
+                    columns.Add($"`{property.GetColumnName()}`");
+
+                    // Como já estamos no SavedChanges, o valor aqui já será o '64' (ID real)
+                    var value = entry.CurrentValues[property];
+                    values.Add(FormatValueForMySql(value));
+                }
+
+                var sql = $"INSERT INTO `{tableName}` ({string.Join(", ", columns)}) VALUES ({string.Join(", ", values)});";
+                File.AppendAllText(@$"D:\CrediSIS\DBs\inserts.sql", sql + Environment.NewLine);
+            }
+
+            // Limpa a lista para não duplicar no próximo SaveChanges do mesmo DbContext
+            _entriesToBeInserted.Clear();
+        }
+
+        private string FormatValueForMySql(object? value)
+        {
+            if (value == null)
+                return "NULL";
+
+            if (value.GetType().IsEnum)
+            {
+                var field = value.GetType().GetField(value.ToString());
+                var attr = field.GetCustomAttribute<DescriptionAttribute>();
+                return $"'{(attr == null ? value.ToString() : attr.Description)}'";
+            }
+
+            return value switch
+            {
+                string s => $"'{s.Replace("'", "''")}'",
+                bool b => b ? "1" : "0",
+                DateTime dt => $"'{dt:yyyy-MM-dd HH:mm:ss}'",
+                Guid g => $"'{g}'",
+                long l => l.ToString(CultureInfo.InvariantCulture),
+                ulong ul => ul.ToString(CultureInfo.InvariantCulture),
+                int i => i.ToString(CultureInfo.InvariantCulture),
+                _ => value.ToString()?.Replace(",", ".") ?? "NULL"
+            };
+        }
+    }
+
+    public class xMySqlAuditInterceptor : SaveChangesInterceptor
+    {
+        public override int SavedChanges(SaveChangesCompletedEventData eventData, int result)
+        {
+            GenerateMySqlInserts(eventData.Context);
+            return base.SavedChanges(eventData, result);
         }
 
         private void GenerateMySqlInserts(DbContext? context)
@@ -117,41 +216,63 @@ namespace MigracaoTabelas.Target
             {
                 var entityType = entry.Metadata;
                 var tableName = entityType.GetTableName();
-                var schema = entityType.GetSchema(); // MySQL raramente usa schema, mas é bom ter
 
                 var columns = new List<string>();
                 var values = new List<string>();
 
                 foreach (var property in entry.CurrentValues.Properties)
                 {
-                    // Ignora propriedades marcadas como ValueGeneratedOnAdd (ex: IDs Auto Increment)
-                    // a menos que você queira forçar o ID.
-                    if (property.ValueGenerated == Microsoft.EntityFrameworkCore.Metadata.ValueGenerated.OnAdd)
-                        continue;
-
+                    // Removida a restrição de ValueGenerated.OnAdd para incluir as PKs
                     columns.Add($"`{property.GetColumnName()}`");
 
-                    var value = entry.CurrentValues[property];
-                    values.Add(FormatValueForMySql(value));
+                    var val = entry.Property(property.Name).CurrentValue;
+                    if (entry.Property(property.Name).IsTemporary)
+                    {
+                        // Se for temporário, o EF ainda não "sabe" o valor final do banco.
+                        // Mas se você setou 64 na mão, tente ler direto da entidade:
+                        val = entry.Entity.GetType().GetProperty(property.Name)?.GetValue(entry.Entity);
+                    }
+                    values.Add(FormatValueForMySql(val));
                 }
 
                 var sql = $"INSERT INTO `{tableName}` ({string.Join(", ", columns)}) VALUES ({string.Join(", ", values)});";
                 File.AppendAllText(@$"D:\CrediSIS\DBs\inserts.sql", sql + Environment.NewLine);
+
             }
         }
+
 
         private string FormatValueForMySql(object? value)
         {
             if (value == null)
                 return "NULL";
 
+            // 1. Trata Enums primeiro
+            if (value.GetType().IsEnum)
+            {
+                return $"'{value.ToString()?.Replace("'", "''")}'";
+            }
+
             return value switch
             {
-                string s => $"'{s.Replace("'", "''")}'", // Escape simples para strings
+                string s => $"'{s.Replace("'", "''")}'",
                 bool b => b ? "1" : "0",
                 DateTime dt => $"'{dt:yyyy-MM-dd HH:mm:ss}'",
                 Guid g => $"'{g}'",
-                _ => value.ToString()?.Replace(",", ".") ?? "NULL" // Garante ponto decimal em floats/doubles
+
+                // 2. Números Inteiros de 64 bits (Onde mora o problema)
+                // Usamos a cultura invariante para evitar qualquer separador de milhar
+                long l => l.ToString(CultureInfo.InvariantCulture),
+                ulong ul => ul.ToString(CultureInfo.InvariantCulture),
+                int i => i.ToString(CultureInfo.InvariantCulture),
+                uint ui => ui.ToString(CultureInfo.InvariantCulture),
+
+                // 3. Números Decimais
+                float f => f.ToString(CultureInfo.InvariantCulture),
+                double d => d.ToString(CultureInfo.InvariantCulture),
+                decimal dec => dec.ToString(CultureInfo.InvariantCulture),
+
+                _ => $"'{value.ToString()?.Replace("'", "''")}'"
             };
         }
     }

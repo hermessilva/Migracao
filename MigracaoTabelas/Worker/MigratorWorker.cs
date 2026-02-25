@@ -48,6 +48,8 @@ namespace MigracaoTabelas.Worker
             try
             {
                 tx = _TContext.Database.BeginTransaction();
+                File.WriteAllText(@$"D:\CrediSIS\DBs\inserts.sql", "SET FOREIGN_KEY_CHECKS = 0;" + Environment.NewLine + 
+                    " SET NAMES 'utf8mb4';" + Environment.NewLine + "start transaction;" + Environment.NewLine);
                 Agencia ag = null;
                 databsess.ForEach(d => Log.Information("Aência encontra para migração [" + d.TABLE_SCHEMA + "]"));
                 foreach (var sagencia in databsess)
@@ -78,6 +80,8 @@ namespace MigracaoTabelas.Worker
                     }
                 }
                 tx.Commit();
+                File.AppendAllText(@$"D:\CrediSIS\DBs\inserts.sql", "commit;");
+
                 Log.Information($"Migração da Agencia [{ag.Nome}] Código [{ag.Codigo}] id[{ag.Id}] concluída com sucesso!");
             }
             catch (Exception ex)
