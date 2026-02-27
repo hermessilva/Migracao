@@ -70,7 +70,8 @@ public class IntegracaoSeniorConfiguration : BaseEntityConfiguration<IntegracaoS
                                                        "Cancelamento Seguro Prestamista Parcelado Comissão", "Cancelamento Seguro Prestamista À Vista Proporcional Comissão",
                                                        "Pagamento Seguro Prestamista", "Recebimento Comissão Seguro Prestamista",
                                                        "Recebimento Premio Seguro Prestamista Parcelado", "Recebimento Comissão Seguro Prestamista Parcelado",
-                                                       "Faturamento Prêmio Seguro Prestamista")
+                                                       "Faturamento Prêmio Seguro Prestamista", "Faturamento Comissão Seguro Prestamista",
+                                                       "Faturamento IRRF Seguro Prestamista")
             .HasConversion(v =>
                 v.AsString(),
                 v => EnumHelper.FromString<TipoLancamentoContabilIntegracaoSenior>(v)

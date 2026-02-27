@@ -174,10 +174,10 @@ public enum StatusSeguro
     Ativo = 2,
     [Description("Recusado")]
     Recusado = 3,
-    [Description("Expirado")]
-    Expirado = 4,
     [Description("Cancelado")]
-    Cancelado = 5,
+    Cancelado = 4,
+    [Description("Expirado")]
+    Expirado = 5,
 }
 
 public enum MotivoSeguro

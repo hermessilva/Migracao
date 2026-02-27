@@ -4,10 +4,10 @@ using MySql.EntityFrameworkCore.Metadata;
 
 #nullable disable
 
-namespace MigracaoTabelas.Migrations
+namespace MigracaoTabelas.Target.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class Inicial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -80,7 +80,10 @@ namespace MigracaoTabelas.Migrations
                     tipo = table.Column<string>(type: "enum('Física','Jurídica')", nullable: false, comment: "Tipo de pessoa: Física (CPF) ou Jurídica (CNPJ)"),
                     nome = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Nome completo (pessoa física) ou razão social (pessoa jurídica) do cooperado"),
                     nome_fantasia = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Nome fantasia do cooperado (aplicável apenas para pessoa jurídica)"),
-                    email = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Endereço de e-mail para contato e comunicações com o cooperado")
+                    nome_social = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Nome social do cooperado (nome pelo qual a pessoa prefere ser chamada)"),
+                    email = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "Endereço de e-mail para contato e comunicações com o cooperado"),
+                    data_nascimento = table.Column<DateTime>(type: "datetime(6)", nullable: true, comment: "Data de nascimento do cooperado"),
+                    sexo = table.Column<string>(type: "enum('Masculino','Feminino')", nullable: true, comment: "Sexo do cooperado: Masculino, Feminino ou Juridico (para pessoa jurídica)")
                 },
                 constraints: table =>
                 {
@@ -214,14 +217,15 @@ namespace MigracaoTabelas.Migrations
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     agencia_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira referenciando a tabela agencia"),
                     status = table.Column<string>(type: "enum('Enviado','Falha')", nullable: false, comment: "Status da integração: Enviado (sucesso) ou Falha (erro no envio)"),
-                    tipo_lancamento_contabil = table.Column<string>(type: "enum('Seguro Prestamista Contratado','Comissão Seguro Prestamista Contratado','Cancelamento Seguro Prestamista Parcelado Comissão','Cancelamento Seguro Prestamista À Vista Proporcional Comissão','Pagamento Seguro Prestamista','Recebimento Comissão Seguro Prestamista','Recebimento Premio Seguro Prestamista Parcelado','Recebimento Comissão Seguro Prestamista Parcelado')", nullable: false, comment: "Tipo do lançamento contábil conforme enum tipo_lancamento"),
+                    tipo_lancamento_contabil = table.Column<string>(type: "enum('Seguro Prestamista Contratado','Comissão Seguro Prestamista Contratado','Cancelamento Seguro Prestamista Parcelado Comissão','Cancelamento Seguro Prestamista À Vista Proporcional Comissão','Pagamento Seguro Prestamista','Recebimento Comissão Seguro Prestamista','Recebimento Premio Seguro Prestamista Parcelado','Recebimento Comissão Seguro Prestamista Parcelado','Faturamento Prêmio Seguro Prestamista','Faturamento Comissão Seguro Prestamista','Faturamento IRRF Seguro Prestamista')", nullable: false, comment: "Tipo do lançamento contábil conforme enum tipo_lancamento"),
                     codigo_pa = table.Column<string>(type: "char(3)", nullable: false, comment: "Código do ponto de atendimento de origem do lançamento"),
                     conta_contabil_debito = table.Column<string>(type: "varchar(255)", nullable: false, comment: "Código da conta contábil de débito para o lançamento"),
                     conta_contabil_credito = table.Column<string>(type: "varchar(255)", nullable: false, comment: "Código da conta contábil de crédito para o lançamento"),
                     data_movimentacao = table.Column<DateTime>(type: "datetime", nullable: false, comment: "Data e hora da movimentação a ser integrada"),
                     valor = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor monetário do lançamento a ser integrado"),
                     descricao = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição detalhada do lançamento para identificação"),
-                    numero_lancamento = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, comment: "Número do lançamento (ID do lançamento de origem)")
+                    numero_lancamento = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, comment: "Número do lançamento (ID do lançamento de origem)"),
+                    visualizar = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: true, comment: "Indica se o registro deve ser visualizado nas consultas")
                 },
                 constraints: table =>
                 {
@@ -462,7 +466,19 @@ namespace MigracaoTabelas.Migrations
                     debito_comissao_parcela = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Código da conta contábil debito comissao parcela"),
                     descricao_debito_comissao_parcela = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil debito comissao parcela"),
                     credito_comissao_parcela = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Código da conta contábil credito comissao parcela"),
-                    descricao_credito_comissao_parcela = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil credito comissao parcela")
+                    descricao_credito_comissao_parcela = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil credito comissao parcela"),
+                    debito_faturamento_premio = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Código da conta contábil debito faturamento premio"),
+                    descricao_debito_faturamento_premio = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil debito faturamento premio"),
+                    credito_faturamento_premio = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Código da conta contábil credito faturamento premio"),
+                    descricao_credito_faturamento_premio = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil credito faturamento premio"),
+                    debito_faturamento_comissao = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Código da conta contábil débito faturamento comissão"),
+                    descricao_debito_faturamento_comissao = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil débito faturamento comissão"),
+                    credito_faturamento_comissao = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Código da conta contábil crédito faturamento comissão"),
+                    descricao_credito_faturamento_comissao = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil crédito faturamento comissão"),
+                    debito_faturamento_irrf = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Código da conta contábil débito faturamento IRRF"),
+                    descricao_debito_faturamento_irrf = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil débito faturamento IRRF"),
+                    credito_faturamento_irrf = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: false, comment: "Código da conta contábil crédito faturamento IRRF"),
+                    descricao_credito_faturamento_irrf = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Descrição da conta contábil crédito faturamento IRRF")
                 },
                 constraints: table =>
                 {
@@ -476,13 +492,44 @@ namespace MigracaoTabelas.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "faturamento_exportacao",
+                columns: table => new
+                {
+                    id = table.Column<ulong>(type: "bigint unsigned", nullable: false)
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    seguradora_id = table.Column<ulong>(type: "bigint unsigned", nullable: false),
+                    usuario_nome = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false),
+                    usuario_email = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false),
+                    tipo_pagamento = table.Column<string>(type: "enum('À Vista','Parcelado')", nullable: false, comment: "Tipo de pagamento do seguro: À Vista ou Parcelado"),
+                    periodo_inicio = table.Column<DateTime>(type: "datetime", nullable: false),
+                    periodo_fim = table.Column<DateTime>(type: "datetime", nullable: false),
+                    quantidade_registros = table.Column<int>(type: "int", nullable: false),
+                    status = table.Column<string>(type: "enum('Sucesso','Erro')", nullable: false, comment: "Status da exportação: Sucesso ou Erro"),
+                    nome_arquivo = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false),
+                    arquivo_hash = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false),
+                    mensagem_erro = table.Column<string>(type: "text", nullable: true),
+                    criado_em = table.Column<DateTime>(type: "datetime", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_faturamento_exportacao", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_faturamento_exportacao_seguradora_seguradora_id",
+                        column: x => x.seguradora_id,
+                        principalTable: "seguradora",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                })
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "gestao_documento",
                 columns: table => new
                 {
                     id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador único do registro na tabela")
                         .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
                     seguradora_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira referenciando a tabela seguradora"),
-                    tipo = table.Column<string>(type: "enum('Termo de Adesão','DPS')", nullable: false, comment: "Tipo do documento/modelo"),
+                    tipo = table.Column<string>(type: "enum('Termo de Adesão com DPS','Termo de Adesão sem DPS','Documentação Complementar')", nullable: false, comment: "Tipo do documento/modelo"),
                     validade = table.Column<DateTime>(type: "date", nullable: false, comment: "Data inicial de validade"),
                     status = table.Column<string>(type: "enum('Ativo','Inativo')", nullable: false, comment: "Indica se um documento está disponível para uso"),
                     modelo = table.Column<string>(type: "mediumtext", nullable: false, comment: "Modelo que será usado para gerar o documento"),
@@ -641,6 +688,81 @@ namespace MigracaoTabelas.Migrations
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "baixa_comissao",
+                columns: table => new
+                {
+                    id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador único do registro de baixa de comissão")
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    seguradora_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira referenciando a tabela seguradora"),
+                    lote = table.Column<string>(type: "varchar(50)", nullable: false, comment: "Número do lote/fatura oriundo do faturamento"),
+                    competencia = table.Column<DateTime>(type: "date", nullable: false, comment: "Mês e ano correspondente ao movimento do faturamento (vencimento da parcela)"),
+                    tipo_pagamento = table.Column<string>(type: "enum('À Vista','Parcelado','Único')", nullable: false, comment: "Tipo de pagamento do seguro: À Vista, Parcelado ou Único"),
+                    data_emissao = table.Column<DateTime>(type: "date", nullable: false, comment: "Data de expectativa de pagamento de comissão indicada no faturamento"),
+                    valor_comissao = table.Column<decimal>(type: "decimal(14,2)", nullable: false, comment: "Valor total de comissão provisionada para o lote/fatura"),
+                    quantidade_cooperados = table.Column<int>(type: "int", nullable: false, comment: "Número total de movimentos faturados no lote"),
+                    data_recebimento = table.Column<DateTime>(type: "date", nullable: true, comment: "Data em que a comissão foi efetivamente recebida/baixada"),
+                    situacao = table.Column<string>(type: "enum('Pendente','Recebida')", nullable: false, comment: "Situação da comissão: Pendente ou Recebida"),
+                    usuario_baixa_id = table.Column<ulong>(type: "bigint unsigned", nullable: true, comment: "Chave estrangeira referenciando o usuário que realizou a baixa"),
+                    criado_em = table.Column<DateTime>(type: "datetime", nullable: false, comment: "Data e hora de criação do registro")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_baixa_comissao", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_baixa_comissao_seguradora_seguradora_id",
+                        column: x => x.seguradora_id,
+                        principalTable: "seguradora",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_baixa_comissao_usuario_usuario_baixa_id",
+                        column: x => x.usuario_baixa_id,
+                        principalTable: "usuario",
+                        principalColumn: "id");
+                },
+                comment: "Registros de baixa de comissão de faturamento de seguro prestamista, agrupados por seguradora, lote e competência")
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "faturamento_importacao_historico",
+                columns: table => new
+                {
+                    id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador único do registro de importação")
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    seguradora_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira referenciando a seguradora do arquivo importado"),
+                    tipo_pagamento = table.Column<string>(type: "enum('À Vista','Parcelado','Único')", nullable: false, comment: "Tipo de pagamento: À Vista, Parcelado ou Único"),
+                    lote = table.Column<string>(type: "varchar(50)", nullable: false, comment: "Número do lote/fatura identificado no arquivo importado"),
+                    nome_arquivo = table.Column<string>(type: "varchar(255)", nullable: false, comment: "Nome do arquivo importado pelo usuário"),
+                    usuario_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira referenciando o usuário que realizou a importação"),
+                    origem = table.Column<string>(type: "enum('Manual','Automático')", nullable: false, comment: "Origem da importação: Manual ou Automático"),
+                    status_importacao = table.Column<string>(type: "enum('Processado','Erro','Processado Parcialmente')", nullable: false, comment: "Status da importação: Processado, Erro ou Processado Parcialmente"),
+                    total_registros_arquivo = table.Column<int>(type: "int", nullable: false, comment: "Total de registros/linhas encontrados no arquivo"),
+                    quantidade_seguros_aceitos = table.Column<int>(type: "int", nullable: false, comment: "Quantidade de seguros com status aceito no arquivo"),
+                    quantidade_seguros_nao_aceitos = table.Column<int>(type: "int", nullable: false, comment: "Quantidade de seguros com status recusado ou pendente no arquivo"),
+                    valor_total_seguros_aceitos = table.Column<decimal>(type: "decimal(18,2)", nullable: false, comment: "Valor total dos prêmios dos seguros aceitos"),
+                    valor_total_seguros_nao_aceitos = table.Column<decimal>(type: "decimal(18,2)", nullable: false, comment: "Valor total dos prêmios dos seguros não aceitos"),
+                    valor_total_arquivo = table.Column<decimal>(type: "decimal(18,2)", nullable: false, comment: "Valor total geral de todos os registros do arquivo"),
+                    valor_total_faturar = table.Column<decimal>(type: "decimal(18,2)", nullable: false, comment: "Valor total a ser faturado (aceitos)"),
+                    observacao = table.Column<string>(type: "mediumtext", nullable: true, comment: "Observações adicionais ou mensagem de erro da importação"),
+                    criado_em = table.Column<DateTime>(type: "datetime", nullable: false, comment: "Data e hora de criação do registro de importação")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_faturamento_importacao_historico", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_faturamento_importacao_historico_seguradora_seguradora_id",
+                        column: x => x.seguradora_id,
+                        principalTable: "seguradora",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_faturamento_importacao_historico_usuario_usuario_id",
+                        column: x => x.usuario_id,
+                        principalTable: "usuario",
+                        principalColumn: "id");
+                },
+                comment: "Histórico de importações de arquivos de retorno das seguradoras para faturamento")
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "seguro",
                 columns: table => new
                 {
@@ -663,11 +785,12 @@ namespace MigracaoTabelas.Migrations
                     vencimento = table.Column<DateTime>(type: "date", nullable: true, comment: "Data de vencimento base do contrato ou da próxima parcela"),
                     capital_segurado = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor total do capital segurado (valor coberto em caso de sinistro)"),
                     premio_total = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor total do prêmio do seguro a ser pago"),
-                    tipo_pagamento = table.Column<string>(type: "enum('À Vista','Parcelado','Único')", nullable: false, comment: "Modalidade de pagamento: À Vista, Parcelado ou Único"),
+                    tipo_pagamento = table.Column<string>(type: "enum('À Vista','Parcelado')", nullable: false, comment: "Modalidade de pagamento: À Vista ou Parcelado"),
                     estorno_proporcional = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor de estorno proporcional em caso de cancelamento"),
                     valor_base = table.Column<decimal>(type: "decimal(10,2)", nullable: true, comment: "Valor base utilizado para cálculo do seguro (saldo devedor ou valor financiado)"),
                     declaracao_pessoal_saude = table.Column<bool>(type: "tinyint(1)", nullable: true, comment: "Indica se foi exigida Declaração Pessoal de Saúde (true/false)"),
-                    valor_iof = table.Column<decimal>(type: "decimal(10,2)", nullable: true, comment: "Valor do IOF (Imposto sobre Operações Financeiras) incidente sobre o prêmio")
+                    valor_iof = table.Column<decimal>(type: "decimal(10,2)", nullable: true, comment: "Valor do IOF (Imposto sobre Operações Financeiras) incidente sobre o prêmio"),
+                    upload_documento = table.Column<DateTime>(type: "datetime", nullable: true, comment: "Data e hora do upload dos documentos relacionados ao seguro")
                 },
                 constraints: table =>
                 {
@@ -699,6 +822,42 @@ namespace MigracaoTabelas.Migrations
                         principalColumn: "id");
                 },
                 comment: "Contratos de seguros e seus metadados financeiros e relacionamentos")
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "armazenamento_documento",
+                columns: table => new
+                {
+                    id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador único do registro na tabela")
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    seguro_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira referenciando a tabela seguro"),
+                    nome_original = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false, comment: "Nome original do arquivo no momento do upload"),
+                    extensao_arquivo = table.Column<string>(type: "varchar(15)", maxLength: 15, nullable: false, comment: "Extensão do arquivo (ex: pdf, png, jpg)"),
+                    tipo = table.Column<string>(type: "enum('Termo de Adesão com DPS','Termo de Adesão sem DPS','Documentação Complementar')", nullable: false, comment: "Tipo/finalidade do documento armazenado"),
+                    finalidade = table.Column<string>(type: "varchar(30)", maxLength: 30, nullable: true, comment: "Descrição da finalidade do documento quando Tipo for Documentação Complementar"),
+                    local = table.Column<string>(type: "enum('Amazon Web Services S3','Microsoft Azure Blob Storage','Google Cloud Platform Storage','Oracle Cloud Infrastructure Object Storage','Armazenamento On-Premises')", nullable: false, comment: "Local de armazenamento (AWS, Azure, GCP, OCI, OnPrem)"),
+                    unidade_armazenamento = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false, comment: "Nome do Bucket (S3/GCP/MinIO) ou Container (Azure/OCI)"),
+                    caminho_arquivo = table.Column<string>(type: "varchar(450)", maxLength: 450, nullable: false, comment: "Caminho completo do objeto (Key/Path) no provedor de armazenamento"),
+                    codigo_regiao = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true, comment: "Código da região do provedor (ex: us-east-1, eastus, southamerica-east1)"),
+                    endpoint_alias = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true, comment: "URL base customizada para CDN, proxy ou endpoint personalizado"),
+                    tipo_mime = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false, comment: "Tipo MIME do arquivo (ex: application/pdf, image/png)"),
+                    tamanho_bytes = table.Column<long>(type: "bigint", nullable: false, comment: "Tamanho do arquivo em bytes"),
+                    hash_controle = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: true, comment: "Hash SHA-256 do arquivo para verificação de integridade e auditoria"),
+                    status = table.Column<string>(type: "enum('Ativo','Inativo','Pendente de Processamento','Erro no Upload','Excluído')", nullable: false, defaultValue: "Ativo", comment: "Status atual do documento armazenado"),
+                    criado_por = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false, comment: "Identificador do usuário que criou o registro"),
+                    criado_em = table.Column<DateTime>(type: "datetime", nullable: false, defaultValueSql: "CURRENT_TIMESTAMP(6)", comment: "Data e hora de criação do registro")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_armazenamento_documento", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_armazenamento_documento_seguro_seguro_id",
+                        column: x => x.seguro_id,
+                        principalTable: "seguro",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                },
+                comment: "Armazena referências de documentos em provedores de nuvem ou on-premises vinculados a seguros")
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -740,7 +899,7 @@ namespace MigracaoTabelas.Migrations
                     seguro_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira da tabela seguro"),
                     data = table.Column<DateTime>(type: "date", nullable: false, comment: "Data do cancelamento"),
                     criado_em = table.Column<DateTime>(type: "datetime", nullable: false, comment: "Data/hora de criação do registro"),
-                    motivo = table.Column<string>(type: "enum('Aditivo','Cancelamento por prejuízo','Renegociaçao','Sinistro','Solicitado pela cooperativa','Solicitado pelo cooperado','Liquidação Antecipada')", nullable: false, comment: "Motivo do cancelamento"),
+                    motivo = table.Column<string>(type: "enum('Cancelado pelo cooperado','Cancelado pela cooperativa','Sinistro','Recusado pela seguradora','Cancelamento por prejuízo','Liquidação antecipada','Cancelado por renegociação','Cancelado por aditivo')", nullable: false, comment: "Motivo do cancelamento"),
                     valor_restituir = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor que foi restituido ao segurado"),
                     valor_comissao = table.Column<decimal>(type: "decimal(10,2)", nullable: false, comment: "Valor que foi laçando de abatimento de comissão"),
                     dias_utilizados = table.Column<int>(type: "int", nullable: false, comment: "Quantidade de dias que foi utilizado o seguro")
@@ -755,6 +914,37 @@ namespace MigracaoTabelas.Migrations
                         principalColumn: "id");
                 },
                 comment: "Registro de cancelamento de seguro")
+                .Annotation("MySQL:Charset", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "faturamento_parcela",
+                columns: table => new
+                {
+                    id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Identificador único do registro de faturamento")
+                        .Annotation("MySQL:ValueGenerationStrategy", MySQLValueGenerationStrategy.IdentityColumn),
+                    parcela_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira referenciando a tabela parcela"),
+                    usuario_id = table.Column<ulong>(type: "bigint unsigned", nullable: false, comment: "Chave estrangeira referenciando a tabela usuario que realizou a operação"),
+                    lote = table.Column<string>(type: "varchar(50)", nullable: false, comment: "Número do lote/fatura informado pelo usuário no momento do faturamento"),
+                    status = table.Column<string>(type: "enum('Faturado','Cancelado','Não Faturado','Em Processamento')", nullable: false, comment: "Status do faturamento: Faturado, Cancelado, Não Faturado ou Em Processamento"),
+                    origem = table.Column<string>(type: "enum('Manual','Automático')", nullable: false, comment: "Origem do faturamento: Manual ou Automático"),
+                    data_pagamento = table.Column<DateTime>(type: "date", nullable: false, comment: "Data de pagamento informada no momento do faturamento"),
+                    criado_em = table.Column<DateTime>(type: "datetime", nullable: false, comment: "Data e hora de criação do registro")
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_faturamento_parcela", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_faturamento_parcela_parcela_parcela_id",
+                        column: x => x.parcela_id,
+                        principalTable: "parcela",
+                        principalColumn: "id");
+                    table.ForeignKey(
+                        name: "FK_faturamento_parcela_usuario_usuario_id",
+                        column: x => x.usuario_id,
+                        principalTable: "usuario",
+                        principalColumn: "id");
+                },
+                comment: "Registros de faturamento e cancelamento de parcelas do seguro prestamista")
                 .Annotation("MySQL:Charset", "utf8mb4");
 
             migrationBuilder.CreateIndex(
@@ -789,6 +979,63 @@ namespace MigracaoTabelas.Migrations
                 name: "IX_ApoliceGrupoSeguradora_Ordem",
                 table: "apolice_grupo_seguradora",
                 column: "ordem");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_armazenamento_documento_hash_controle",
+                table: "armazenamento_documento",
+                column: "hash_controle");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_armazenamento_documento_local_caminho",
+                table: "armazenamento_documento",
+                columns: new[] { "local", "unidade_armazenamento", "caminho_arquivo" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "ix_armazenamento_documento_seguro_id",
+                table: "armazenamento_documento",
+                column: "seguro_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_armazenamento_documento_status",
+                table: "armazenamento_documento",
+                column: "status");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_armazenamento_documento_tipo",
+                table: "armazenamento_documento",
+                column: "tipo");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_baixa_comissao_competencia",
+                table: "baixa_comissao",
+                column: "competencia");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_baixa_comissao_lote",
+                table: "baixa_comissao",
+                column: "lote");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_baixa_comissao_seguradora_id",
+                table: "baixa_comissao",
+                column: "seguradora_id");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_baixa_comissao_seguradora_lote_competencia_tipo_pagamento",
+                table: "baixa_comissao",
+                columns: new[] { "seguradora_id", "lote", "competencia", "tipo_pagamento" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "idx_baixa_comissao_situacao",
+                table: "baixa_comissao",
+                column: "situacao");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_baixa_comissao_usuario_baixa_id",
+                table: "baixa_comissao",
+                column: "usuario_baixa_id");
 
             migrationBuilder.CreateIndex(
                 name: "comissao_seguradora_index_5",
@@ -835,6 +1082,82 @@ namespace MigracaoTabelas.Migrations
                 table: "evento_outbox",
                 column: "chave_idempotente",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "idx_faturamento_exportacao_arquivo_hash",
+                table: "faturamento_exportacao",
+                column: "arquivo_hash");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_faturamento_exportacao_criado_em",
+                table: "faturamento_exportacao",
+                column: "criado_em");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_faturamento_exportacao_filtros",
+                table: "faturamento_exportacao",
+                columns: new[] { "seguradora_id", "tipo_pagamento", "periodo_inicio", "periodo_fim" });
+
+            migrationBuilder.CreateIndex(
+                name: "idx_faturamento_exportacao_seguradora_id",
+                table: "faturamento_exportacao",
+                column: "seguradora_id");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_faturamento_exportacao_usuario_email",
+                table: "faturamento_exportacao",
+                column: "usuario_email");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_fat_imp_hist_criado_em",
+                table: "faturamento_importacao_historico",
+                column: "criado_em");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_fat_imp_hist_lote",
+                table: "faturamento_importacao_historico",
+                column: "lote");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_fat_imp_hist_seguradora_id",
+                table: "faturamento_importacao_historico",
+                column: "seguradora_id");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_fat_imp_hist_status_importacao",
+                table: "faturamento_importacao_historico",
+                column: "status_importacao");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_fat_imp_hist_usuario_id",
+                table: "faturamento_importacao_historico",
+                column: "usuario_id");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_faturamento_parcela_criado_em",
+                table: "faturamento_parcela",
+                column: "criado_em");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_faturamento_parcela_lote",
+                table: "faturamento_parcela",
+                column: "lote");
+
+            migrationBuilder.CreateIndex(
+                name: "idx_faturamento_parcela_parcela_id",
+                table: "faturamento_parcela",
+                column: "parcela_id",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "idx_faturamento_parcela_status",
+                table: "faturamento_parcela",
+                column: "status");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_faturamento_parcela_usuario_id",
+                table: "faturamento_parcela",
+                column: "usuario_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_gestao_documento_seguradora_id",
@@ -978,7 +1301,13 @@ namespace MigracaoTabelas.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "armazenamento_documento");
+
+            migrationBuilder.DropTable(
                 name: "auditoria");
+
+            migrationBuilder.DropTable(
+                name: "baixa_comissao");
 
             migrationBuilder.DropTable(
                 name: "comissao_seguradora");
@@ -996,6 +1325,15 @@ namespace MigracaoTabelas.Migrations
                 name: "evento_outbox");
 
             migrationBuilder.DropTable(
+                name: "faturamento_exportacao");
+
+            migrationBuilder.DropTable(
+                name: "faturamento_importacao_historico");
+
+            migrationBuilder.DropTable(
+                name: "faturamento_parcela");
+
+            migrationBuilder.DropTable(
                 name: "gestao_documento");
 
             migrationBuilder.DropTable(
@@ -1006,9 +1344,6 @@ namespace MigracaoTabelas.Migrations
 
             migrationBuilder.DropTable(
                 name: "parametrizacao");
-
-            migrationBuilder.DropTable(
-                name: "parcela");
 
             migrationBuilder.DropTable(
                 name: "proposta_seguradora");
@@ -1026,13 +1361,16 @@ namespace MigracaoTabelas.Migrations
                 name: "tela_acao_perfil");
 
             migrationBuilder.DropTable(
-                name: "seguro");
+                name: "parcela");
 
             migrationBuilder.DropTable(
                 name: "acao");
 
             migrationBuilder.DropTable(
                 name: "tela");
+
+            migrationBuilder.DropTable(
+                name: "seguro");
 
             migrationBuilder.DropTable(
                 name: "apolice_grupo_seguradora");

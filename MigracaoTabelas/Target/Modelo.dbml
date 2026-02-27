@@ -324,11 +324,7 @@ Ref: gestao_documento.seguradora_id > seguradora.id
 enum tipo_documento_armazenado {
   "Termo de Adesão com DPS"
   "Termo de Adesão sem DPS"
-  "Comprovante de Pagamento"
-  "Documento de Identificação"
-  "Comprovante de Residência"
-  "Laudo Médico"
-  "Outros"
+  "Documentação Complementar"
 }
 
 enum local_armazenamento_documento {
@@ -379,8 +375,7 @@ enum tipo_cooperado{
 } 
 enum sexo_cooperado{
   "Masculino"
-  "Feminino" 
-  "Outro"
+  "Feminino"
 } 
 
 Table cooperado [headercolor: #126E7A] {
@@ -426,6 +421,13 @@ enum motivo_seguro {
   "Regular"
   "Recusado pela seguradora"
   "Expiração da vigência do seguro"
+  "Aditivo"
+  "Cancelamento por prejuízo"
+  "Renegociação"
+  "Sinistro"
+  "Solicitado pela cooperativa"
+  "Solicitado pelo cooperado"
+  "Liquidação antecipada"
 }
 
 // Enum que define os possíveis status de um seguro durante seu ciclo de vida
@@ -563,6 +565,7 @@ enum tipo_faturamento_parcela_status {
   "Faturado"
   "Cancelado"
   "Não Faturado"
+  "Em Processamento"
 }
 
 enum tipo_faturamento_parcela_origem {
@@ -575,7 +578,7 @@ Table faturamento_parcela [headercolor: #1E69FD] {
   parcela_id     "bigint unsigned"               [not null, note: 'Chave estrangeira referenciando a tabela parcela (1:1)']
   usuario_id     "bigint unsigned"               [not null, note: 'Chave estrangeira referenciando o usuário que realizou o faturamento']
   lote           varchar(50)                     [not null, note: 'Identificador do lote de faturamento']
-  status         tipo_faturamento_parcela_status [not null, note: 'Status do faturamento: Faturado, Cancelado ou Não Faturado']
+  status         tipo_faturamento_parcela_status [not null, note: 'Status do faturamento: Faturado, Cancelado, Não Faturado ou Em Processamento']
   origem         tipo_faturamento_parcela_origem [not null, note: 'Origem do faturamento: Manual ou Automático']
   data_pagamento date                            [not null, note: 'Data do pagamento vinculado ao faturamento']
   criado_em      datetime                        [not null, note: 'Data e hora de criação do registro']
@@ -701,10 +704,6 @@ Ref: integracao_senior.agencia_id > agencia.id
 
 // Enum que define os motivos de cancelamento de seguro (replica status_seguro para contexto de cancelamento)
 enum motivo_cancel {
-  "Em análise pela Seguradora" // Cancelamento em análise pela seguradora
-  "Pendente de documentação" // Cancelamento aguardando documentação
-  "Ativo" // Status ativo (não aplicável para cancelamento)
-  "Expiração da vigência do seguro" // Cancelamento por término de vigência
   "Cancelado pelo cooperado" // Cancelamento solicitado pelo cooperado
   "Cancelado pela cooperativa" // Cancelamento realizado pela cooperativa
   "Sinistro" // Encerramento por sinistro

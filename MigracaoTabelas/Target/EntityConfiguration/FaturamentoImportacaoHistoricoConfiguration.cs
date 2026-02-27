@@ -54,8 +54,8 @@ public class FaturamentoImportacaoHistoricoConfiguration : BaseEntityConfigurati
                 builder.Property(x => x.Origem)
                     .HasColumnName("origem")
                     .HasConversion(v => v.AsString(), v => EnumHelper.FromString<TipoFaturamentoParcelaOrigem>(v))
-                    .HasComment("Origem da importação: Manual ou Automatico"),
-                "Manual", "Automatico"
+                    .HasComment("Origem da importação: Manual ou Automático"),
+                "Manual", "Automático"
             )
             .IsRequired();
 

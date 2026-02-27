@@ -27,7 +27,7 @@ public enum TipoFaturamentoParcelaStatus
     [Description("Não Faturado")]
     NaoFaturado = 3,
 
-    [Description("EmProcessamento")]
+    [Description("Em Processamento")]
     EmProcessamento = 4
 }
 
@@ -36,6 +36,6 @@ public enum TipoFaturamentoParcelaOrigem
     [Description("Manual")]
     Manual = 1,
 
-    [Description("Automatico")]
+    [Description("Automático")]
     Automatico = 2,
 }

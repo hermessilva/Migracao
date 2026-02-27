@@ -47,8 +47,8 @@ public class FaturamentoParcelaConfiguration : BaseEntityConfiguration<Faturamen
                         v.AsString(),
                         v => EnumHelper.FromString<TipoFaturamentoParcelaStatus>(v)
                     )
-                    .HasComment("Status do faturamento: Faturado, Cancelado ou Em Processamento"),
-                "Faturado", "Cancelado", "EmProcessamento"
+                    .HasComment("Status do faturamento: Faturado, Cancelado, Não Faturado ou Em Processamento"),
+                "Faturado", "Cancelado", "Não Faturado", "Em Processamento"
             )
             .IsRequired();
 
@@ -59,8 +59,8 @@ public class FaturamentoParcelaConfiguration : BaseEntityConfiguration<Faturamen
                         v.AsString(),
                         v => EnumHelper.FromString<TipoFaturamentoParcelaOrigem>(v)
                     )
-                    .HasComment("Origem do faturamento: Manual ou Automatico"),
-                "Manual", "Automatico"
+                    .HasComment("Origem do faturamento: Manual ou Automático"),
+                "Manual", "Automático"
             )
             .IsRequired();
 

@@ -3,7 +3,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
-using MigracaoTabelas.Enums;
 using MigracaoTabelas.Source;
 using MigracaoTabelas.Target;
 

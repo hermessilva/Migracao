@@ -21,8 +21,6 @@ namespace MigracaoTabelas.Target
         {
         }
 
-        public DbSet<Auditoria> Auditoria { get; set; }
-
         public DbSet<Usuario> Usuario { get; set; }
         public DbSet<Perfil> Perfil { get; set; }
         public DbSet<Tela> Tela { get; set; }
@@ -40,7 +38,6 @@ namespace MigracaoTabelas.Target
         public DbSet<Cooperado> Cooperado { get; set; }
         public DbSet<CooperadoAgenciaConta> CooperadoAgenciaConta { get; set; }
         public DbSet<Seguro> Seguro { get; set; }
-        public DbSet<SeguroParametro> SeguroParametro { get; set; }
         public DbSet<SeguroCancelamento> SeguroCancelamento { get; set; }
         public DbSet<Parcela> Parcela { get; set; }
         public DbSet<Parametrizacao> Parametrizacao { get; set; }
@@ -49,6 +46,12 @@ namespace MigracaoTabelas.Target
         public DbSet<ComissaoSeguradora> ComissaoSeguradora { get; set; }
         public DbSet<ContaCorrenteSeguradora> ContaCorrenteSeguradora { get; set; }
         public DbSet<PropostaSeguradora> PropostaSeguradora { get; set; }
+        public DbSet<SeguroParametro> SeguroParametro { get; set; }
+        public DbSet<EventoOutbox> EventosOutbox { get; set; }
+        public DbSet<FaturamentoParcela> FaturamentoParcela { get; set; }
+        public DbSet<FaturamentoImportacaoHistorico> FaturamentoImportacaoHistorico { get; set; }
+        public DbSet<ArmazenamentoDocumento> ArmazenamentoDocumento { get; set; }
+        public DbSet<BaixaComissao> BaixaComissao { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

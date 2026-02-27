@@ -39,9 +39,9 @@ public sealed class SeguroCancelamentoConfiguration : BaseEntityConfiguration<Se
             .IsRequired();
 
         ConfigureEnum(pBuilder.Property(pX => pX.Motivo)
-            .HasColumnName("motivo"), "Aditivo", "Cancelamento por prejuízo", "Renegociaçao", "Sinistro",
-                           "Solicitado pela cooperativa", "Solicitado pelo cooperado",
-                           "Liquidação Antecipada", "Recusado pela Seguradora")
+            .HasColumnName("motivo"), "Cancelado pelo cooperado", "Cancelado pela cooperativa", "Sinistro",
+                           "Recusado pela seguradora", "Cancelamento por prejuízo",
+                           "Liquidação antecipada", "Cancelado por renegociação", "Cancelado por aditivo")
             .HasConversion(
                 v => v.AsString(),
                 v => EnumHelper.FromString<MotivoSeguroCancelamento>(v)

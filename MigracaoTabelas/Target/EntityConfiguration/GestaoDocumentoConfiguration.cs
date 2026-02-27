@@ -27,7 +27,7 @@ public sealed class GestaoDocumentoConfiguration : BaseEntityConfiguration<Gesta
             .IsRequired();
 
         ConfigureEnum(builder.Property(x => x.Tipo)
-            .HasColumnName("tipo"), "Termo de Adesão", "DPS")
+            .HasColumnName("tipo"), "Termo de Adesão com DPS", "Termo de Adesão sem DPS", "Documentação Complementar")
             .HasConversion(
                 v => v.AsString(),
                 v => EnumHelper.FromString<TipoGestaoDocumento>(v))

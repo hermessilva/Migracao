@@ -8,18 +8,18 @@ using MigracaoTabelas.Target;
 
 #nullable disable
 
-namespace MigracaoTabelas.Migrations
+namespace MigracaoTabelas.Target.Migrations
 {
     [DbContext(typeof(TxDbContext))]
-    [Migration("20260108202203_Init")]
-    partial class Init
+    [Migration("20260226231132_Inicial")]
+    partial class Inicial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.10")
+                .HasAnnotation("ProductVersion", "10.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("MigracaoTabelas.Target.Acao", b =>
@@ -170,6 +170,141 @@ namespace MigracaoTabelas.Migrations
                         });
                 });
 
+            modelBuilder.Entity("MigracaoTabelas.Target.ArmazenamentoDocumento", b =>
+                {
+                    b.Property<ulong>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint unsigned")
+                        .HasColumnName("id")
+                        .HasComment("Identificador único do registro na tabela");
+
+                    b.Property<string>("CaminhoArquivo")
+                        .IsRequired()
+                        .HasMaxLength(450)
+                        .HasColumnType("varchar(450)")
+                        .HasColumnName("caminho_arquivo")
+                        .HasComment("Caminho completo do objeto (Key/Path) no provedor de armazenamento");
+
+                    b.Property<string>("CodigoRegiao")
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("codigo_regiao")
+                        .HasComment("Código da região do provedor (ex: us-east-1, eastus, southamerica-east1)");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime")
+                        .HasColumnName("criado_em")
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP(6)")
+                        .HasComment("Data e hora de criação do registro");
+
+                    b.Property<string>("CriadoPor")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("criado_por")
+                        .HasComment("Identificador do usuário que criou o registro");
+
+                    b.Property<string>("EndpointAlias")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("endpoint_alias")
+                        .HasComment("URL base customizada para CDN, proxy ou endpoint personalizado");
+
+                    b.Property<string>("ExtensaoArquivo")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("varchar(15)")
+                        .HasColumnName("extensao_arquivo")
+                        .HasComment("Extensão do arquivo (ex: pdf, png, jpg)");
+
+                    b.Property<string>("Finalidade")
+                        .HasMaxLength(30)
+                        .HasColumnType("varchar(30)")
+                        .HasColumnName("finalidade")
+                        .HasComment("Descrição da finalidade do documento quando Tipo for Documentação Complementar");
+
+                    b.Property<string>("HashControle")
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("hash_controle")
+                        .HasComment("Hash SHA-256 do arquivo para verificação de integridade e auditoria");
+
+                    b.Property<string>("Local")
+                        .IsRequired()
+                        .HasColumnType("enum('Amazon Web Services S3','Microsoft Azure Blob Storage','Google Cloud Platform Storage','Oracle Cloud Infrastructure Object Storage','Armazenamento On-Premises')")
+                        .HasColumnName("local")
+                        .HasComment("Local de armazenamento (AWS, Azure, GCP, OCI, OnPrem)");
+
+                    b.Property<string>("NomeOriginal")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("nome_original")
+                        .HasComment("Nome original do arquivo no momento do upload");
+
+                    b.Property<ulong>("SeguroId")
+                        .HasColumnType("bigint unsigned")
+                        .HasColumnName("seguro_id")
+                        .HasComment("Chave estrangeira referenciando a tabela seguro");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("enum('Ativo','Inativo','Pendente de Processamento','Erro no Upload','Excluído')")
+                        .HasDefaultValue("Ativo")
+                        .HasColumnName("status")
+                        .HasComment("Status atual do documento armazenado");
+
+                    b.Property<long>("TamanhoBytes")
+                        .HasColumnType("bigint")
+                        .HasColumnName("tamanho_bytes")
+                        .HasComment("Tamanho do arquivo em bytes");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("enum('Termo de Adesão com DPS','Termo de Adesão sem DPS','Documentação Complementar')")
+                        .HasColumnName("tipo")
+                        .HasComment("Tipo/finalidade do documento armazenado");
+
+                    b.Property<string>("TipoMime")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("tipo_mime")
+                        .HasComment("Tipo MIME do arquivo (ex: application/pdf, image/png)");
+
+                    b.Property<string>("UnidadeArmazenamento")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("unidade_armazenamento")
+                        .HasComment("Nome do Bucket (S3/GCP/MinIO) ou Container (Azure/OCI)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("HashControle")
+                        .HasDatabaseName("ix_armazenamento_documento_hash_controle");
+
+                    b.HasIndex("SeguroId")
+                        .HasDatabaseName("ix_armazenamento_documento_seguro_id");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("ix_armazenamento_documento_status");
+
+                    b.HasIndex("Tipo")
+                        .HasDatabaseName("ix_armazenamento_documento_tipo");
+
+                    b.HasIndex("Local", "UnidadeArmazenamento", "CaminhoArquivo")
+                        .IsUnique()
+                        .HasDatabaseName("ix_armazenamento_documento_local_caminho");
+
+                    b.ToTable("armazenamento_documento", null, t =>
+                        {
+                            t.HasComment("Armazena referências de documentos em provedores de nuvem ou on-premises vinculados a seguros");
+                        });
+                });
+
             modelBuilder.Entity("MigracaoTabelas.Target.Auditoria", b =>
                 {
                     b.Property<ulong>("Id")
@@ -235,6 +370,98 @@ namespace MigracaoTabelas.Migrations
                     b.ToTable("auditoria", null, t =>
                         {
                             t.HasComment("Tabela de auditoria para rastreamento de todas as operações realizadas no sistema");
+                        });
+                });
+
+            modelBuilder.Entity("MigracaoTabelas.Target.BaixaComissao", b =>
+                {
+                    b.Property<ulong>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint unsigned")
+                        .HasColumnName("id")
+                        .HasComment("Identificador único do registro de baixa de comissão");
+
+                    b.Property<DateTime>("Competencia")
+                        .HasColumnType("date")
+                        .HasColumnName("competencia")
+                        .HasComment("Mês e ano correspondente ao movimento do faturamento (vencimento da parcela)");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime")
+                        .HasColumnName("criado_em")
+                        .HasComment("Data e hora de criação do registro");
+
+                    b.Property<DateTime>("DataEmissao")
+                        .HasColumnType("date")
+                        .HasColumnName("data_emissao")
+                        .HasComment("Data de expectativa de pagamento de comissão indicada no faturamento");
+
+                    b.Property<DateTime?>("DataRecebimento")
+                        .HasColumnType("date")
+                        .HasColumnName("data_recebimento")
+                        .HasComment("Data em que a comissão foi efetivamente recebida/baixada");
+
+                    b.Property<string>("Lote")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("lote")
+                        .HasComment("Número do lote/fatura oriundo do faturamento");
+
+                    b.Property<int>("QuantidadeCooperados")
+                        .HasColumnType("int")
+                        .HasColumnName("quantidade_cooperados")
+                        .HasComment("Número total de movimentos faturados no lote");
+
+                    b.Property<ulong>("SeguradoraId")
+                        .HasColumnType("bigint unsigned")
+                        .HasColumnName("seguradora_id")
+                        .HasComment("Chave estrangeira referenciando a tabela seguradora");
+
+                    b.Property<string>("Situacao")
+                        .IsRequired()
+                        .HasColumnType("enum('Pendente','Recebida')")
+                        .HasColumnName("situacao")
+                        .HasComment("Situação da comissão: Pendente ou Recebida");
+
+                    b.Property<string>("TipoPagamento")
+                        .IsRequired()
+                        .HasColumnType("enum('À Vista','Parcelado','Único')")
+                        .HasColumnName("tipo_pagamento")
+                        .HasComment("Tipo de pagamento do seguro: À Vista, Parcelado ou Único");
+
+                    b.Property<ulong?>("UsuarioBaixaId")
+                        .HasColumnType("bigint unsigned")
+                        .HasColumnName("usuario_baixa_id")
+                        .HasComment("Chave estrangeira referenciando o usuário que realizou a baixa");
+
+                    b.Property<decimal>("ValorComissao")
+                        .HasColumnType("decimal(14,2)")
+                        .HasColumnName("valor_comissao")
+                        .HasComment("Valor total de comissão provisionada para o lote/fatura");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Competencia")
+                        .HasDatabaseName("idx_baixa_comissao_competencia");
+
+                    b.HasIndex("Lote")
+                        .HasDatabaseName("idx_baixa_comissao_lote");
+
+                    b.HasIndex("SeguradoraId")
+                        .HasDatabaseName("idx_baixa_comissao_seguradora_id");
+
+                    b.HasIndex("Situacao")
+                        .HasDatabaseName("idx_baixa_comissao_situacao");
+
+                    b.HasIndex("UsuarioBaixaId");
+
+                    b.HasIndex("SeguradoraId", "Lote", "Competencia", "TipoPagamento")
+                        .IsUnique()
+                        .HasDatabaseName("idx_baixa_comissao_seguradora_lote_competencia_tipo_pagamento");
+
+                    b.ToTable("baixa_comissao", null, t =>
+                        {
+                            t.HasComment("Registros de baixa de comissão de faturamento de seguro prestamista, agrupados por seguradora, lote e competência");
                         });
                 });
 
@@ -440,6 +667,27 @@ namespace MigracaoTabelas.Migrations
                         .HasColumnName("credito_comissao_valor_pago")
                         .HasComment("Código da conta contábil comissao valor pago credito");
 
+                    b.Property<string>("CreditoFaturamentoComissao")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("credito_faturamento_comissao")
+                        .HasComment("Código da conta contábil crédito faturamento comissão");
+
+                    b.Property<string>("CreditoFaturamentoIRRF")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("credito_faturamento_irrf")
+                        .HasComment("Código da conta contábil crédito faturamento IRRF");
+
+                    b.Property<string>("CreditoFaturamentoPremio")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("credito_faturamento_premio")
+                        .HasComment("Código da conta contábil credito faturamento premio");
+
                     b.Property<string>("CreditoPremioContratacao")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -495,6 +743,27 @@ namespace MigracaoTabelas.Migrations
                         .HasColumnType("varchar(50)")
                         .HasColumnName("debito_comissao_valor_pago")
                         .HasComment("Código da conta contábil comissao valor pago debito");
+
+                    b.Property<string>("DebitoFaturamentoComissao")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("debito_faturamento_comissao")
+                        .HasComment("Código da conta contábil débito faturamento comissão");
+
+                    b.Property<string>("DebitoFaturamentoIRRF")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("debito_faturamento_irrf")
+                        .HasComment("Código da conta contábil débito faturamento IRRF");
+
+                    b.Property<string>("DebitoFaturamentoPremio")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("debito_faturamento_premio")
+                        .HasComment("Código da conta contábil debito faturamento premio");
 
                     b.Property<string>("DebitoPremioContratacao")
                         .IsRequired()
@@ -559,6 +828,27 @@ namespace MigracaoTabelas.Migrations
                         .HasColumnName("descricao_credito_comissao_parcela")
                         .HasComment("Descrição da conta contábil credito comissao parcela");
 
+                    b.Property<string>("DescricaoCreditoFaturamentoComissao")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("descricao_credito_faturamento_comissao")
+                        .HasComment("Descrição da conta contábil crédito faturamento comissão");
+
+                    b.Property<string>("DescricaoCreditoFaturamentoIRRF")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("descricao_credito_faturamento_irrf")
+                        .HasComment("Descrição da conta contábil crédito faturamento IRRF");
+
+                    b.Property<string>("DescricaoCreditoFaturamentoPremio")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("descricao_credito_faturamento_premio")
+                        .HasComment("Descrição da conta contábil credito faturamento premio");
+
                     b.Property<string>("DescricaoCreditoPremioContratacao")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -608,6 +898,27 @@ namespace MigracaoTabelas.Migrations
                         .HasColumnName("descricao_debito_comissao_parcela")
                         .HasComment("Descrição da conta contábil debito comissao parcela");
 
+                    b.Property<string>("DescricaoDebitoFaturamentoComissao")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("descricao_debito_faturamento_comissao")
+                        .HasComment("Descrição da conta contábil débito faturamento comissão");
+
+                    b.Property<string>("DescricaoDebitoFaturamentoIRRF")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("descricao_debito_faturamento_irrf")
+                        .HasComment("Descrição da conta contábil débito faturamento IRRF");
+
+                    b.Property<string>("DescricaoDebitoFaturamentoPremio")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("descricao_debito_faturamento_premio")
+                        .HasComment("Descrição da conta contábil debito faturamento premio");
+
                     b.Property<string>("DescricaoDebitoPremioContratacao")
                         .IsRequired()
                         .HasMaxLength(255)
@@ -651,6 +962,11 @@ namespace MigracaoTabelas.Migrations
                         .HasColumnName("id")
                         .HasComment("Identificador único do registro na tabela");
 
+                    b.Property<DateTime?>("DataNascimento")
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("data_nascimento")
+                        .HasComment("Data de nascimento do cooperado");
+
                     b.Property<string>("Email")
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)")
@@ -670,12 +986,23 @@ namespace MigracaoTabelas.Migrations
                         .HasColumnName("nome_fantasia")
                         .HasComment("Nome fantasia do cooperado (aplicável apenas para pessoa jurídica)");
 
+                    b.Property<string>("NomeSocial")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("nome_social")
+                        .HasComment("Nome social do cooperado (nome pelo qual a pessoa prefere ser chamada)");
+
                     b.Property<string>("NumeroDocumento")
                         .IsRequired()
                         .HasMaxLength(14)
                         .HasColumnType("varchar(14)")
                         .HasColumnName("numero_documento")
                         .HasComment("Documento de identificação do cooperado (CPF com 11 dígitos ou CNPJ com 14 dígitos, sem formatação)");
+
+                    b.Property<string>("Sexo")
+                        .HasColumnType("enum('Masculino','Feminino')")
+                        .HasColumnName("sexo")
+                        .HasComment("Sexo do cooperado: Masculino, Feminino ou Juridico (para pessoa jurídica)");
 
                     b.Property<string>("Tipo")
                         .IsRequired()
@@ -811,6 +1138,278 @@ namespace MigracaoTabelas.Migrations
                         });
                 });
 
+            modelBuilder.Entity("MigracaoTabelas.Target.ExportacaoFaturamento", b =>
+                {
+                    b.Property<ulong>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint unsigned")
+                        .HasColumnName("id");
+
+                    b.Property<string>("ArquivoHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)")
+                        .HasColumnName("arquivo_hash");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime")
+                        .HasColumnName("criado_em");
+
+                    b.Property<string>("MensagemErro")
+                        .HasColumnType("text")
+                        .HasColumnName("mensagem_erro");
+
+                    b.Property<string>("NomeArquivo")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("nome_arquivo");
+
+                    b.Property<DateTime>("PeriodoFim")
+                        .HasColumnType("datetime")
+                        .HasColumnName("periodo_fim");
+
+                    b.Property<DateTime>("PeriodoInicio")
+                        .HasColumnType("datetime")
+                        .HasColumnName("periodo_inicio");
+
+                    b.Property<int>("QuantidadeRegistros")
+                        .HasColumnType("int")
+                        .HasColumnName("quantidade_registros");
+
+                    b.Property<ulong>("SeguradoraId")
+                        .HasColumnType("bigint unsigned")
+                        .HasColumnName("seguradora_id");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("enum('Sucesso','Erro')")
+                        .HasColumnName("status")
+                        .HasComment("Status da exportação: Sucesso ou Erro");
+
+                    b.Property<string>("TipoPagamento")
+                        .IsRequired()
+                        .HasColumnType("enum('À Vista','Parcelado')")
+                        .HasColumnName("tipo_pagamento")
+                        .HasComment("Tipo de pagamento do seguro: À Vista ou Parcelado");
+
+                    b.Property<string>("UsuarioEmail")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("usuario_email");
+
+                    b.Property<string>("UsuarioNome")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("usuario_nome");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ArquivoHash")
+                        .HasDatabaseName("idx_faturamento_exportacao_arquivo_hash");
+
+                    b.HasIndex("CriadoEm")
+                        .HasDatabaseName("idx_faturamento_exportacao_criado_em");
+
+                    b.HasIndex("SeguradoraId")
+                        .HasDatabaseName("idx_faturamento_exportacao_seguradora_id");
+
+                    b.HasIndex("UsuarioEmail")
+                        .HasDatabaseName("idx_faturamento_exportacao_usuario_email");
+
+                    b.HasIndex("SeguradoraId", "TipoPagamento", "PeriodoInicio", "PeriodoFim")
+                        .HasDatabaseName("idx_faturamento_exportacao_filtros");
+
+                    b.ToTable("faturamento_exportacao", (string)null);
+                });
+
+            modelBuilder.Entity("MigracaoTabelas.Target.FaturamentoImportacaoHistorico", b =>
+                {
+                    b.Property<ulong>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint unsigned")
+                        .HasColumnName("id")
+                        .HasComment("Identificador único do registro de importação");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime")
+                        .HasColumnName("criado_em")
+                        .HasComment("Data e hora de criação do registro de importação");
+
+                    b.Property<string>("Lote")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("lote")
+                        .HasComment("Número do lote/fatura identificado no arquivo importado");
+
+                    b.Property<string>("NomeArquivo")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("nome_arquivo")
+                        .HasComment("Nome do arquivo importado pelo usuário");
+
+                    b.Property<string>("Observacao")
+                        .HasColumnType("mediumtext")
+                        .HasColumnName("observacao")
+                        .HasComment("Observações adicionais ou mensagem de erro da importação");
+
+                    b.Property<string>("Origem")
+                        .IsRequired()
+                        .HasColumnType("enum('Manual','Automático')")
+                        .HasColumnName("origem")
+                        .HasComment("Origem da importação: Manual ou Automático");
+
+                    b.Property<int>("QuantidadeSegurosAceitos")
+                        .HasColumnType("int")
+                        .HasColumnName("quantidade_seguros_aceitos")
+                        .HasComment("Quantidade de seguros com status aceito no arquivo");
+
+                    b.Property<int>("QuantidadeSegurosNaoAceitos")
+                        .HasColumnType("int")
+                        .HasColumnName("quantidade_seguros_nao_aceitos")
+                        .HasComment("Quantidade de seguros com status recusado ou pendente no arquivo");
+
+                    b.Property<ulong>("SeguradoraId")
+                        .HasColumnType("bigint unsigned")
+                        .HasColumnName("seguradora_id")
+                        .HasComment("Chave estrangeira referenciando a seguradora do arquivo importado");
+
+                    b.Property<string>("StatusImportacao")
+                        .IsRequired()
+                        .HasColumnType("enum('Processado','Erro','Processado Parcialmente')")
+                        .HasColumnName("status_importacao")
+                        .HasComment("Status da importação: Processado, Erro ou Processado Parcialmente");
+
+                    b.Property<string>("TipoPagamento")
+                        .IsRequired()
+                        .HasColumnType("enum('À Vista','Parcelado','Único')")
+                        .HasColumnName("tipo_pagamento")
+                        .HasComment("Tipo de pagamento: À Vista, Parcelado ou Único");
+
+                    b.Property<int>("TotalRegistrosArquivo")
+                        .HasColumnType("int")
+                        .HasColumnName("total_registros_arquivo")
+                        .HasComment("Total de registros/linhas encontrados no arquivo");
+
+                    b.Property<ulong>("UsuarioId")
+                        .HasColumnType("bigint unsigned")
+                        .HasColumnName("usuario_id")
+                        .HasComment("Chave estrangeira referenciando o usuário que realizou a importação");
+
+                    b.Property<decimal>("ValorTotalArquivo")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("valor_total_arquivo")
+                        .HasComment("Valor total geral de todos os registros do arquivo");
+
+                    b.Property<decimal>("ValorTotalFaturar")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("valor_total_faturar")
+                        .HasComment("Valor total a ser faturado (aceitos)");
+
+                    b.Property<decimal>("ValorTotalSegurosAceitos")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("valor_total_seguros_aceitos")
+                        .HasComment("Valor total dos prêmios dos seguros aceitos");
+
+                    b.Property<decimal>("ValorTotalSegurosNaoAceitos")
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("valor_total_seguros_nao_aceitos")
+                        .HasComment("Valor total dos prêmios dos seguros não aceitos");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CriadoEm")
+                        .HasDatabaseName("idx_fat_imp_hist_criado_em");
+
+                    b.HasIndex("Lote")
+                        .HasDatabaseName("idx_fat_imp_hist_lote");
+
+                    b.HasIndex("SeguradoraId")
+                        .HasDatabaseName("idx_fat_imp_hist_seguradora_id");
+
+                    b.HasIndex("StatusImportacao")
+                        .HasDatabaseName("idx_fat_imp_hist_status_importacao");
+
+                    b.HasIndex("UsuarioId")
+                        .HasDatabaseName("idx_fat_imp_hist_usuario_id");
+
+                    b.ToTable("faturamento_importacao_historico", null, t =>
+                        {
+                            t.HasComment("Histórico de importações de arquivos de retorno das seguradoras para faturamento");
+                        });
+                });
+
+            modelBuilder.Entity("MigracaoTabelas.Target.FaturamentoParcela", b =>
+                {
+                    b.Property<ulong>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint unsigned")
+                        .HasColumnName("id")
+                        .HasComment("Identificador único do registro de faturamento");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime")
+                        .HasColumnName("criado_em")
+                        .HasComment("Data e hora de criação do registro");
+
+                    b.Property<DateTime>("DataPagamento")
+                        .HasColumnType("date")
+                        .HasColumnName("data_pagamento")
+                        .HasComment("Data de pagamento informada no momento do faturamento");
+
+                    b.Property<string>("Lote")
+                        .IsRequired()
+                        .HasColumnType("varchar(50)")
+                        .HasColumnName("lote")
+                        .HasComment("Número do lote/fatura informado pelo usuário no momento do faturamento");
+
+                    b.Property<string>("Origem")
+                        .IsRequired()
+                        .HasColumnType("enum('Manual','Automático')")
+                        .HasColumnName("origem")
+                        .HasComment("Origem do faturamento: Manual ou Automático");
+
+                    b.Property<ulong>("ParcelaId")
+                        .HasColumnType("bigint unsigned")
+                        .HasColumnName("parcela_id")
+                        .HasComment("Chave estrangeira referenciando a tabela parcela");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("enum('Faturado','Cancelado','Não Faturado','Em Processamento')")
+                        .HasColumnName("status")
+                        .HasComment("Status do faturamento: Faturado, Cancelado, Não Faturado ou Em Processamento");
+
+                    b.Property<ulong>("UsuarioId")
+                        .HasColumnType("bigint unsigned")
+                        .HasColumnName("usuario_id")
+                        .HasComment("Chave estrangeira referenciando a tabela usuario que realizou a operação");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CriadoEm")
+                        .HasDatabaseName("idx_faturamento_parcela_criado_em");
+
+                    b.HasIndex("Lote")
+                        .HasDatabaseName("idx_faturamento_parcela_lote");
+
+                    b.HasIndex("ParcelaId")
+                        .IsUnique()
+                        .HasDatabaseName("idx_faturamento_parcela_parcela_id");
+
+                    b.HasIndex("Status")
+                        .HasDatabaseName("idx_faturamento_parcela_status");
+
+                    b.HasIndex("UsuarioId");
+
+                    b.ToTable("faturamento_parcela", null, t =>
+                        {
+                            t.HasComment("Registros de faturamento e cancelamento de parcelas do seguro prestamista");
+                        });
+                });
+
             modelBuilder.Entity("MigracaoTabelas.Target.GestaoDocumento", b =>
                 {
                     b.Property<ulong>("Id")
@@ -852,7 +1451,7 @@ namespace MigracaoTabelas.Migrations
 
                     b.Property<string>("Tipo")
                         .IsRequired()
-                        .HasColumnType("enum('Termo de Adesão','DPS')")
+                        .HasColumnType("enum('Termo de Adesão com DPS','Termo de Adesão sem DPS','Documentação Complementar')")
                         .HasColumnName("tipo")
                         .HasComment("Tipo do documento/modelo");
 
@@ -928,7 +1527,7 @@ namespace MigracaoTabelas.Migrations
 
                     b.Property<string>("TipoLancamentoContabil")
                         .IsRequired()
-                        .HasColumnType("enum('Seguro Prestamista Contratado','Comissão Seguro Prestamista Contratado','Cancelamento Seguro Prestamista Parcelado Comissão','Cancelamento Seguro Prestamista À Vista Proporcional Comissão','Pagamento Seguro Prestamista','Recebimento Comissão Seguro Prestamista','Recebimento Premio Seguro Prestamista Parcelado','Recebimento Comissão Seguro Prestamista Parcelado')")
+                        .HasColumnType("enum('Seguro Prestamista Contratado','Comissão Seguro Prestamista Contratado','Cancelamento Seguro Prestamista Parcelado Comissão','Cancelamento Seguro Prestamista À Vista Proporcional Comissão','Pagamento Seguro Prestamista','Recebimento Comissão Seguro Prestamista','Recebimento Premio Seguro Prestamista Parcelado','Recebimento Comissão Seguro Prestamista Parcelado','Faturamento Prêmio Seguro Prestamista','Faturamento Comissão Seguro Prestamista','Faturamento IRRF Seguro Prestamista')")
                         .HasColumnName("tipo_lancamento_contabil")
                         .HasComment("Tipo do lançamento contábil conforme enum tipo_lancamento");
 
@@ -936,6 +1535,13 @@ namespace MigracaoTabelas.Migrations
                         .HasColumnType("decimal(10,2)")
                         .HasColumnName("valor")
                         .HasComment("Valor monetário do lançamento a ser integrado");
+
+                    b.Property<bool>("Visualizar")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(true)
+                        .HasColumnName("visualizar")
+                        .HasComment("Indica se o registro deve ser visualizado nas consultas");
 
                     b.HasKey("Id");
 
@@ -1443,9 +2049,14 @@ namespace MigracaoTabelas.Migrations
 
                     b.Property<string>("TipoPagamento")
                         .IsRequired()
-                        .HasColumnType("enum('À Vista','Parcelado','Único')")
+                        .HasColumnType("enum('À Vista','Parcelado')")
                         .HasColumnName("tipo_pagamento")
-                        .HasComment("Modalidade de pagamento: À Vista, Parcelado ou Único");
+                        .HasComment("Modalidade de pagamento: À Vista ou Parcelado");
+
+                    b.Property<DateTime?>("UploadDocumento")
+                        .HasColumnType("datetime")
+                        .HasColumnName("upload_documento")
+                        .HasComment("Data e hora do upload dos documentos relacionados ao seguro");
 
                     b.Property<ulong?>("UsuarioId")
                         .HasColumnType("bigint unsigned")
@@ -1512,7 +2123,7 @@ namespace MigracaoTabelas.Migrations
 
                     b.Property<string>("Motivo")
                         .IsRequired()
-                        .HasColumnType("enum('Aditivo','Cancelamento por prejuízo','Renegociaçao','Sinistro','Solicitado pela cooperativa','Solicitado pelo cooperado','Liquidação Antecipada')")
+                        .HasColumnType("enum('Cancelado pelo cooperado','Cancelado pela cooperativa','Sinistro','Recusado pela seguradora','Cancelamento por prejuízo','Liquidação antecipada','Cancelado por renegociação','Cancelado por aditivo')")
                         .HasColumnName("motivo")
                         .HasComment("Motivo do cancelamento");
 
@@ -1818,6 +2429,35 @@ namespace MigracaoTabelas.Migrations
                     b.Navigation("Seguradora");
                 });
 
+            modelBuilder.Entity("MigracaoTabelas.Target.ArmazenamentoDocumento", b =>
+                {
+                    b.HasOne("MigracaoTabelas.Target.Seguro", "Seguro")
+                        .WithMany("ArmazenamentosDocumentos")
+                        .HasForeignKey("SeguroId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Seguro");
+                });
+
+            modelBuilder.Entity("MigracaoTabelas.Target.BaixaComissao", b =>
+                {
+                    b.HasOne("MigracaoTabelas.Target.Seguradora", "Seguradora")
+                        .WithMany()
+                        .HasForeignKey("SeguradoraId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("MigracaoTabelas.Target.Usuario", "UsuarioBaixa")
+                        .WithMany()
+                        .HasForeignKey("UsuarioBaixaId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.Navigation("Seguradora");
+
+                    b.Navigation("UsuarioBaixa");
+                });
+
             modelBuilder.Entity("MigracaoTabelas.Target.ComissaoSeguradora", b =>
                 {
                     b.HasOne("MigracaoTabelas.Target.Seguradora", "Seguradoras")
@@ -1879,6 +2519,55 @@ namespace MigracaoTabelas.Migrations
                     b.Navigation("Agencias");
 
                     b.Navigation("Cooperados");
+                });
+
+            modelBuilder.Entity("MigracaoTabelas.Target.ExportacaoFaturamento", b =>
+                {
+                    b.HasOne("MigracaoTabelas.Target.Seguradora", "Seguradora")
+                        .WithMany()
+                        .HasForeignKey("SeguradoraId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Seguradora");
+                });
+
+            modelBuilder.Entity("MigracaoTabelas.Target.FaturamentoImportacaoHistorico", b =>
+                {
+                    b.HasOne("MigracaoTabelas.Target.Seguradora", "Seguradora")
+                        .WithMany()
+                        .HasForeignKey("SeguradoraId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("MigracaoTabelas.Target.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Seguradora");
+
+                    b.Navigation("Usuario");
+                });
+
+            modelBuilder.Entity("MigracaoTabelas.Target.FaturamentoParcela", b =>
+                {
+                    b.HasOne("MigracaoTabelas.Target.Parcela", "Parcela")
+                        .WithOne("FaturamentoParcela")
+                        .HasForeignKey("MigracaoTabelas.Target.FaturamentoParcela", "ParcelaId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("MigracaoTabelas.Target.Usuario", "Usuario")
+                        .WithMany()
+                        .HasForeignKey("UsuarioId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Parcela");
+
+                    b.Navigation("Usuario");
                 });
 
             modelBuilder.Entity("MigracaoTabelas.Target.GestaoDocumento", b =>
@@ -2120,6 +2809,11 @@ namespace MigracaoTabelas.Migrations
                     b.Navigation("Seguros");
                 });
 
+            modelBuilder.Entity("MigracaoTabelas.Target.Parcela", b =>
+                {
+                    b.Navigation("FaturamentoParcela");
+                });
+
             modelBuilder.Entity("MigracaoTabelas.Target.Perfil", b =>
                 {
                     b.Navigation("TelasAcoesPerfis");
@@ -2155,6 +2849,8 @@ namespace MigracaoTabelas.Migrations
 
             modelBuilder.Entity("MigracaoTabelas.Target.Seguro", b =>
                 {
+                    b.Navigation("ArmazenamentosDocumentos");
+
                     b.Navigation("Parcelas");
 
                     b.Navigation("SegurosCancelamentos");
