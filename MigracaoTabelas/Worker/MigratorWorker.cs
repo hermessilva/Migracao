@@ -1,10 +1,14 @@
 
 
+using K4os.Compression.LZ4.Internal;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 using MigracaoTabelas.Source;
 using MigracaoTabelas.Target;
+
+using Mysqlx.Crud;
 
 using Serilog;
 
@@ -44,11 +48,21 @@ namespace MigracaoTabelas.Worker
             using var srcctx = _Scope.ServiceProvider.GetRequiredService<SxDbContext>();
             databsess = srcctx.Database.SqlQueryRaw<DataBaseSess>("SELECT CONCAT('agencia_', CAST(AG_CODIGO AS CHAR(8))) TABLE_SCHEMA,AG_CODIGO Codigo FROM unico.cd_agencia WHERE AG_ATIVA = 1").ToList();
             IDbContextTransaction tx = null;
+            var tableOrder = new[] {"agencia","cooperado","seguradora","seguro_parametro","ponto_atendimento","seguradora_limite",
+                                    "contabilizacao_seguradora","comissao_seguradora","cooperado_agencia_conta","apolice_grupo_seguradora","seguro","parcela"};
             try
             {
                 tx = _TContext.Database.BeginTransaction();
-                File.WriteAllText(@$"D:\CrediSIS\DBs\inserts.sql", "SET FOREIGN_KEY_CHECKS = 0;" + Environment.NewLine + 
-                    " SET NAMES 'utf8mb4';" + Environment.NewLine + "start transaction;" + Environment.NewLine);
+                var file = new FileStream(@$"D:\CrediSIS\DBs\inserts.sql", FileMode.Create, FileAccess.Write);
+                var strWriter = new StreamWriter(file);
+                strWriter.AutoFlush = true;
+                //strWriter.WriteLine("SET FOREIGN_KEY_CHECKS = 0;");
+                strWriter.WriteLine("SET NAMES 'utf8mb4';");
+                strWriter.WriteLine();
+                strWriter.WriteLine("start transaction;");
+                strWriter.WriteLine();
+                var defaultData = File.ReadAllText(@$"Default Data.sql");
+                strWriter.WriteLine(defaultData);
                 Agencia ag = null;
                 databsess.ForEach(d => Log.Information("Aência encontra para migração [" + d.TABLE_SCHEMA + "]"));
                 foreach (var sagencia in databsess)
@@ -58,30 +72,38 @@ namespace MigracaoTabelas.Worker
                     Log.Information($"[{sagencia.TABLE_SCHEMA}]");
                     using (var sctx = _Scope.ServiceProvider.GetRequiredService<SxDbContext>())
                     {
-                        //if (sagencia.Codigo == "0012")
-                        //{
-                        //    Log.Warning($"Agencia não contem fuction saldocontratoemprestimoaditivo");
-                        //    continue;
-                        //}
-                        //if (sagencia.Codigo == "0023")
-                        //{
-                        //    Log.Warning($"Agencia Com banco sob lock");
-                        //    continue;
-                        //}
                         ag = _DataCache.GetAgencia(sctx, sagencia.Codigo);
                         _DataCache.GetPontoAtendimento(sctx, sagencia.Codigo, "000");
-
-                        Log.Information($"Iniciando migração da Agencia [{ag.Nome}] Códiog [{ag.Codigo}] id[{ag.Id}]");
-                        Console.WriteLine();
+                        lock (_TContext)
+                        {
+                            Log.Information($"Iniciando migração da Agencia [{ag.Nome}] Códiog [{ag.Codigo}] id[{ag.Id}]");
+                            Console.WriteLine();
+                        }
                         _SContext = sctx;
                         MigraDados(sctx);
                         sctx.Dispose();
                     }
                 }
-                tx.Commit();
-                File.AppendAllText(@$"D:\CrediSIS\DBs\inserts.sql", "commit;");
 
-                Log.Information($"Migração da Agencia [{ag.Nome}] Código [{ag.Codigo}] id[{ag.Id}] concluída com sucesso!");
+                foreach (var table in tableOrder)
+                    foreach (var t in _TContext.CapturedInserts.Where(i => i.Table == table))
+                        strWriter.WriteLine(t.Insert);
+
+                var tables = _TContext.CapturedInserts.Select(i => i.Table).Distinct().ToList();
+                foreach (var table in tables)
+                    File.AppendAllText(@$"D:\CrediSIS\DBs\Tables.txt", table + Environment.NewLine);
+
+                tx.Commit();
+                strWriter.WriteLine();
+
+                strWriter.WriteLine("INSERT INTO usuario(id, ponto_atendimento_id, perfil_id, login, nome, email, status, criado_em) " +
+                    "VALUES(23, 1, 1, 'portal.seguradoras', 'Usuario de Sistema do ERP', 'mailto@etc.com', 'Ativo', '2025-11-18 09:11:02');");
+
+                strWriter.WriteLine();
+                strWriter.WriteLine("commit;");
+                file.Close();
+                file.Dispose();
+                Log.Information($"\r\nMigração da Agencia [{ag.Nome}] Código [{ag.Codigo}] id[{ag.Id}] concluída com sucesso!");
             }
             catch (Exception ex)
             {
@@ -148,7 +170,7 @@ namespace MigracaoTabelas.Worker
                 }
                 catch (Exception ex)
                 {
-                    Log.Error($"Erro ao migrar prestamista Conta [{prestamista.CcoConta}] Contrato [{prestamista.SegContrato}]: {ex.Message}");
+                    Console.WriteLine($"\r\nErro ao migrar prestamista Conta [{prestamista.CcoConta}] Contrato [{prestamista.SegContrato}]: {ex.Message}");
                 }
             }
             if (seguros.Count > 0)
@@ -158,7 +180,8 @@ namespace MigracaoTabelas.Worker
                 TotalMigrado += seguros.Count;
             }
             stopwatch.Stop();
-            Log.Information($"Migrados {processados} Prestamistas e {parcnt} Parcelas. Tempo Total: {stopwatch.Elapsed:hh\\:mm\\:ss} ");
+            lock (_TContext)
+                Console.WriteLine($"\r\nMigrados {processados} Prestamistas e {parcnt} Parcelas. Tempo Total: {stopwatch.Elapsed:hh\\:mm\\:ss} ");
         }
 
         private static DateTime ETA(int totalPrestamistas, int processados, System.Diagnostics.Stopwatch stopwatch, DateTime lastUpdate, TimeSpan updateInterval)

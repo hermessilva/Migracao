@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using Microsoft.Extensions.Options;
 
+using MigracaoTabelas.Source;
+
 namespace MigracaoTabelas.Target
 {
 
@@ -53,6 +55,8 @@ namespace MigracaoTabelas.Target
         public DbSet<ArmazenamentoDocumento> ArmazenamentoDocumento { get; set; }
         public DbSet<BaixaComissao> BaixaComissao { get; set; }
 
+        public List<(string Table, string Insert)> CapturedInserts { get; } = new List<(string Table, string Insert)>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -67,7 +71,7 @@ namespace MigracaoTabelas.Target
 
         protected override void OnConfiguring(DbContextOptionsBuilder pBuilder)
         {
-            pBuilder.AddInterceptors(new MySqlAuditInterceptor());
+            pBuilder.AddInterceptors(new MySqlAuditInterceptor(this));
 
             if (!pBuilder.IsConfigured)
             {
@@ -108,6 +112,12 @@ namespace MigracaoTabelas.Target
     {
         // Lista temporária para segurar as referências das entidades que entraram como 'Added'
         private List<EntityEntry>? _entriesToBeInserted;
+        private TxDbContext txDbContext;
+
+        public MySqlAuditInterceptor(TxDbContext txDbContext)
+        {
+            this.txDbContext = txDbContext;
+        }
 
         public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
         {
@@ -166,7 +176,8 @@ namespace MigracaoTabelas.Target
                 }
 
                 var sql = $"INSERT INTO `{tableName}` ({string.Join(", ", columns)}) VALUES ({string.Join(", ", values)});";
-                File.AppendAllText(@$"D:\CrediSIS\DBs\inserts.sql", sql + Environment.NewLine);
+                txDbContext.CapturedInserts.Add((tableName, sql));
+                //File.AppendAllText(@$"D:\CrediSIS\DBs\inserts.sql", sql + Environment.NewLine);
             }
 
             // Limpa a lista para não duplicar no próximo SaveChanges do mesmo DbContext
