@@ -1,5 +1,8 @@
 
+using System.Text;
+
 using jsreport.Binary;
+
 using MigracaoTabelas.Source;
 using MigracaoTabelas.Target;
 using MigracaoTabelas.Worker;
@@ -31,8 +34,8 @@ namespace MigracaoTabelas
                 builder.Host.UseSerilog();
                 builder.Services.AddTransient<SxDbContext>();
                 builder.Services.AddDbContext<SxDbContext>();
-                builder.Services.AddScoped<TxDbContext>();
-                builder.Services.AddDbContext<TxDbContext>();                                                                                          
+                builder.Services.AddTransient<TxDbContext>();
+                builder.Services.AddDbContext<TxDbContext>();
                 var app = builder.Build();
                 var thds = Environment.ProcessorCount;
 

@@ -11,7 +11,7 @@ namespace MigracaoTabelas.Worker
         private Dictionary<(string, string), PontoAtendimento> PontosAtendimento = new Dictionary<(string, string), PontoAtendimento>();
         private Dictionary<string, Cooperado> Cooperados = new Dictionary<string, Cooperado>();
         private Dictionary<string, Seguradora> Seguradoras = new Dictionary<string, Seguradora>();
-        private Dictionary<(ulong, ulong), ApoliceGrupoSeguradora> ApolicesGruposSeguradoras = new Dictionary<(ulong, ulong), ApoliceGrupoSeguradora>();
+        private Dictionary<(ulong, ulong, string, bool), ApoliceGrupoSeguradora> ApolicesGruposSeguradoras = new Dictionary<(ulong, ulong, string, bool), ApoliceGrupoSeguradora>();
 
         private Object _ToLock = new Object();
 
@@ -37,7 +37,28 @@ namespace MigracaoTabelas.Worker
         {
             _TContext.Seguradora.AsNoTracking().ToList().ForEach(a =>
             {
-                Seguradoras.Add(a.Cnpj, a);
+
+                switch (a.Nome)
+                {
+                    case "MAPFRE SEGUROS":
+                        a.Cnpj = "0001";
+                        break;
+                    case "MAG SEGURADORA":
+                        a.Cnpj = "0004";
+                        break;
+                    case "ICATU SEGUROS":
+                        a.Cnpj = "0005";
+                        break;
+                    case "UNIMED CAPITAL VARIAVEL":
+                        a.Cnpj = "0003";
+                        break;
+                    case "UNIMED CAPITAL FIXO":
+                        a.Cnpj = "0006";
+                        break;
+                    default:
+                        throw new Exception("Seguradora [" + a.Nome + "] não mapeada para um CNPJ fictício. Atualize o método CriarSeguradora para incluir essa seguradora.");
+                }
+                Seguradoras.Add((a.Cnpj.PadRight(14, '0')).Substring(0, 14), a);
             });
             _TContext.Agencia.AsNoTracking().ToList().ForEach(a =>
             {
@@ -53,7 +74,7 @@ namespace MigracaoTabelas.Worker
             });
             _TContext.ApoliceGrupoSeguradora.AsNoTracking().ToList().ForEach(a =>
             {
-                ApolicesGruposSeguradoras.Add((a.AgenciaId, a.SeguradoraId), a);
+                ApolicesGruposSeguradoras.Add((a.AgenciaId, a.SeguradoraId, a.TipoCapital.AsString(), !string.IsNullOrWhiteSpace(a.ModalidadeUnico)), a);
             });
         }
 
@@ -213,15 +234,18 @@ namespace MigracaoTabelas.Worker
                 var cnpj = (pCodigo.PadRight(14, '0')).Substring(0, 14);
                 if (Seguradoras.ContainsKey(cnpj))
                     return Seguradoras[cnpj];
-                var seguradoraSrc = pSContext.Seguradoras.Where(s => s.Codigo == pCodigo).FirstOrDefault();
-                if (seguradoraSrc == null)
-                    throw new Exception($"Seguradora [{cnpj}] não encontrada.");
-                var seguradora = CriarSeguradora(seguradoraSrc);
 
-                _TContext.Seguradora.Add(seguradora);
-                _TContext.SaveChanges();
-                Seguradoras.Add(cnpj, seguradora);
-                return seguradora;
+                throw new Exception("Seguradora com código [" + pCodigo + "] não encontrada no cache. Verifique se o código está correto e se a seguradora existe na fonte de dados.");
+
+                //var seguradoraSrc = pSContext.Seguradoras.Where(s => s.Codigo == pCodigo).FirstOrDefault();
+                //if (seguradoraSrc == null)
+                //    throw new Exception($"Seguradora [{cnpj}] não encontrada.");
+                //var seguradora = CriarSeguradora(seguradoraSrc);
+
+                //_TContext.Seguradora.Add(seguradora);
+                //_TContext.SaveChanges();
+                //Seguradoras.Add(cnpj, seguradora);
+                //return seguradora;
             }
         }
 
@@ -504,31 +528,41 @@ namespace MigracaoTabelas.Worker
             return seguradora;
         }
 
-        public ulong GetAgenciaSeguradora(ulong pAgenciaId, ulong pSeguradoraId, string pSeguradoraNome )
+        public ulong GetAgenciaSeguradora(ulong pAgenciaId, ulong pSeguradoraId, string pSeguradoraNome, string pTipoCapital, bool pModalidadeParcelado)
         {
             ArgumentOutOfRangeException.ThrowIfZero(pAgenciaId, nameof(pAgenciaId));
             lock (_ToLock)
             {
-                if (ApolicesGruposSeguradoras.ContainsKey((pAgenciaId, pSeguradoraId)))
-                    return ApolicesGruposSeguradoras[(pAgenciaId, pSeguradoraId)].Id;
+                if (ApolicesGruposSeguradoras.ContainsKey((pAgenciaId, pSeguradoraId, pTipoCapital, pModalidadeParcelado)))
+                    return ApolicesGruposSeguradoras[(pAgenciaId, pSeguradoraId, pTipoCapital, pModalidadeParcelado)].Id;
 
-                var ags = new ApoliceGrupoSeguradora
-                {
-                    Apolice = "APO-001",
-                    Grupo = "GRP-001",
-                    SubGrupo = "SUB-001",
-                    TipoCapital = pSeguradoraNome.Contains("VARIAVEL") ? TipoCapitalApolice.Variavel : TipoCapitalApolice.Fixo,
-                    ModalidadeUnico = "Unico",
-                    ModalidadeAVista = 1.5m,
-                    ModalidadeParcelado = 10m,
-                    AgenciaId = pAgenciaId,
-                    SeguradoraId = pSeguradoraId,
-                };
-                _TContext.ApoliceGrupoSeguradora.Add(ags);
-                _TContext.SaveChanges();
+                var ret = ApolicesGruposSeguradoras.Values.FirstOrDefault(a => a.AgenciaId == pAgenciaId && a.SeguradoraId == pSeguradoraId && a.TipoCapital.AsString() == pTipoCapital);
+                if (ret != null)
+                    return ret.Id;
 
-                ApolicesGruposSeguradoras.Add((pAgenciaId, pSeguradoraId), ags);
-                return ags.Id;
+                ret = ApolicesGruposSeguradoras.Values.FirstOrDefault(a => a.AgenciaId == pAgenciaId && a.SeguradoraId == pSeguradoraId);
+                if (ret != null)
+                    return ret.Id;
+
+                throw new InvalidOperationException("Tipo de capital desconhecido: " + pTipoCapital);
+
+                //var ags = new ApoliceGrupoSeguradora
+                //{
+                //    Apolice = "APO-001",
+                //    Grupo = "GRP-001",
+                //    SubGrupo = "SUB-001",
+                //    TipoCapital = pSeguradoraNome.Contains("VARIAVEL") ? TipoCapitalApolice.Variavel : TipoCapitalApolice.Fixo,
+                //    ModalidadeUnico = "Unico",
+                //    ModalidadeAVista = 1.5m,
+                //    ModalidadeParcelado = 10m,
+                //    AgenciaId = pAgenciaId,
+                //    SeguradoraId = pSeguradoraId,
+                //};
+                //_TContext.ApoliceGrupoSeguradora.Add(ags);
+                //_TContext.SaveChanges();
+
+                //ApolicesGruposSeguradoras.Add((pAgenciaId, pSeguradoraId, pTipoCapital), ags);
+                //return ags.Id;
             }
         }
     }

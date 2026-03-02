@@ -18,6 +18,7 @@ namespace MigracaoTabelas.Target
 
     public class TxDbContext : DbContext
     {
+        public string Connection = "";
         public TxDbContext(DbContextOptions<TxDbContext> options)
             : base(options)
         {
@@ -76,6 +77,8 @@ namespace MigracaoTabelas.Target
             if (!pBuilder.IsConfigured)
             {
                 var str = Utils.Read("TARGET_DB", "");
+                if (Connection != "")
+                    str = Connection;
                 pBuilder.UseMySQL(str);
             }
 #if DEBUG
