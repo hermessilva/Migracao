@@ -54,8 +54,10 @@ namespace MigracaoTabelas.Worker
             SxDbContext.Schema = "unico";
             using var srcctx = _Scope.ServiceProvider.GetRequiredService<SxDbContext>();
             IDbContextTransaction tx = null;
-            var tableOrder = new[] {"agencia","cooperado","seguradora","seguro_parametro","ponto_atendimento","seguradora_limite",
-                                    "contabilizacao_seguradora","comissao_seguradora","cooperado_agencia_conta","apolice_grupo_seguradora","seguro","parcela"};
+            var tableOrder = new[] {"agencia","cooperado","seguradora","seguro_parametro","ponto_atendimento","seguradora_limite","proposta_seguradora",
+                                    "condicao_seguradora","conta_corrente_seguradora","contabilizacao_seguradora","comissao_seguradora",
+                                    "cooperado_agencia_conta","apolice_grupo_seguradora","seguro","parcela"};
+
             try
             {
                 databsess = srcctx.Database.SqlQueryRaw<DataBaseSess>("SELECT CONCAT('agencia_', CAST(AG_CODIGO AS CHAR(8))) TABLE_SCHEMA,AG_CODIGO Codigo FROM unico.cd_agencia WHERE AG_ATIVA = 1").ToList();
@@ -63,7 +65,6 @@ namespace MigracaoTabelas.Worker
                 var file = new FileStream(@$"D:\CrediSIS\DBs\inserts.sql", FileMode.Create, FileAccess.Write);
                 var strWriter = new StreamWriter(file);
                 strWriter.AutoFlush = true;
-                //strWriter.WriteLine("SET FOREIGN_KEY_CHECKS = 0;");
                 strWriter.WriteLine("SET NAMES 'utf8mb4';");
                 strWriter.WriteLine();
                 strWriter.WriteLine("start transaction;");
@@ -229,7 +230,7 @@ namespace MigracaoTabelas.Worker
                 {
                     processados++;
                     parcnt += Migrate(parcelas, seguros, prestamista);
-                    if (seguros.Count > 100)
+                    if (seguros.Count > 50)
                     {
                         _TContext.AddRange(seguros);
                         _TContext.SaveChanges();
@@ -280,9 +281,8 @@ namespace MigracaoTabelas.Worker
 
         private int Migrate(Dictionary<(string CcoConta, string SegContrato, short ConSeq), List<SxEpSegParcela>> pParcelas, List<Seguro> pSeguros, SxEpSegPrestamista pPrestamista)
         {
-            pParcelas.TryGetValue((pPrestamista.CcoConta, pPrestamista.SegContrato, pPrestamista.ConSeq), out var parcelasSrc);
-            if (parcelasSrc == null || parcelasSrc.Count == 0)
-                return 0;
+            if (!pParcelas.TryGetValue((pPrestamista.CcoConta, pPrestamista.SegContrato, pPrestamista.ConSeq), out var parcelasSrc))
+                parcelasSrc = new List<SxEpSegParcela>();
             var tgt = new Seguro();
             tgt.Assign(pPrestamista);
             var (cooagct, cooperado, conta) = GetCooperadoId(pPrestamista);
@@ -313,6 +313,16 @@ namespace MigracaoTabelas.Worker
             spar.PorcentagemComissaoCorretora = comissao?.PorcentagemComissaoCorretora ?? 0.45M;
             spar.PorcentagemComissaoCooperativa = comissao?.PorcentagemComissaoCooperativa ?? 0.20M;
             tgt.SeguroParametro = spar;
+            if (parcelasSrc.Count == 0)
+            {
+                var parcelaTgt = new Parcela();
+                parcelaTgt.Status = StatusParcela.Pago;
+                parcelaTgt.NumeroParcela = 1;
+                parcelaTgt.ValorOriginal = parcelaTgt.ValorParcela = pPrestamista.SegPremio.HasValue ? pPrestamista.SegPremio.Value : 0;
+                parcelaTgt.DataUltimoPagamento = parcelaTgt.Liquidacao = parcelaTgt.Vencimento = pPrestamista.SegInicio.Value;
+                parcelaTgt.ValorPago = parcelaTgt.ValorOriginal;
+                tgt.Parcelas.Add(parcelaTgt);
+            }
 
             foreach (var item in parcelasSrc)
             {

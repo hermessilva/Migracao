@@ -1,7 +1,13 @@
 
+using System.Diagnostics;
 using System.Text;
 
+using Google.Protobuf.WellKnownTypes;
+
 using jsreport.Binary;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 using MigracaoTabelas.Source;
 using MigracaoTabelas.Target;
@@ -18,6 +24,7 @@ namespace MigracaoTabelas
     {
         static void Main(string[] args)
         {
+
             Log.Logger = new LoggerConfiguration()
                .ReadFrom.Configuration(new ConfigurationBuilder()
                .AddJsonFile("appsettings.json")
@@ -39,6 +46,15 @@ namespace MigracaoTabelas
                 var app = builder.Build();
                 var thds = Environment.ProcessorCount;
 
+                if (args.Length > 0)
+                {
+                    Console.WriteLine("Argumentos de linha de comando:");
+                    if (File.Exists(args[0]))
+                        ImportaDados(args[0], app.Services);
+                    else
+                        Console.WriteLine("Arquivo não encontrado: " + args[0]);
+                    return;
+                }
                 Log.Information("Iniciando a migração das tabelas...");
                 using (var scope = app.Services.CreateScope())
                 {
@@ -60,6 +76,51 @@ namespace MigracaoTabelas
             {
                 Log.CloseAndFlush();
             }
+        }
+
+        private static void ImportaDados(string pScriptSQLFile, IServiceProvider services)
+        {
+            Console.Clear();
+            string lcmd = "";
+            TxDbContext ctx = null;
+            try
+            {
+                var script = File.ReadAllText(pScriptSQLFile, Encoding.UTF8);
+                var cmds = script.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
+                var total = cmds.Length;
+                var sw = Stopwatch.StartNew();
+
+                using var scope = services.CreateScope();
+                ctx = scope.ServiceProvider.GetRequiredService<TxDbContext>();
+                ctx.Database.OpenConnection();
+                ctx.Database.ExecuteSqlRaw("start transaction");
+
+                for (int i = 0; i < total; i++)
+                {
+                    lcmd = cmds[i];
+                    if (lcmd?.Length < "insert".Length)
+                        continue;
+                    ctx.Database.ExecuteSqlRaw(lcmd);
+                    PrintEta(i + 1, total, sw.Elapsed);
+                }
+
+                ctx.Database.ExecuteSqlRaw("commit");
+                Console.WriteLine();
+                Console.WriteLine("Importação Concluída com Sucesso.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine();
+                Console.WriteLine("Erro ao importar dados: " + ex.Message + "\r\n[" + lcmd + "]");
+                ctx.Database.ExecuteSqlRaw("rollback");
+            }
+        }
+
+        private static void PrintEta(int pCurrent, int pTotal, TimeSpan pElapsed)
+        {
+            var avgPerItem = pElapsed.TotalSeconds / pCurrent;
+            var remaining = TimeSpan.FromSeconds(avgPerItem * (pTotal - pCurrent));
+            Console.Write($"\r[{pCurrent:#,##0}/{pTotal:#,##0}] Decorrido: {pElapsed:hh\\:mm\\:ss} | ETA: {remaining:hh\\:mm\\:ss}   ");
         }
     }
 }
