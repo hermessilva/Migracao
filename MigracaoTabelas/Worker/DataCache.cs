@@ -180,6 +180,7 @@ namespace MigracaoTabelas.Worker
                         Tipo = cooperado.Tipo == "F" ? TipoPessoaCooperado.Fisica : TipoPessoaCooperado.Juridica,
                         NomeFantasia = cooperado.NomeFantasia,
                         Email = cooperado.Email,
+                        DataNascimento = cooperado.Nascimento
                     };
                     _TContext.Cooperado.Add(coop);
                     _TContext.SaveChanges();

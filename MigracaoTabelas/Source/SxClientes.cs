@@ -41,6 +41,12 @@ namespace MigracaoTabelas.Source
         /// </summary>
         public string Agencia { get; set; }
 
+        /// <summary>
+        /// Mapeado de 'CLI_NASC'.
+        /// Data de nascimento (pode ser nulo).
+        /// </summary>
+        public DateTime? Nascimento { get; set; }
+
     }
 }
 

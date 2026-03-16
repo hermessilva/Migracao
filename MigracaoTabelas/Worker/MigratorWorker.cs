@@ -287,13 +287,13 @@ namespace MigracaoTabelas.Worker
             tgt.Assign(pPrestamista);
             var (cooagct, cooperado, conta) = GetCooperadoId(pPrestamista);
             var agenciaId = GetAgenciaId();
-            var tipoCapital = pPrestamista.SegNome.Contains("VAIAVEL") ? TipoCapitalApolice.Variavel : TipoCapitalApolice.Fixo;
+            var tipoCapital = pPrestamista.SegNome.Contains("VARIAVEL") ? TipoCapitalApolice.Variavel : TipoCapitalApolice.Fixo;
             tgt.CooperadoAgenciaContaId = cooagct.Id;
             tgt.PontoAtendimentoId = GetPontoAtendimentoId(conta.PaCodigo);
             var (apoliceGrupoSeguradoraId, seguradoraNome) = GetAgenciaSeguradoraId(pPrestamista, agenciaId, tipoCapital.AsString(), parcelasSrc.Count > 1);
             tgt.ApoliceGrupoSeguradoraId = apoliceGrupoSeguradoraId;
             tgt.CooperadoAgenciaContaId = cooagct.Id;
-
+            tgt.TipoPagamento = parcelasSrc.Count > 1 ? TipoPagamentoSeguro.Parcelado : TipoPagamentoSeguro.AVista ;
             //tgt.UsuarioId = 18;
 
             // Obtém a seguradora para buscar as comissões

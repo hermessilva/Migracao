@@ -13,7 +13,7 @@ public class Parcela
 
     public void Assign(SxEpSegParcela source)
     {
-        if (source.SegCancelado.HasValue)
+        if (source.SegPgto.HasValue)
             Status = StatusParcela.Pago;
         else
             Status = StatusParcela.Pendente;

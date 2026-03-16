@@ -80,12 +80,11 @@ namespace MigracaoTabelas
 
         private static void ImportaDados(string pScriptSQLFile, IServiceProvider services)
         {
-            Console.Clear();
             string lcmd = "";
             TxDbContext ctx = null;
             try
             {
-                var script = File.ReadAllText(pScriptSQLFile, Encoding.UTF8);
+                var script = File.ReadAllText(pScriptSQLFile, Encoding.Default);
                 var cmds = script.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
                 var total = cmds.Length;
                 var sw = Stopwatch.StartNew();
@@ -94,15 +93,23 @@ namespace MigracaoTabelas
                 ctx = scope.ServiceProvider.GetRequiredService<TxDbContext>();
                 ctx.Database.OpenConnection();
                 ctx.Database.ExecuteSqlRaw("start transaction");
-
+                var cmdx = "";
+                Console.Clear();
                 for (int i = 0; i < total; i++)
                 {
                     lcmd = cmds[i];
                     if (lcmd?.Length < "insert".Length)
                         continue;
-                    ctx.Database.ExecuteSqlRaw(lcmd);
-                    PrintEta(i + 1, total, sw.Elapsed);
+                    cmdx += lcmd + ";\r\n";
+                    if (i % 1000 == 0)
+                    {
+                        ctx.Database.ExecuteSqlRaw(cmdx);
+                        cmdx = "";
+                        PrintEta(i + 1, total, sw.Elapsed);
+                    }
                 }
+                if (cmdx?.Length > "insert".Length)
+                    ctx.Database.ExecuteSqlRaw(cmdx);
 
                 ctx.Database.ExecuteSqlRaw("commit");
                 Console.WriteLine();

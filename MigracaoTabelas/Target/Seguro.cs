@@ -150,8 +150,7 @@ public class Seguro
         PremioTotal = source.SegPremio ?? 0.00m;
         ValorBase = source.SegBase;
         ValorIof = source.SegIof;
-        ContratoSequencia = source.ContratoSequencia.ToString("00");
-        TipoPagamento = source.TipoPagamentoSeguro == 1 ? TipoPagamentoSeguro.AVista : TipoPagamentoSeguro.Parcelado;
+        ContratoSequencia = source.ContratoSequencia.ToString("00");        
     }
 }
 
