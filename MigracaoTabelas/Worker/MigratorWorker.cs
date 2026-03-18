@@ -319,7 +319,7 @@ namespace MigracaoTabelas.Worker
                 parcelaTgt.Status = StatusParcela.Pago;
                 parcelaTgt.NumeroParcela = 1;
                 parcelaTgt.ValorOriginal = parcelaTgt.ValorParcela = pPrestamista.SegPremio.HasValue ? pPrestamista.SegPremio.Value : 0;
-                parcelaTgt.DataUltimoPagamento = parcelaTgt.Liquidacao = parcelaTgt.Vencimento = pPrestamista.SegInicio.Value;
+                parcelaTgt.DataUltimoPagamento = parcelaTgt.Liquidacao = parcelaTgt.Vencimento = pPrestamista.SegEfetivacao.Value;
                 parcelaTgt.ValorPago = parcelaTgt.ValorOriginal;
                 tgt.Parcelas.Add(parcelaTgt);
             }
