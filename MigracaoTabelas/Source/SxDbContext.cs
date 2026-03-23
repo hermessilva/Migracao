@@ -111,12 +111,12 @@ WITH ResumoFinanceiro AS (
 )
 SELECT 
     CASE 
-        WHEN C.CON_DEBSEGURO = 2 OR C.CON_PARCELAS = 1 THEN 1 -- 'SEGURO À VISTA'
-        WHEN (SELECT COUNT(*) FROM ResumoFinanceiro RF WHERE RF.contrato = S.SEG_CONTRATO AND RF.total_seg > 0) > 1 THEN 2 -- 'SEGURO PARCELADO'
+        WHEN C.CON_DEBSEGURO = 2 OR C.CON_PARCELAS = 1 THEN 1 -- 'SEGURO À VISTA' 
+        WHEN (SELECT COUNT(*) FROM ResumoFinanceiro RF WHERE RF.contrato = S.SEG_CONTRATO AND RF.total_seg > 0) > 1 THEN 2 -- 'SEGURO PARCELADO' 
         ELSE 3 -- 'SEGURO À VISTA (LANÇAMENTO ÚNICO)'
     END AS tipo_seguro,
     CASE 
-        WHEN C.MOD_CALCULO IN (2, 3) THEN 1 -- 'SALDO VARIÁVEL (PRICE/SAC)'
+        WHEN C.MOD_CALCULO IN (2, 3) THEN 1 -- 'SALDO VARIÁVEL (PRICE/SAC)' 
         ELSE 2 -- 'SALDO FIXO'
     END AS tipo_saldo,
     C.CON_PARCELAS AS parc_emprestimo,    
@@ -130,10 +130,15 @@ FROM ep_segprestamista S
 INNER JOIN ep_contrato C ON S.SEG_CONTRATO = C.CON_NDOC AND S.CON_SEQ = C.CON_SEQ
 join cc_conta cc on cc.cco_conta = S.cco_conta
 LEFT JOIN ResumoFinanceiro RF ON S.SEG_CONTRATO = RF.contrato AND S.CON_SEQ = RF.con_seq
+LEFT JOIN ep_segparcela SP_ABERTA ON S.SEG_CONTRATO = SP_ABERTA.seg_contrato 
+    AND S.CON_SEQ = SP_ABERTA.con_seq 
+    AND SP_ABERTA.seg_pgto IS NULL
 WHERE 
-	S.seg_modalidade = 4 and cc.cco_situacao = 1 and S.seg_canctipo = 0 and S.seg_fim  >= '2026-03-03' and C.con_pgto is null and  
-	S.sql_deleted = 'F' and S.PST_CODIGO <> '0007'
-GROUP BY S.SEG_CONTRATO, S.CON_SEQ, S.SEG_PREMIO, C.CON_DEBSEGURO, C.CON_PARCELAS, C.MOD_CALCULO, S.SEG_FIM;
+    S.seg_modalidade = 4 and cc.cco_situacao = 1 and S.seg_canctipo = 0 and C.con_pgto is null and 
+    S.sql_deleted = 'F' and S.PST_CODIGO <> '0007' and (S.seg_fim >= '2026-03-03' OR SP_ABERTA.seg_contrato IS NOT NULL)
+GROUP BY 
+    1, 2, 3, 6, S.SEG_CONTRATO, S.CON_SEQ, S.SEG_PREMIO, C.CON_DEBSEGURO, C.CON_PARCELAS, C.MOD_CALCULO, S.SEG_FIM;
+
 ");
             });
 
