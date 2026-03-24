@@ -134,8 +134,21 @@ LEFT JOIN ep_segparcela SP_ABERTA ON S.SEG_CONTRATO = SP_ABERTA.seg_contrato
     AND S.CON_SEQ = SP_ABERTA.con_seq 
     AND SP_ABERTA.seg_pgto IS NULL
 WHERE 
-    S.seg_modalidade = 4 and cc.cco_situacao = 1 and S.seg_canctipo = 0 and C.con_pgto is null and 
-    S.sql_deleted = 'F' and S.PST_CODIGO <> '0007' and (S.seg_fim >= '2026-03-03' OR SP_ABERTA.seg_contrato IS NOT NULL)
+    S.seg_modalidade = 4 
+    AND cc.cco_situacao = 1 
+    AND C.con_pgto is null 
+    AND S.sql_deleted = 'F' 
+    AND S.PST_CODIGO <> '0007' 
+    AND (S.seg_fim >= '2026-03-03' OR SP_ABERTA.seg_contrato IS NOT NULL)
+    -- Nova validação do seg_canctipo inserida abaixo
+    AND (
+        S.seg_canctipo = 0
+        OR (
+            S.seg_canctipo IN (1, 2, 3) 
+            AND SP_ABERTA.seg_contrato IS NOT NULL 
+            AND SP_ABERTA.seg_vcto <= S.SEG_CANCELAMENTO
+        )
+    )
 GROUP BY 
     1, 2, 3, 6, S.SEG_CONTRATO, S.CON_SEQ, S.SEG_PREMIO, C.CON_DEBSEGURO, C.CON_PARCELAS, C.MOD_CALCULO, S.SEG_FIM;
 

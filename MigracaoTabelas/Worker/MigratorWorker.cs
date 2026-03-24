@@ -287,13 +287,13 @@ namespace MigracaoTabelas.Worker
             tgt.Assign(pPrestamista);
             var (cooagct, cooperado, conta) = GetCooperadoId(pPrestamista);
             var agenciaId = GetAgenciaId();
-            var tipoCapital = pPrestamista.SegNome.Contains("VARIAVEL") ? TipoCapitalApolice.Variavel : TipoCapitalApolice.Fixo;
             tgt.CooperadoAgenciaContaId = cooagct.Id;
             tgt.PontoAtendimentoId = GetPontoAtendimentoId(conta.PaCodigo);
-            var (apoliceGrupoSeguradoraId, seguradoraNome) = GetAgenciaSeguradoraId(pPrestamista, agenciaId, tipoCapital.AsString(), parcelasSrc.Count > 1);
-            tgt.ApoliceGrupoSeguradoraId = apoliceGrupoSeguradoraId;
             tgt.CooperadoAgenciaContaId = cooagct.Id;
-            tgt.TipoPagamento = parcelasSrc.Count > 1 ? TipoPagamentoSeguro.Parcelado : TipoPagamentoSeguro.AVista ;
+            tgt.TipoPagamento = parcelasSrc.Count > 1 ? TipoPagamentoSeguro.Parcelado : TipoPagamentoSeguro.AVista;
+            var (apoliceGrupoSeguradoraId, tipoCapital) = GetAgenciaSeguradoraId(pPrestamista, agenciaId, tgt.TipoPagamento);
+            tgt.ApoliceGrupoSeguradoraId = apoliceGrupoSeguradoraId;
+
             //tgt.UsuarioId = 18;
 
             // Obtém a seguradora para buscar as comissões
@@ -308,6 +308,31 @@ namespace MigracaoTabelas.Worker
             else
                 spar.Coeficiente = 0.0005945M;
 
+            SeguroCancelamento canc = null;
+            if (pPrestamista.SegCancTipo != 0)
+            {
+                tgt.SegurosCancelamentos.Add(canc = new SeguroCancelamento
+                {
+                    Data = pPrestamista.SegCancelamento.Value,
+                });
+            }
+
+            switch (pPrestamista.SegCancTipo)
+            {
+                case 1:
+                    tgt.Motivo = MotivoSeguro.SolicitadoPeloCooperado;
+                    canc.Motivo = MotivoSeguroCancelamento.SolicitadoPeloCooperado;
+                    break;
+                case 2:
+                    tgt.Motivo = MotivoSeguro.SolicitadoPelaCooperativa;
+                    canc.Motivo = MotivoSeguroCancelamento.SolicitadoPelaCooperativa;
+                    break;
+                case 3:
+                    tgt.Motivo = MotivoSeguro.Sinistro;
+                    canc.Motivo = MotivoSeguroCancelamento.Sinistro;
+                    break;
+            }
+
             spar.Periodicidade30Dias = true;
             spar.PorcentualIof = 0.0038M;
             spar.PorcentagemComissaoCorretora = comissao?.PorcentagemComissaoCorretora ?? 0.45M;
@@ -319,9 +344,13 @@ namespace MigracaoTabelas.Worker
                 parcelaTgt.Status = StatusParcela.Pago;
                 parcelaTgt.NumeroParcela = 1;
                 parcelaTgt.ValorOriginal = parcelaTgt.ValorParcela = pPrestamista.SegPremio.HasValue ? pPrestamista.SegPremio.Value : 0;
-                parcelaTgt.DataUltimoPagamento = parcelaTgt.Liquidacao = parcelaTgt.Vencimento = pPrestamista.SegEfetivacao.Value;
+                var data = pPrestamista.SegInicio;
+                if (pPrestamista.SegEfetivacao.HasValue)
+                    data = pPrestamista.SegEfetivacao.Value;
+                parcelaTgt.DataUltimoPagamento = parcelaTgt.Liquidacao = parcelaTgt.Vencimento = data.Value;
                 parcelaTgt.ValorPago = parcelaTgt.ValorOriginal;
                 tgt.Parcelas.Add(parcelaTgt);
+                AddHistorico(parcelaTgt);
             }
 
             foreach (var item in parcelasSrc)
@@ -329,6 +358,9 @@ namespace MigracaoTabelas.Worker
                 var parcelaTgt = new Parcela();
                 parcelaTgt.Assign(item);
                 tgt.Parcelas.Add(parcelaTgt);
+                if (parcelaTgt.DataUltimoPagamento != null)
+                    AddHistorico(parcelaTgt);
+
             }
 
             pSeguros.Add(tgt);
@@ -336,10 +368,29 @@ namespace MigracaoTabelas.Worker
             return parcelasSrc?.Count ?? 0;
         }
 
-        private (ulong ID, string Nome) GetAgenciaSeguradoraId(SxEpSegPrestamista prestamista, ulong agenciaId, string pTipoCapital, bool pModalidadeParcelado)
+        private void AddHistorico(Parcela pParcela)
         {
-            var seguradoraId = _DataCache.GetSeguradora(_SContext, prestamista.PstCodigo).Id;
-            return (_DataCache.GetAgenciaSeguradora(agenciaId, seguradoraId, prestamista.SegNome, pTipoCapital, pModalidadeParcelado), prestamista.SegNome);
+            var historico = new SeguroHistoricoPagamento
+            {
+                DataPagamento = pParcela.DataUltimoPagamento.Value,
+                ValorPago = pParcela.ValorPago,
+                Operacao = OperacaoSeguroHistoricoPagamento.Recebimento
+            };
+            pParcela.SeguroHistoricoPagamentos.Add(historico);
+        }
+
+        private (ulong, TipoCapitalApolice) GetAgenciaSeguradoraId(SxEpSegPrestamista prestamista, ulong agenciaId, TipoPagamentoSeguro pTipoPagamento)
+        {
+            var seguradora = _DataCache.GetSeguradora(_SContext, prestamista.PstCodigo);
+            var tipoCapital = seguradora.Nome.Contains("VARIAVEL") ? TipoCapitalApolice.Variavel : TipoCapitalApolice.Fixo;
+
+            var apoliceGrupo = seguradora.ApolicesGruposSeguradoras.FirstOrDefault(ags => (ags.TipoCapital == tipoCapital && pTipoPagamento == TipoPagamentoSeguro.Parcelado && ags.ModalidadeUnico != null) ||
+                              (ags.TipoCapital == tipoCapital && pTipoPagamento == TipoPagamentoSeguro.AVista && ags.ModalidadeAVista != null) ||
+                              (ags.TipoCapital == tipoCapital && pTipoPagamento == TipoPagamentoSeguro.Parcelado && ags.ModalidadeParcelado != null));
+
+            if (apoliceGrupo == null)
+                throw new Exception($"Não foi possível encontrar um grupo de apólice para a seguradora [{seguradora.Nome}] com Tipo Capital [{tipoCapital}] e Modalidade [{pTipoPagamento}]");
+            return (apoliceGrupo.Id, tipoCapital);
         }
 
         private (CooperadoAgenciaConta, Cooperado, SxContas) GetCooperadoId(SxEpSegPrestamista prestamista)

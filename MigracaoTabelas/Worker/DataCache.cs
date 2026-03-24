@@ -35,7 +35,7 @@ namespace MigracaoTabelas.Worker
 
         private void PrepareCache()
         {
-            _TContext.Seguradora.AsNoTracking().ToList().ForEach(a =>
+            _TContext.Seguradora.Include(s => s.ApolicesGruposSeguradoras).AsNoTracking().ToList().ForEach(a =>
             {
 
                 switch (a.Nome)

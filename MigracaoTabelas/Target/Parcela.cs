@@ -49,7 +49,8 @@ public class Parcela
     // Relacionamentos
     public virtual Seguro Seguros { get; set; } = null!;
     public virtual FaturamentoParcela? FaturamentoParcela { get; set; }
-
+    public virtual ICollection<SeguroHistoricoPagamento> SeguroHistoricoPagamentos { get; set; } = new List<SeguroHistoricoPagamento>();
+        
     public void PagarManualmente(decimal valor)
     {
         ValorPago += valor;

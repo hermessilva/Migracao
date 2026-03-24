@@ -55,6 +55,7 @@ namespace MigracaoTabelas.Target
         public DbSet<FaturamentoImportacaoHistorico> FaturamentoImportacaoHistorico { get; set; }
         public DbSet<ArmazenamentoDocumento> ArmazenamentoDocumento { get; set; }
         public DbSet<BaixaComissao> BaixaComissao { get; set; }
+        public DbSet<SeguroHistoricoPagamento> SeguroHistoricoPagamento{ get; set; }
 
         public List<(string Table, string Insert)> CapturedInserts { get; } = new List<(string Table, string Insert)>();
 
@@ -81,6 +82,13 @@ namespace MigracaoTabelas.Target
                     str = Connection;
                 pBuilder.UseMySQL(str);
             }
+
+            pBuilder.LogTo(s => Debug.WriteLine(s), (eventId, logLevel) =>
+            {
+                return logLevel == LogLevel.Error || eventId.Id == RelationalEventId.CommandError.Id;
+            });
+
+            pBuilder.EnableDetailedErrors(true);
 #if DEBUG
 
             pBuilder.EnableSensitiveDataLogging(true);

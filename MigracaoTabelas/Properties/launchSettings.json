@@ -2,7 +2,7 @@
   "profiles": {
     "MigracaoTabelas": {
       "commandName": "Project",
-      "commandLineArgs": "D:\\CrediSIS\\DBs\\inserts.sql",
+      "commandLineArgs": "",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
