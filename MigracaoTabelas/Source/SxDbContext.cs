@@ -15,6 +15,7 @@ namespace MigracaoTabelas.Source
         }
 
         public DbSet<SxEpSegParcela> EpSegParcelas { get; set; }
+        public DbSet<SxEpParcela> EpParcela { get; set; }
         public DbSet<SxEpSegPrestamista> EpSegPrestamista { get; set; }
         public DbSet<SxAgencia> Agencia { get; set; }
         public DbSet<SxPontoAtendimento> PontoAtendimento { get; set; }
@@ -26,6 +27,13 @@ namespace MigracaoTabelas.Source
             base.OnModelCreating(modelBuilder);
 
             // TODO : codigo da seguradora e demais campos
+
+            modelBuilder.Entity<SxEpParcela>(entity =>
+            {
+                entity.HasNoKey();
+                entity.ToSqlQuery(@"select es.* from ep_parcela  es join ep_segprestamista es2 on es2.CCO_CONTA = es.CCO_CONTA and 
+                                    es2.SEG_CONTRATO = es.CON_NDOC and es2.CON_SEQ = es.CON_SEQ where es.EMP_VLRSEG is not null");
+            });
 
             modelBuilder.Entity<SxSeguradoras>(entity =>
             {
@@ -91,67 +99,49 @@ namespace MigracaoTabelas.Source
             {
                 entity.HasNoKey();
                 entity.ToSqlQuery(@$"
-WITH ResumoFinanceiro AS (
+WITH ParcelasPendentes AS (
+    SELECT con_ndoc, con_seq, 'P' as origem
+    FROM ep_parcela 
+    WHERE emp_pagseg IS NULL AND emp_vlrseg > 0
+    UNION 
+    SELECT seg_contrato, con_seq, 'S' as origem
+    FROM ep_segparcela 
+    WHERE seg_pgto IS NULL
+),
+ResumoFinanceiro AS (
     SELECT 
-        cco_conta, seg_contrato AS contrato, con_seq,
+        seg_contrato AS contrato, con_seq,
         SUM(seg_valor) AS total_seg,
-        COUNT(seg_parcela) AS qtd_seg,
-        'MODULO_SEGURO' AS fonte
+        COUNT(seg_parcela) AS qtd_seg
     FROM ep_segparcela
-    GROUP BY 1, 2, 3    
-    UNION ALL    
-    SELECT 
-        cco_conta, con_ndoc AS contrato, con_seq,
-        SUM(emp_vlrseg) AS total_seg,
-        COUNT(CASE WHEN emp_vlrseg > 0 THEN emp_parcela END) AS qtd_seg,
-        'TABELA_PARCELAS' AS fonte
-    FROM ep_parcela
-    WHERE emp_vlrseg > 0
-    GROUP BY 1, 2, 3
+    GROUP BY 1, 2
 )
 SELECT 
     CASE 
-        WHEN C.CON_DEBSEGURO = 2 OR C.CON_PARCELAS = 1 THEN 1 -- 'SEGURO À VISTA' 
-        WHEN (SELECT COUNT(*) FROM ResumoFinanceiro RF WHERE RF.contrato = S.SEG_CONTRATO AND RF.total_seg > 0) > 1 THEN 2 -- 'SEGURO PARCELADO' 
-        ELSE 3 -- 'SEGURO À VISTA (LANÇAMENTO ÚNICO)'
+        WHEN C.CON_DEBSEGURO = 2 OR C.CON_PARCELAS = 1 THEN 1 
+        WHEN COALESCE(RF.total_seg, 0) > 0 THEN 2 
+        ELSE 3 
     END AS tipo_seguro,
-    CASE 
-        WHEN C.MOD_CALCULO IN (2, 3) THEN 1 -- 'SALDO VARIÁVEL (PRICE/SAC)' 
-        ELSE 2 -- 'SALDO FIXO'
-    END AS tipo_saldo,
-    C.CON_PARCELAS AS parc_emprestimo,    
-    COALESCE(MAX(CASE WHEN fonte = 'MODULO_SEGURO' THEN total_seg END), 
-             MAX(CASE WHEN fonte = 'TABELA_PARCELAS' THEN total_seg END), 0) AS Soma_Das_Parcelas,    
-    COALESCE(MAX(CASE WHEN fonte = 'MODULO_SEGURO' THEN qtd_seg END), 
-             MAX(CASE WHEN fonte = 'TABELA_PARCELAS' THEN qtd_seg END), 0) AS Qtd_Parcelas_Seguro,
-    C.con_seq contratosequencia,
+    CASE WHEN C.MOD_CALCULO IN (2, 3) THEN 1 ELSE 2 END AS tipo_saldo,
+    C.CON_PARCELAS AS parc_emprestimo,
+    COALESCE(RF.total_seg, 0) AS Soma_Das_Parcelas,
+    COALESCE(RF.qtd_seg, 0) AS Qtd_Parcelas_Seguro,
+    C.con_seq AS contratosequencia,
     S.*
 FROM ep_segprestamista S
 INNER JOIN ep_contrato C ON S.SEG_CONTRATO = C.CON_NDOC AND S.CON_SEQ = C.CON_SEQ
-join cc_conta cc on cc.cco_conta = S.cco_conta
+INNER JOIN cc_conta cc ON cc.cco_conta = S.cco_conta
 LEFT JOIN ResumoFinanceiro RF ON S.SEG_CONTRATO = RF.contrato AND S.CON_SEQ = RF.con_seq
-LEFT JOIN ep_segparcela SP_ABERTA ON S.SEG_CONTRATO = SP_ABERTA.seg_contrato 
-    AND S.CON_SEQ = SP_ABERTA.con_seq 
-    AND SP_ABERTA.seg_pgto IS NULL
+LEFT JOIN ParcelasPendentes PP ON S.SEG_CONTRATO = PP.con_ndoc AND S.CON_SEQ = PP.con_seq
 WHERE 
     S.seg_modalidade = 4 
     AND cc.cco_situacao = 1 
-    AND C.con_pgto is null 
+    AND S.seg_canctipo = 0 
     AND S.sql_deleted = 'F' 
-    AND S.PST_CODIGO <> '0007' 
-    AND (S.seg_fim >= '2026-03-03' OR SP_ABERTA.seg_contrato IS NOT NULL)
-    -- Nova validação do seg_canctipo inserida abaixo
-    AND (
-        S.seg_canctipo = 0
-        OR (
-            S.seg_canctipo IN (1, 2, 3) 
-            AND SP_ABERTA.seg_contrato IS NOT NULL 
-            AND SP_ABERTA.seg_vcto <= S.SEG_CANCELAMENTO
-        )
-    )
-GROUP BY 
-    1, 2, 3, 6, S.SEG_CONTRATO, S.CON_SEQ, S.SEG_PREMIO, C.CON_DEBSEGURO, C.CON_PARCELAS, C.MOD_CALCULO, S.SEG_FIM;
-
+    AND S.PST_CODIGO <> '0007'
+    AND ((C.con_pgto IS NULL AND S.seg_fim >= '2026-03-03') OR 
+        (C.con_pgto IS NOT NULL AND PP.con_ndoc IS NOT NULL))
+GROUP BY S.SEG_CONTRATO, S.CON_SEQ, C.CON_NDOC, C.CON_SEQ
 ");
             });
 
@@ -167,8 +157,9 @@ GROUP BY
 
                 entity.Property(e => e.Codigo).HasColumnName("CODIGO");
                 entity.Property(e => e.Nome).HasColumnName("NOME");
+                entity.Property(e => e.Sigla).HasColumnName("SIGLA");
 
-                entity.ToSqlQuery(@"select ca.AG_CODIGO as CODIGO ,ca.AG_SIGLA as NOME from unico.cd_agencia ca");
+                entity.ToSqlQuery(@"select ca.AG_CODIGO as CODIGO ,ca.AG_SIGLA as SIGLA, ca.AG_RAZAO as NOME from unico.cd_agencia ca");
             });
 
             modelBuilder.Entity<SxContas>(entity =>
@@ -202,8 +193,8 @@ GROUP BY
                 entity.Property(e => e.Nome).HasColumnName("Nome");
 
                 entity.ToSqlQuery(@"SELECT COALESCE(cl.CLI_CPFCNPJ, '') AS numerodocumento, cl.CLI_TIPPES AS tipo, COALESCE(cl.cli_nome, '') AS nome,
-                                    cl.CLI_NFANTA AS nomefantasia,cl.CLI_EMAIL AS email,cl.AG_CODIGO  AS Agencia , cl.CLI_NASC Nascimento
-                                    FROM unico.cd_cliente cl");
+                                    cl.CLI_NFANTA AS nomefantasia,cl.CLI_EMAIL AS email,cl.AG_CODIGO  AS Agencia , cl.CLI_NASC Nascimento,
+                                    if(cl.CLI_SEXO=1,'M','F') Sexo FROM unico.cd_cliente cl");
             });
 
 

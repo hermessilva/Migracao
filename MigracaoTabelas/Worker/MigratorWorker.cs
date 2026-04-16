@@ -1,5 +1,6 @@
 
 
+using System.Runtime.Intrinsics.X86;
 using System.Text;
 
 using K4os.Compression.LZ4.Internal;
@@ -65,12 +66,53 @@ namespace MigracaoTabelas.Worker
                 var file = new FileStream(@$"D:\CrediSIS\DBs\inserts.sql", FileMode.Create, FileAccess.Write);
                 var strWriter = new StreamWriter(file);
                 strWriter.AutoFlush = true;
+                strWriter.WriteLine("use portal_seguros;");
+                strWriter.WriteLine("");
+                strWriter.WriteLine("SET FOREIGN_KEY_CHECKS = 0;");
+                strWriter.WriteLine("");
+                strWriter.WriteLine("truncate table acao;");
+                strWriter.WriteLine("truncate table agencia;");
+                strWriter.WriteLine("truncate table apolice_grupo_seguradora;");
+                strWriter.WriteLine("truncate table armazenamento_documento;");
+                strWriter.WriteLine("truncate table auditoria;");
+                strWriter.WriteLine("truncate table baixa_comissao;");
+                strWriter.WriteLine("truncate table comissao_seguradora;");
+                strWriter.WriteLine("truncate table condicao_seguradora;");
+                strWriter.WriteLine("truncate table conta_corrente_seguradora;");
+                strWriter.WriteLine("truncate table contabilizacao_seguradora;");
+                strWriter.WriteLine("truncate table cooperado;");
+                strWriter.WriteLine("truncate table cooperado_agencia_conta;");
+                strWriter.WriteLine("truncate table evento_outbox;");
+                strWriter.WriteLine("truncate table faturamento_exportacao;");
+                strWriter.WriteLine("truncate table faturamento_importacao_historico;");
+                strWriter.WriteLine("truncate table faturamento_parcela;");
+                strWriter.WriteLine("truncate table gestao_documento;");
+                strWriter.WriteLine("truncate table integracao_senior;");
+                strWriter.WriteLine("truncate table lancamento_efetivar;");
+                strWriter.WriteLine("truncate table parametrizacao;");
+                strWriter.WriteLine("truncate table parcela;");
+                strWriter.WriteLine("truncate table perfil;");
+                strWriter.WriteLine("truncate table ponto_atendimento;");
+                strWriter.WriteLine("truncate table proposta_seguradora;");
+                strWriter.WriteLine("truncate table seguradora;");
+                strWriter.WriteLine("truncate table seguradora_limite;");
+                strWriter.WriteLine("truncate table seguro;");
+                strWriter.WriteLine("truncate table seguro_cancelamento;");
+                strWriter.WriteLine("truncate table seguro_parametro;");
+                strWriter.WriteLine("truncate table tela;");
+                strWriter.WriteLine("truncate table tela_acao;");
+                strWriter.WriteLine("truncate table tela_acao_perfil;");
+                strWriter.WriteLine("truncate table usuario;");
+                strWriter.WriteLine("truncate table seguro_historico_pagamento;");
+                strWriter.WriteLine("");
+                strWriter.WriteLine("SET FOREIGN_KEY_CHECKS = 0;");
+                strWriter.WriteLine("");
                 strWriter.WriteLine("SET NAMES 'utf8mb4';");
                 strWriter.WriteLine();
                 strWriter.WriteLine("start transaction;");
                 strWriter.WriteLine();
-                var defaultData = File.ReadAllText(@$"Default Data.sql");
-                strWriter.WriteLine(defaultData);
+
+
                 Agencia ag = null;
                 databsess.ForEach(d => Log.Information("Aência encontra para migração [" + d.TABLE_SCHEMA + "]"));
                 MigraExistente();
@@ -141,23 +183,58 @@ namespace MigracaoTabelas.Worker
                 strWriter.Write("INSERT INTO usuario (ponto_atendimento_id, perfil_id, login, nome, email, status, criado_em) (select p.id, ");
                 strWriter.WriteLine($"{ln[6]}, '{ln[2]}', '{ln[3]}','{ln[4]}', 'Ativo', SYSDATE() from agencia a join ponto_atendimento p on p.agencia_id =a.id where a.codigo ='{ln[0]}' and p.codigo ='{ln[1]}' );");
             }
+            strWriter.WriteLine($"");
+            strWriter.WriteLine($"");
+            strWriter.WriteLine($"-- USUARIOS DE DEV;");
+            strWriter.WriteLine($"");
+            strWriter.WriteLine($"INSERT INTO usuario(ponto_atendimento_id, perfil_id, login, nome, email, status, criado_em) VALUES(1, 1, 'hermes.silva', 'Hermes Jose da Silva', 'hermes.silva@mouts.info', 'Ativo', '2025-11-06 10:51:05');");
+            strWriter.WriteLine($"INSERT INTO usuario(ponto_atendimento_id, perfil_id, login, nome, email, status, criado_em) VALUES(1, 1, 'james.junior', 'James Prust Júnior', 'james.prust@mouts.info', 'Ativo', '2025-11-06 10:51:05');");
+            strWriter.WriteLine($"INSERT INTO usuario(ponto_atendimento_id, perfil_id, login, nome, email, status, criado_em) VALUES(1, 6, 'kelen.alves', 'Kelen Vicentina dos Santos Alves', 'kelen.alves@mouts.info', 'Ativo', '2025-11-06 10:51:05');");
+            strWriter.WriteLine($"INSERT INTO usuario(ponto_atendimento_id, perfil_id, login, nome, email, status, criado_em) VALUES(1, 6, 'rodrigo.casali', 'Rodrigo Casali Testes', 'rodrigo.casali@mouts.info', 'Ativo', '2025-11-06 10:51:06');");
+            strWriter.WriteLine($"INSERT INTO usuario(ponto_atendimento_id, perfil_id, login, nome, email, status, criado_em) VALUES(1, 1, 'viviane.fuzati', 'Viviane Fuzati', 'viviane.fuzati@mouts.info', 'Ativo', '2025-11-06 10:51:06');");
+            strWriter.WriteLine($"INSERT INTO usuario(ponto_atendimento_id, perfil_id, login, nome, email, status, criado_em) VALUES(1, 1, 'jose.silva', 'Jose da SIlva', 'josedasilva@gmail.com', 'Ativo', '2025-12-26 18:57:38');");
+            strWriter.WriteLine($"INSERT INTO usuario(ponto_atendimento_id, perfil_id, login, nome, email, status, criado_em) VALUES(1, 6, 'CENTRAL', 'CENTRAL', 'central@terceirizado.credisis.com.br', 'Ativo', '2026-01-05 16:30:36');");
+            strWriter.WriteLine($"INSERT INTO usuario(ponto_atendimento_id, perfil_id, login, nome, email, status, criado_em) VALUES(1, 6, 'lucas.fogaca', 'Lucas Rodrigues Schwartzhaupt Fogaça', 'lucas.fogaca@mouts.info', 'Ativo', '2026-03-24 13:08:02');");
+
         }
 
         private void MigraExistente()
         {
             using var dbx = _Scope.ServiceProvider.GetRequiredService<TxDbContext>();
-            dbx.Connection = "Server=172.30.98.12;Database=portal_seguros;User Id=portalseguros;Password=Qu2{Zug8+Vo9;Port=3306;Pooling=true";
+            //dbx.Connection = "Server=172.30.98.12;Database=portal_seguros;User Id=portalseguros;Password=Qu2{Zug8+Vo9;Port=3306;Pooling=true";
+            dbx.Connection = "Server=172.30.98.100;Database=portal_seguros;User Id=portalseguros;Password=We5]Me7^Beg0;Port=6446;Pooling=true;";
+            var sedid = new ulong[] { 1, 2, 3, 4, 5 };
             var agencias = dbx.Agencia.AsNoTracking().ToList();
             var pontos = dbx.PontoAtendimento.AsNoTracking().ToList();
-            var segurados = dbx.Seguradora.AsNoTracking().ToList();
-            var CondicaoSeguradora = dbx.CondicaoSeguradora.AsNoTracking().ToList();
+            var segurados = dbx.Seguradora.Where(s => sedid.Any(i => i == s.Id)).AsNoTracking().ToList();
+            var CondicaoSeguradora = dbx.CondicaoSeguradora.Where(s => sedid.Any(i => i == s.SeguradoraId)).AsNoTracking().ToList();
             var GestaoDocumento = dbx.GestaoDocumento.AsNoTracking().ToList();
-            var ContabilizacaoSeguradora = dbx.ContabilizacaoSeguradora.AsNoTracking().ToList();
-            var ContaCorrenteSeguradora = dbx.ContaCorrenteSeguradora.AsNoTracking().ToList();
-            var PropostaSeguradora = dbx.PropostaSeguradora.AsNoTracking().ToList();
-            var ComissaoSeguradora = dbx.ComissaoSeguradora.AsNoTracking().ToList();
-            var SeguradoraLimite = dbx.SeguradoraLimite.AsNoTracking().ToList();
-            var ApoliceGrupoSeguradora = dbx.ApoliceGrupoSeguradora.AsNoTracking().ToList();
+            var ContabilizacaoSeguradora = dbx.ContabilizacaoSeguradora.Where(s => sedid.Any(i => i == s.SeguradoraId)).AsNoTracking().ToList();
+            var ContaCorrenteSeguradora = dbx.ContaCorrenteSeguradora.Where(s => sedid.Any(i => i == s.SeguradoraId)).AsNoTracking().ToList();
+            var PropostaSeguradora = dbx.PropostaSeguradora.Where(s => sedid.Any(i => i == s.SeguradoraId)).AsNoTracking().ToList();
+            var ComissaoSeguradora = dbx.ComissaoSeguradora.Where(s => sedid.Any(i => i == s.SeguradoraId)).AsNoTracking().ToList();
+            var SeguradoraLimite = dbx.SeguradoraLimite.Where(s => sedid.Any(i => i == s.SeguradoraId)).AsNoTracking().ToList();
+            var ApoliceGrupoSeguradora = dbx.ApoliceGrupoSeguradora.Where(s => sedid.Any(i => i == s.SeguradoraId)).AsNoTracking().ToList();
+
+            var parametrizacao = dbx.Parametrizacao.AsNoTracking().ToList();
+            var acao = dbx.Acao.AsNoTracking().ToList();
+            var perfil = dbx.Perfil.AsNoTracking().ToList();
+            var tela = dbx.Tela.AsNoTracking().ToList();
+            var tela_acao = dbx.TelaAcao.AsNoTracking().ToList();
+            var tela_acao_perfil = dbx.TelaAcaoPerfil.AsNoTracking().ToList();
+
+            parametrizacao.ForEach(a => _TContext.Add(a));
+            _TContext.SaveChanges();
+            acao.ForEach(a => _TContext.Add(a));
+            _TContext.SaveChanges();
+            perfil.ForEach(a => _TContext.Add(a));
+            _TContext.SaveChanges();
+            tela.ForEach(a => _TContext.Add(a));
+            _TContext.SaveChanges();
+            tela_acao.ForEach(a => _TContext.Add(a));
+            _TContext.SaveChanges();
+            tela_acao_perfil.ForEach(a => _TContext.Add(a));
+            _TContext.SaveChanges();
 
             agencias.ForEach(a => _TContext.Add(a));
             _TContext.SaveChanges();
@@ -201,6 +278,11 @@ namespace MigracaoTabelas.Worker
                 Log.Information($"Nenhuma Parcela de Contrato encontrada para migração da Base de Dados [{SxDbContext.Schema}].");
                 return;
             }
+            var tmpepparcelas = sctx.EpParcela.AsNoTracking().ToList();
+
+            var epparcelas = tmpepparcelas
+                .GroupBy(p => (p.CcoConta, p.ConNdoc, (short)p.ConSeq))
+                .ToDictionary(g => g.Key, g => g.ToList());
 
             var parcelas = segparcelas
                 .GroupBy(p => (p.CcoConta, p.SegContrato, p.ConSeq))
@@ -229,7 +311,7 @@ namespace MigracaoTabelas.Worker
                 try
                 {
                     processados++;
-                    parcnt += Migrate(parcelas, seguros, prestamista);
+                    parcnt += Migrate(parcelas, epparcelas, seguros, prestamista);
                     if (seguros.Count > 50)
                     {
                         _TContext.AddRange(seguros);
@@ -279,19 +361,27 @@ namespace MigracaoTabelas.Worker
             return lastUpdate;
         }
 
-        private int Migrate(Dictionary<(string CcoConta, string SegContrato, short ConSeq), List<SxEpSegParcela>> pParcelas, List<Seguro> pSeguros, SxEpSegPrestamista pPrestamista)
+        private int Migrate(Dictionary<(string CcoConta, string SegContrato, short ConSeq), List<SxEpSegParcela>> pParcelas, Dictionary<(string CcoConta, string ConNdoc, short ConSeq), List<SxEpParcela>> pEpParcelas, List<Seguro> pSeguros, SxEpSegPrestamista pPrestamista)
         {
+            List<SxEpParcela> epParcelas = new List<SxEpParcela>();
             if (!pParcelas.TryGetValue((pPrestamista.CcoConta, pPrestamista.SegContrato, pPrestamista.ConSeq), out var parcelasSrc))
+            {
                 parcelasSrc = new List<SxEpSegParcela>();
+                if (!pEpParcelas.TryGetValue((pPrestamista.CcoConta, pPrestamista.SegContrato, pPrestamista.ConSeq), out epParcelas))
+                    epParcelas = new List<SxEpParcela>();
+            }
+
+
+            if ((pPrestamista.SegFim < DateTime.Now.Date && !parcelasSrc.Any() && !epParcelas.Any()) || pPrestamista.SegCancTipo != 0)
+                return 0;
             var tgt = new Seguro();
             tgt.Assign(pPrestamista);
             var (cooagct, cooperado, conta) = GetCooperadoId(pPrestamista);
-            var agenciaId = GetAgenciaId();
             tgt.CooperadoAgenciaContaId = cooagct.Id;
             tgt.PontoAtendimentoId = GetPontoAtendimentoId(conta.PaCodigo);
             tgt.CooperadoAgenciaContaId = cooagct.Id;
             tgt.TipoPagamento = parcelasSrc.Count > 1 ? TipoPagamentoSeguro.Parcelado : TipoPagamentoSeguro.AVista;
-            var (apoliceGrupoSeguradoraId, tipoCapital) = GetAgenciaSeguradoraId(pPrestamista, agenciaId, tgt.TipoPagamento);
+            var (apoliceGrupoSeguradoraId, tipoCapital) = GetAgenciaSeguradoraId(pPrestamista, _SAgencia.Codigo, tgt.TipoPagamento);
             tgt.ApoliceGrupoSeguradoraId = apoliceGrupoSeguradoraId;
 
             //tgt.UsuarioId = 18;
@@ -308,37 +398,12 @@ namespace MigracaoTabelas.Worker
             else
                 spar.Coeficiente = 0.0005945M;
 
-            SeguroCancelamento canc = null;
-            if (pPrestamista.SegCancTipo != 0)
-            {
-                tgt.SegurosCancelamentos.Add(canc = new SeguroCancelamento
-                {
-                    Data = pPrestamista.SegCancelamento.Value,
-                });
-            }
-
-            switch (pPrestamista.SegCancTipo)
-            {
-                case 1:
-                    tgt.Motivo = MotivoSeguro.SolicitadoPeloCooperado;
-                    canc.Motivo = MotivoSeguroCancelamento.SolicitadoPeloCooperado;
-                    break;
-                case 2:
-                    tgt.Motivo = MotivoSeguro.SolicitadoPelaCooperativa;
-                    canc.Motivo = MotivoSeguroCancelamento.SolicitadoPelaCooperativa;
-                    break;
-                case 3:
-                    tgt.Motivo = MotivoSeguro.Sinistro;
-                    canc.Motivo = MotivoSeguroCancelamento.Sinistro;
-                    break;
-            }
-
             spar.Periodicidade30Dias = true;
             spar.PorcentualIof = 0.0038M;
-            spar.PorcentagemComissaoCorretora = comissao?.PorcentagemComissaoCorretora ?? 0.45M;
-            spar.PorcentagemComissaoCooperativa = comissao?.PorcentagemComissaoCooperativa ?? 0.20M;
+            spar.PorcentagemComissaoCorretora = comissao?.PorcentagemComissaoCorretora ?? 0.8M;
+            spar.PorcentagemComissaoCooperativa = comissao?.PorcentagemComissaoCooperativa ?? 0.45M;
             tgt.SeguroParametro = spar;
-            if (parcelasSrc.Count == 0)
+            if (parcelasSrc.Count == 0 && epParcelas.Count == 0)
             {
                 var parcelaTgt = new Parcela();
                 parcelaTgt.Status = StatusParcela.Pago;
@@ -354,6 +419,16 @@ namespace MigracaoTabelas.Worker
             }
 
             foreach (var item in parcelasSrc)
+            {
+                var parcelaTgt = new Parcela();
+                parcelaTgt.Assign(item);
+                tgt.Parcelas.Add(parcelaTgt);
+                if (parcelaTgt.DataUltimoPagamento != null)
+                    AddHistorico(parcelaTgt);
+
+            }
+
+            foreach (var item in epParcelas)
             {
                 var parcelaTgt = new Parcela();
                 parcelaTgt.Assign(item);
@@ -379,18 +454,22 @@ namespace MigracaoTabelas.Worker
             pParcela.SeguroHistoricoPagamentos.Add(historico);
         }
 
-        private (ulong, TipoCapitalApolice) GetAgenciaSeguradoraId(SxEpSegPrestamista prestamista, ulong agenciaId, TipoPagamentoSeguro pTipoPagamento)
+        private (ulong, TipoCapitalApolice) GetAgenciaSeguradoraId(SxEpSegPrestamista prestamista, string agencia, TipoPagamentoSeguro pTipoPagamento)
         {
             var seguradora = _DataCache.GetSeguradora(_SContext, prestamista.PstCodigo);
             var tipoCapital = seguradora.Nome.Contains("VARIAVEL") ? TipoCapitalApolice.Variavel : TipoCapitalApolice.Fixo;
 
-            var apoliceGrupo = seguradora.ApolicesGruposSeguradoras.FirstOrDefault(ags => (ags.TipoCapital == tipoCapital && pTipoPagamento == TipoPagamentoSeguro.Parcelado && ags.ModalidadeUnico != null) ||
+            var apoliceGrupo = seguradora.ApolicesGruposSeguradoras.Where(ags => ags.Agencia.Codigo == agencia &&
+                              ((ags.TipoCapital == tipoCapital && pTipoPagamento == TipoPagamentoSeguro.Parcelado && ags.ModalidadeUnico != null) ||
                               (ags.TipoCapital == tipoCapital && pTipoPagamento == TipoPagamentoSeguro.AVista && ags.ModalidadeAVista != null) ||
-                              (ags.TipoCapital == tipoCapital && pTipoPagamento == TipoPagamentoSeguro.Parcelado && ags.ModalidadeParcelado != null));
+                              (ags.TipoCapital == tipoCapital && pTipoPagamento == TipoPagamentoSeguro.Parcelado && ags.ModalidadeParcelado != null))).ToList();
 
-            if (apoliceGrupo == null)
+            if (!apoliceGrupo.Any())
                 throw new Exception($"Não foi possível encontrar um grupo de apólice para a seguradora [{seguradora.Nome}] com Tipo Capital [{tipoCapital}] e Modalidade [{pTipoPagamento}]");
-            return (apoliceGrupo.Id, tipoCapital);
+            if (apoliceGrupo.Count > 1)
+                throw new Exception($"Mais de uma apolice grupo para o mesmo tipo [{seguradora.Nome}] com Tipo Capital [{tipoCapital}] e Modalidade [{pTipoPagamento}]");
+
+            return (apoliceGrupo[0].Id, tipoCapital);
         }
 
         private (CooperadoAgenciaConta, Cooperado, SxContas) GetCooperadoId(SxEpSegPrestamista prestamista)
@@ -403,11 +482,6 @@ namespace MigracaoTabelas.Worker
             var pv = _DataCache.GetPontoAtendimento(_SContext, _SAgencia.Codigo, pPonto);
             return pv.Id;
 
-        }
-
-        private ulong GetAgenciaId()
-        {
-            return _DataCache.GetAgencia(_SContext, _SAgencia.Codigo).Id;
         }
     }
 }

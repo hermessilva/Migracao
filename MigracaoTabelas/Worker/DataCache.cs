@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using MigracaoTabelas.Source;
 using MigracaoTabelas.Target;
 
+using Mysqlx.Session;
+
 namespace MigracaoTabelas.Worker
 {
     public class DataCache
@@ -11,7 +13,6 @@ namespace MigracaoTabelas.Worker
         private Dictionary<(string, string), PontoAtendimento> PontosAtendimento = new Dictionary<(string, string), PontoAtendimento>();
         private Dictionary<string, Cooperado> Cooperados = new Dictionary<string, Cooperado>();
         private Dictionary<string, Seguradora> Seguradoras = new Dictionary<string, Seguradora>();
-        private Dictionary<(ulong, ulong, string, bool), ApoliceGrupoSeguradora> ApolicesGruposSeguradoras = new Dictionary<(ulong, ulong, string, bool), ApoliceGrupoSeguradora>();
 
         private Object _ToLock = new Object();
 
@@ -35,30 +36,37 @@ namespace MigracaoTabelas.Worker
 
         private void PrepareCache()
         {
-            _TContext.Seguradora.Include(s => s.ApolicesGruposSeguradoras).AsNoTracking().ToList().ForEach(a =>
+            var sedid = new ulong[] { 1, 2, 3, 4, 5 };
+
+            _TContext.Seguradora
+                .Include(s => s.ApolicesGruposSeguradoras)
+                .ThenInclude(s => s.Agencia)
+                .Where(s => sedid.Any(i => i == s.Id)).AsNoTracking().ToList().ForEach(a =>
             {
 
                 switch (a.Nome)
                 {
                     case "MAPFRE SEGUROS":
                         a.Cnpj = "0001";
+                        Seguradoras.Add((a.Cnpj.PadRight(14, '0')).Substring(0, 14), a);
                         break;
                     case "MAG SEGURADORA":
                         a.Cnpj = "0004";
+                        Seguradoras.Add((a.Cnpj.PadRight(14, '0')).Substring(0, 14), a);
                         break;
                     case "ICATU SEGUROS":
                         a.Cnpj = "0005";
+                        Seguradoras.Add((a.Cnpj.PadRight(14, '0')).Substring(0, 14), a);
                         break;
                     case "UNIMED CAPITAL VARIAVEL":
                         a.Cnpj = "0003";
+                        Seguradoras.Add((a.Cnpj.PadRight(14, '0')).Substring(0, 14), a);
                         break;
                     case "UNIMED CAPITAL FIXO":
                         a.Cnpj = "0006";
+                        Seguradoras.Add((a.Cnpj.PadRight(14, '0')).Substring(0, 14), a);
                         break;
-                    default:
-                        throw new Exception("Seguradora [" + a.Nome + "] não mapeada para um CNPJ fictício. Atualize o método CriarSeguradora para incluir essa seguradora.");
                 }
-                Seguradoras.Add((a.Cnpj.PadRight(14, '0')).Substring(0, 14), a);
             });
             _TContext.Agencia.AsNoTracking().ToList().ForEach(a =>
             {
@@ -67,14 +75,6 @@ namespace MigracaoTabelas.Worker
             _TContext.PontoAtendimento.Include(p => p.Agencia).ToList().ForEach(p =>
             {
                 PontosAtendimento.Add((p.Agencia.Codigo, p.Codigo), p);
-            });
-            _TContext.Cooperado.Include(c => c.CooperadosAgenciasContas).AsNoTracking().ToList().ForEach(c =>
-            {
-                Cooperados.Add(c.NumeroDocumento, c);
-            });
-            _TContext.ApoliceGrupoSeguradora.AsNoTracking().ToList().ForEach(a =>
-            {
-                ApolicesGruposSeguradoras.Add((a.AgenciaId, a.SeguradoraId, a.TipoCapital.AsString(), !string.IsNullOrWhiteSpace(a.ModalidadeUnico)), a);
             });
         }
 
@@ -180,7 +180,8 @@ namespace MigracaoTabelas.Worker
                         Tipo = cooperado.Tipo == "F" ? TipoPessoaCooperado.Fisica : TipoPessoaCooperado.Juridica,
                         NomeFantasia = cooperado.NomeFantasia,
                         Email = cooperado.Email,
-                        DataNascimento = cooperado.Nascimento
+                        DataNascimento = cooperado.Nascimento,
+                        Sexo = cooperado.Sexo == "M" ? SexoCooperado.Masculino : cooperado.Sexo == "F" ? SexoCooperado.Feminino : (SexoCooperado?)null
                     };
                     _TContext.Cooperado.Add(coop);
                     _TContext.SaveChanges();
@@ -527,44 +528,6 @@ namespace MigracaoTabelas.Worker
             }
 
             return seguradora;
-        }
-
-        public ulong GetAgenciaSeguradora(ulong pAgenciaId, ulong pSeguradoraId, string pSeguradoraNome, string pTipoCapital, bool pModalidadeParcelado)
-        {
-            ArgumentOutOfRangeException.ThrowIfZero(pAgenciaId, nameof(pAgenciaId));
-            lock (_ToLock)
-            {
-                if (ApolicesGruposSeguradoras.ContainsKey((pAgenciaId, pSeguradoraId, pTipoCapital, pModalidadeParcelado)))
-                    return ApolicesGruposSeguradoras[(pAgenciaId, pSeguradoraId, pTipoCapital, pModalidadeParcelado)].Id;
-
-                var ret = ApolicesGruposSeguradoras.Values.FirstOrDefault(a => a.AgenciaId == pAgenciaId && a.SeguradoraId == pSeguradoraId && a.TipoCapital.AsString() == pTipoCapital);
-                if (ret != null)
-                    return ret.Id;
-
-                ret = ApolicesGruposSeguradoras.Values.FirstOrDefault(a => a.AgenciaId == pAgenciaId && a.SeguradoraId == pSeguradoraId);
-                if (ret != null)
-                    return ret.Id;
-
-                throw new InvalidOperationException("Tipo de capital desconhecido: " + pTipoCapital);
-
-                //var ags = new ApoliceGrupoSeguradora
-                //{
-                //    Apolice = "APO-001",
-                //    Grupo = "GRP-001",
-                //    SubGrupo = "SUB-001",
-                //    TipoCapital = pSeguradoraNome.Contains("VARIAVEL") ? TipoCapitalApolice.Variavel : TipoCapitalApolice.Fixo,
-                //    ModalidadeUnico = "Unico",
-                //    ModalidadeAVista = 1.5m,
-                //    ModalidadeParcelado = 10m,
-                //    AgenciaId = pAgenciaId,
-                //    SeguradoraId = pSeguradoraId,
-                //};
-                //_TContext.ApoliceGrupoSeguradora.Add(ags);
-                //_TContext.SaveChanges();
-
-                //ApolicesGruposSeguradoras.Add((pAgenciaId, pSeguradoraId, pTipoCapital), ags);
-                //return ags.Id;
-            }
         }
     }
 }

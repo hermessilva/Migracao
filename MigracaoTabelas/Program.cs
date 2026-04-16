@@ -84,7 +84,7 @@ namespace MigracaoTabelas
             TxDbContext ctx = null;
             try
             {
-                var script = File.ReadAllText(pScriptSQLFile, Encoding.Default);
+                var script = File.ReadAllText(pScriptSQLFile, Encoding.UTF8);
                 var cmds = script.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries);
                 var total = cmds.Length;
                 var sw = Stopwatch.StartNew();
@@ -117,8 +117,9 @@ namespace MigracaoTabelas
             }
             catch (Exception ex)
             {
-                Console.WriteLine();
-                Console.WriteLine("Erro ao importar dados: " + ex.Message + "\r\n[" + lcmd + "]");
+                Console.WriteLine(ex.Message);
+                Console.WriteLine(ex.StackTrace);
+                //Console.WriteLine("Erro ao importar dados: " + ex.Message + "\r\n[" + lcmd + "]");
                 ctx.Database.ExecuteSqlRaw("rollback");
             }
         }

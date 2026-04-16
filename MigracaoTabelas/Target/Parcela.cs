@@ -10,6 +10,24 @@ namespace MigracaoTabelas.Target;
 
 public class Parcela
 {
+    public void Assign(SxEpParcela source)
+    {
+        if (source.EmpPagSeg.HasValue)
+            Status = StatusParcela.Pago;
+        else
+            Status = StatusParcela.Pendente;
+
+        NumeroParcela = (ushort)(source.EmpParcela.HasValue ? source.EmpParcela.Value : 0);
+        ValorOriginal = ValorParcela = source.EmpVlrSeg.HasValue ? source.EmpVlrSeg.Value : 0.00m;
+        Vencimento = source.EmpVcto.HasValue ? source.EmpVcto.Value : DateTime.MinValue;
+        Liquidacao = source.EmpPagSeg;
+        DataUltimoPagamento = source.EmpPagSeg;
+
+        if (source.EmpPagSeg.HasValue && source.EmpVlrSeg.HasValue)
+            ValorPago = source.EmpVlrSeg.Value;
+        else
+            ValorPago = 0.00m;
+    }
 
     public void Assign(SxEpSegParcela source)
     {
@@ -31,26 +49,65 @@ public class Parcela
             ValorPago = 0.00m;
     }
 
-    public ulong Id { get; set; }
-    public ulong SeguroId { get; set; }
-    public StatusParcela Status { get; set; }
-    public ushort NumeroParcela { get; set; }
-    public decimal ValorParcela { get; set; }
-    public decimal ValorOriginal { get; set; }
-    public decimal ValorPago { get; set; }
+    public ulong Id
+    {
+        get; set;
+    }
+    public ulong SeguroId
+    {
+        get; set;
+    }
+    public StatusParcela Status
+    {
+        get; set;
+    }
+    public ushort NumeroParcela
+    {
+        get; set;
+    }
+    public decimal ValorParcela
+    {
+        get; set;
+    }
+    public decimal ValorOriginal
+    {
+        get; set;
+    }
+    public decimal ValorPago
+    {
+        get; set;
+    }
     [NotMapped]
     public decimal ValorAPagar => ValorParcela - ValorPago;
-    public DateTime Vencimento { get; set; }
-    public DateTime? Liquidacao { get; set; }
-    public DateTime? DataUltimoPagamento { get; set; }
-    public decimal ComissaoCorretora { get; set; }
-    public decimal ComissaoCooperativa { get; set; }
+    public DateTime Vencimento
+    {
+        get; set;
+    }
+    public DateTime? Liquidacao
+    {
+        get; set;
+    }
+    public DateTime? DataUltimoPagamento
+    {
+        get; set;
+    }
+    public decimal ComissaoCorretora
+    {
+        get; set;
+    }
+    public decimal ComissaoCooperativa
+    {
+        get; set;
+    }
 
     // Relacionamentos
     public virtual Seguro Seguros { get; set; } = null!;
-    public virtual FaturamentoParcela? FaturamentoParcela { get; set; }
+    public virtual FaturamentoParcela? FaturamentoParcela
+    {
+        get; set;
+    }
     public virtual ICollection<SeguroHistoricoPagamento> SeguroHistoricoPagamentos { get; set; } = new List<SeguroHistoricoPagamento>();
-        
+
     public void PagarManualmente(decimal valor)
     {
         ValorPago += valor;

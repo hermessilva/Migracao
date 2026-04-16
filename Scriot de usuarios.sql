@@ -1,0 +1,9 @@
+INSERT INTO usuario (id, ponto_atendimento_id, perfil_id, login, nome, email, status, criado_em) VALUES (15, 1, 1, 'hermes.silva', 'Hermes Jose da Silva', 'hermes.silva@mouts.info', 'Ativo', '2025-11-06 10:51:05');
+INSERT INTO usuario (id, ponto_atendimento_id, perfil_id, login, nome, email, status, criado_em) VALUES (16, 1, 1, 'james.junior', 'James Prust Júnior', 'james.prust@mouts.info', 'Ativo', '2025-11-06 10:51:05');
+INSERT INTO usuario (id, ponto_atendimento_id, perfil_id, login, nome, email, status, criado_em) VALUES (17, 1, 6, 'kelen.alves', 'Kelen Vicentina dos Santos Alves', 'kelen.alves@mouts.info', 'Ativo', '2025-11-06 10:51:05');
+INSERT INTO usuario (id, ponto_atendimento_id, perfil_id, login, nome, email, status, criado_em) VALUES (20, 1, 6, 'rodrigo.casali', 'Rodrigo Casali Testes', 'rodrigo.casali@mouts.info', 'Ativo', '2025-11-06 10:51:06');
+INSERT INTO usuario (id, ponto_atendimento_id, perfil_id, login, nome, email, status, criado_em) VALUES (21, 1, 1, 'viviane.fuzati', 'Viviane Fuzati', 'viviane.fuzati@mouts.info', 'Ativo', '2025-11-06 10:51:06');
+INSERT INTO usuario (id, ponto_atendimento_id, perfil_id, login, nome, email, status, criado_em) VALUES (23, 1, 1, 'portal.seguradoras', 'Usuario de Sistema do ERP', 'mailto@etc.com', 'Ativo', '2025-11-18 09:11:02');
+INSERT INTO usuario (id, ponto_atendimento_id, perfil_id, login, nome, email, status, criado_em) VALUES (42, 1, 1, 'jose.silva', 'Jose da SIlva', 'josedasilva@gmail.com', 'Ativo', '2025-12-26 18:57:38');
+INSERT INTO usuario (id, ponto_atendimento_id, perfil_id, login, nome, email, status, criado_em) VALUES (44, 1, 6, 'CENTRAL', 'CENTRAL', 'central@terceirizado.credisis.com.br', 'Ativo', '2026-01-05 16:30:36');
+INSERT INTO usuario (id, ponto_atendimento_id, perfil_id, login, nome, email, status, criado_em) VALUES (47, 1, 6, 'lucas.fogaca', 'Lucas Rodrigues Schwartzhaupt Fogaça', 'lucas.fogaca@mouts.info', 'Ativo', '2026-03-24 13:08:02');

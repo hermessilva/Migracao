@@ -40,7 +40,8 @@ namespace MigracaoTabelas.Source
         /// Identificador da agência (nunca será nulo, padrão 0).
         /// </summary>
         public string Agencia { get; set; }
-
+        
+        public string Sexo { get; set; }
         /// <summary>
         /// Mapeado de 'CLI_NASC'.
         /// Data de nascimento (pode ser nulo).

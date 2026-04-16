@@ -12,6 +12,9 @@ namespace MigracaoTabelas.Source
 
         [Column("NOME")]
         public string Nome { get; set; }
+
+        [Column("SIGLA")]
+        public string Sigla { get; set; }
     }
 }
 
